@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -30,6 +29,7 @@ const Index = () => {
   }]);
   const [inputText, setInputText] = useState('');
   const [showQuickQuestions, setShowQuickQuestions] = useState(true);
+  const [showOtherQuestions, setShowOtherQuestions] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [showLanguageSelector, setShowLanguageSelector] = useState(true);
   const [showLoading, setShowLoading] = useState(true);
@@ -59,7 +59,12 @@ const Index = () => {
     }]);
   }, [t]);
 
-  const quickQuestions = [t('question.hours'), t('question.custom'), t('question.rates'), t('question.valuation'), t('question.types'), t('question.coins'), t('question.return'), t('question.repair')];
+  // Initial 4 quick questions
+  const initialQuickQuestions = [t('question.hours'), t('question.custom'), t('question.rates'), t('question.valuation')];
+  
+  // Other 4 questions
+  const otherQuickQuestions = [t('question.types'), t('question.coins'), t('question.return'), t('question.repair')];
+  
   const predefinedQuestions = [t('question.hours'), t('question.custom'), t('question.rates'), t('question.valuation'), t('question.types'), t('question.coins'), t('question.return'), t('question.repair'), t('question.checkRates'), t('question.wedding'), t('question.certificates'), t('question.online')];
 
   const isRateQuery = (text: string): boolean => {
@@ -159,6 +164,7 @@ const Index = () => {
         timestamp: new Date()
       };
       setShowQuickQuestions(true);
+      setShowOtherQuestions(false);
     } else {
       botResponse = {
         id: messages.length + 2,
@@ -167,6 +173,7 @@ const Index = () => {
         timestamp: new Date()
       };
       setShowQuickQuestions(false);
+      setShowOtherQuestions(false);
     }
 
     setMessages(prev => [...prev, userMessage, botResponse]);
@@ -175,6 +182,11 @@ const Index = () => {
 
   const handleQuestionClick = (question: string) => {
     handleSendMessage(question);
+  };
+
+  const handleOtherClick = () => {
+    setShowOtherQuestions(true);
+    setShowQuickQuestions(false);
   };
 
   // Auto-scroll to bottom when new messages are added
@@ -295,7 +307,7 @@ const Index = () => {
                       </div>
                     ))}
 
-                    {/* Quick Questions in Chat */}
+                    {/* Initial Quick Questions in Chat */}
                     {showQuickQuestions && (
                       <div className="flex justify-start">
                         <div className="max-w-[90%] bg-muted border border-border rounded-lg p-4 shadow-md">
@@ -303,7 +315,39 @@ const Index = () => {
                             {t('chat.quickQuestions')}
                           </p>
                           <div className="flex flex-wrap gap-2">
-                            {quickQuestions.map((question, index) => (
+                            {initialQuickQuestions.map((question, index) => (
+                              <Button
+                                key={index}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8"
+                                onClick={() => handleQuestionClick(question)}
+                              >
+                                {question}
+                              </Button>
+                            ))}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8 bg-amber-50 dark:bg-amber-950"
+                              onClick={handleOtherClick}
+                            >
+                              {t('language') === 'marathi' ? 'इतर' : 'Other'}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Other Quick Questions in Chat */}
+                    {showOtherQuestions && (
+                      <div className="flex justify-start">
+                        <div className="max-w-[90%] bg-muted border border-border rounded-lg p-4 shadow-md">
+                          <p className="text-sm text-foreground font-medium mb-3">
+                            {t('language') === 'marathi' ? '💡 इतर प्रश्न - विचारण्यासाठी क्लिक करा:' : '💡 Other Questions - Click to ask:'}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {otherQuickQuestions.map((question, index) => (
                               <Button
                                 key={index}
                                 variant="outline"
