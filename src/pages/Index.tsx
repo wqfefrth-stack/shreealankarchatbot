@@ -1,11 +1,11 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube } from 'lucide-react';
+import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 
 interface Message {
   id: number;
@@ -25,7 +25,17 @@ const Index = () => {
   ]);
   const [inputText, setInputText] = useState('');
   const [showQuickQuestions, setShowQuickQuestions] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Apply dark theme
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
 
   const quickQuestions = [
     "What are your business hours?",
@@ -75,6 +85,13 @@ const Index = () => {
   const isGreeting = (text: string): boolean => {
     const greetings = ['hi', 'hello', 'hey', 'namaste', 'good morning', 'good afternoon', 'good evening'];
     return greetings.some(greeting => text.toLowerCase().includes(greeting));
+  };
+
+  const handleWhatsAppClick = () => {
+    const phoneNumber = '+919921612155';
+    const message = 'Hello! I need assistance with jewelry inquiries from Shree Alankar website.';
+    const whatsappUrl = `https://wa.me/${phoneNumber.replace('+', '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const handleSendMessage = (text: string) => {
@@ -127,9 +144,9 @@ const Index = () => {
   }, [messages]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-100">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       {/* Header */}
-      <header className="bg-gradient-to-r from-amber-900 to-amber-800 text-white shadow-xl">
+      <header className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-xl">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -138,11 +155,26 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold">Shree Alankar</h1>
-                <p className="text-amber-200 text-sm">Fine Jewelry Seller Since 1998</p>
+                <p className="text-primary-foreground/80 text-sm">Fine Jewelry Seller Since 1998</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Badge variant="secondary" className="bg-amber-100 text-amber-900">
+              {/* Theme Toggle */}
+              <div className="flex items-center space-x-2">
+                <Sun className="w-4 h-4" />
+                <Switch
+                  checked={isDarkMode}
+                  onCheckedChange={setIsDarkMode}
+                />
+                <Moon className="w-4 h-4" />
+              </div>
+              
+              {/* WhatsApp Customer Support */}
+              <Badge 
+                variant="secondary" 
+                className="bg-green-500 text-white hover:bg-green-600 cursor-pointer transition-colors"
+                onClick={handleWhatsAppClick}
+              >
                 <MessageCircle className="w-4 h-4 mr-1" />
                 Customer Support
               </Badge>
@@ -181,7 +213,7 @@ const Index = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Chat Window */}
             <div className="lg:col-span-2">
-              <Card className="h-[600px] shadow-xl border-amber-200">
+              <Card className="h-[600px] shadow-xl border-border bg-card">
                 <div className="bg-gradient-to-r from-amber-600 to-amber-700 text-white p-4 rounded-t-lg">
                   <h3 className="text-xl font-semibold flex items-center">
                     <MessageCircle className="w-5 h-5 mr-2" />
@@ -200,12 +232,12 @@ const Index = () => {
                           className={`max-w-[80%] p-3 rounded-lg shadow-md ${
                             message.isUser
                               ? 'bg-amber-600 text-white'
-                              : 'bg-white border border-amber-200 text-gray-800'
+                              : 'bg-muted border border-border text-foreground'
                           }`}
                         >
                           <p className="text-sm">{message.text}</p>
                           <p className={`text-xs mt-1 ${
-                            message.isUser ? 'text-amber-100' : 'text-gray-500'
+                            message.isUser ? 'text-amber-100' : 'text-muted-foreground'
                           }`}>
                             {message.timestamp.toLocaleTimeString()}
                           </p>
@@ -216,8 +248,8 @@ const Index = () => {
                     {/* Quick Questions in Chat */}
                     {showQuickQuestions && (
                       <div className="flex justify-start">
-                        <div className="max-w-[90%] bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-lg p-4 shadow-md">
-                          <p className="text-sm text-amber-900 font-medium mb-3">
+                        <div className="max-w-[90%] bg-muted border border-border rounded-lg p-4 shadow-md">
+                          <p className="text-sm text-foreground font-medium mb-3">
                             💡 Quick Questions - Click to ask:
                           </p>
                           <div className="flex flex-wrap gap-2">
@@ -226,7 +258,7 @@ const Index = () => {
                                 key={index}
                                 variant="outline"
                                 size="sm"
-                                className="text-xs border-amber-300 hover:bg-amber-200 hover:border-amber-400 text-amber-800 h-8"
+                                className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8"
                                 onClick={() => handleQuestionClick(question)}
                               >
                                 {question}
@@ -239,14 +271,14 @@ const Index = () => {
                   </div>
                 </ScrollArea>
 
-                <div className="p-4 border-t border-amber-200">
+                <div className="p-4 border-t border-border">
                   <div className="flex space-x-2">
                     <Input
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
                       placeholder="Type your message..."
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputText)}
-                      className="flex-1 border-amber-300 focus:border-amber-500"
+                      className="flex-1 border-border focus:border-ring bg-background"
                     />
                     <Button
                       onClick={() => handleSendMessage(inputText)}
@@ -262,9 +294,9 @@ const Index = () => {
             {/* Quick Questions & Info */}
             <div className="space-y-6">
               {/* Quick Questions */}
-              <Card className="shadow-xl border-amber-200">
-                <div className="bg-gradient-to-r from-amber-100 to-amber-200 p-4 rounded-t-lg">
-                  <h3 className="text-lg font-semibold text-amber-900">All Questions</h3>
+              <Card className="shadow-xl border-border bg-card">
+                <div className="bg-muted p-4 rounded-t-lg">
+                  <h3 className="text-lg font-semibold text-foreground">All Questions</h3>
                 </div>
                 <CardContent className="p-4">
                   <ScrollArea className="h-[300px]">
@@ -273,7 +305,7 @@ const Index = () => {
                         <Button
                           key={index}
                           variant="outline"
-                          className="w-full text-left justify-start text-sm border-amber-200 hover:bg-amber-50 hover:border-amber-400"
+                          className="w-full text-left justify-start text-sm border-border hover:bg-accent hover:text-accent-foreground"
                           onClick={() => handleQuestionClick(question)}
                         >
                           {question}
@@ -285,9 +317,9 @@ const Index = () => {
               </Card>
 
               {/* Social Media & Links */}
-              <Card className="shadow-xl border-amber-200">
-                <div className="bg-gradient-to-r from-amber-100 to-amber-200 p-4 rounded-t-lg">
-                  <h3 className="text-lg font-semibold text-amber-900">Connect With Us</h3>
+              <Card className="shadow-xl border-border bg-card">
+                <div className="bg-muted p-4 rounded-t-lg">
+                  <h3 className="text-lg font-semibold text-foreground">Connect With Us</h3>
                 </div>
                 <CardContent className="p-4">
                   <div className="space-y-4">
@@ -295,12 +327,12 @@ const Index = () => {
                       href="https://shreealankar.lovable.app/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center p-3 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors"
+                      className="flex items-center p-3 bg-amber-50 dark:bg-amber-950 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors"
                     >
                       <Sparkles className="w-5 h-5 text-amber-600 mr-3" />
                       <div>
-                        <p className="font-medium text-amber-900">Visit Our Website</p>
-                        <p className="text-sm text-amber-700">shreealankar.lovable.app</p>
+                        <p className="font-medium text-amber-900 dark:text-amber-100">Visit Our Website</p>
+                        <p className="text-sm text-amber-700 dark:text-amber-300">shreealankar.lovable.app</p>
                       </div>
                     </a>
                     
@@ -308,12 +340,12 @@ const Index = () => {
                       href="https://www.instagram.com/shreealankar2112"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center p-3 bg-pink-50 rounded-lg hover:bg-pink-100 transition-colors"
+                      className="flex items-center p-3 bg-pink-50 dark:bg-pink-950 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900 transition-colors"
                     >
                       <Instagram className="w-5 h-5 text-pink-600 mr-3" />
                       <div>
-                        <p className="font-medium text-pink-900">Follow on Instagram</p>
-                        <p className="text-sm text-pink-700">@shreealankar2112</p>
+                        <p className="font-medium text-pink-900 dark:text-pink-100">Follow on Instagram</p>
+                        <p className="text-sm text-pink-700 dark:text-pink-300">@shreealankar2112</p>
                       </div>
                     </a>
                     
@@ -321,12 +353,12 @@ const Index = () => {
                       href="http://www.youtube.com/@Shreealankar2112"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center p-3 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                      className="flex items-center p-3 bg-red-50 dark:bg-red-950 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
                     >
                       <Youtube className="w-5 h-5 text-red-600 mr-3" />
                       <div>
-                        <p className="font-medium text-red-900">Subscribe YouTube</p>
-                        <p className="text-sm text-red-700">@Shreealankar2112</p>
+                        <p className="font-medium text-red-900 dark:text-red-100">Subscribe YouTube</p>
+                        <p className="text-sm text-red-700 dark:text-red-300">@Shreealankar2112</p>
                       </div>
                     </a>
                   </div>
@@ -338,18 +370,18 @@ const Index = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-amber-900 to-amber-800 text-white mt-16">
+      <footer className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground mt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h3 className="text-xl font-bold mb-2">Shree Alankar</h3>
-            <p className="text-amber-200 mb-4">Fine Jewelry Seller Since 1998</p>
+            <p className="text-primary-foreground/80 mb-4">Fine Jewelry Seller Since 1998</p>
             <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-8 text-sm">
               <p>📍 Near Bank Of Maharashtra, Lohoner 423301</p>
               <p>📞 Contact: 9921612155</p>
               <p>🕒 Mon-Sat: 10AM-8PM | Sun: 11AM-6PM</p>
             </div>
-            <div className="mt-6 pt-6 border-t border-amber-700">
-              <p className="text-amber-300 text-sm">© 2024 Shree Alankar. All rights reserved.</p>
+            <div className="mt-6 pt-6 border-t border-primary-foreground/20">
+              <p className="text-primary-foreground/60 text-sm">© 2024 Shree Alankar. All rights reserved.</p>
             </div>
           </div>
         </div>
