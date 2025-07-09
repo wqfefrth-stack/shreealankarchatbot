@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,24 +9,22 @@ import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import LoadingAnimation from '@/components/LoadingAnimation';
-
 interface Message {
   id: number;
   text: string;
   isUser: boolean;
   timestamp: Date;
 }
-
 const Index = () => {
-  const { t } = useLanguage();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: t('chat.greeting'),
-      isUser: false,
-      timestamp: new Date(),
-    }
-  ]);
+  const {
+    t
+  } = useLanguage();
+  const [messages, setMessages] = useState<Message[]>([{
+    id: 1,
+    text: t('chat.greeting'),
+    isUser: false,
+    timestamp: new Date()
+  }]);
   const [inputText, setInputText] = useState('');
   const [showQuickQuestions, setShowQuickQuestions] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -55,38 +52,15 @@ const Index = () => {
       id: 1,
       text: t('chat.greeting'),
       isUser: false,
-      timestamp: new Date(),
+      timestamp: new Date()
     }]);
   }, [t]);
-
-  const quickQuestions = [
-    t('question.hours'),
-    t('question.custom'),
-    t('question.rates'),
-    t('question.valuation'),
-    t('question.types'),
-    t('question.coins'),
-    t('question.return'),
-    t('question.repair')
-  ];
-
-  const predefinedQuestions = [
-    t('question.hours'),
-    t('question.custom'),
-    t('question.rates'),
-    t('question.valuation'),
-    t('question.types'),
-    t('question.coins'),
-    t('question.return'),
-    t('question.repair'),
-    t('question.checkRates'),
-    t('question.wedding'),
-    t('question.certificates'),
-    t('question.online'),
-  ];
-
+  const quickQuestions = [t('question.hours'), t('question.custom'), t('question.rates'), t('question.valuation'), t('question.types'), t('question.coins'), t('question.return'), t('question.repair')];
+  const predefinedQuestions = [t('question.hours'), t('question.custom'), t('question.rates'), t('question.valuation'), t('question.types'), t('question.coins'), t('question.return'), t('question.repair'), t('question.checkRates'), t('question.wedding'), t('question.certificates'), t('question.online')];
   const getResponse = (question: string): string => {
-    const responses: { [key: string]: string } = {
+    const responses: {
+      [key: string]: string;
+    } = {
       [t('question.hours')]: t('response.hours'),
       [t('question.custom')]: t('response.custom'),
       [t('question.rates')]: t('response.rates'),
@@ -98,42 +72,35 @@ const Index = () => {
       [t('question.checkRates')]: t('response.checkRates'),
       [t('question.wedding')]: t('response.wedding'),
       [t('question.certificates')]: t('response.certificates'),
-      [t('question.online')]: t('response.online'),
+      [t('question.online')]: t('response.online')
     };
-
     return responses[question] || t('response.default');
   };
-
   const isGreeting = (text: string): boolean => {
     const greetings = ['hi', 'hello', 'hey', 'namaste', 'good morning', 'good afternoon', 'good evening', 'नमस्कार', 'हॅलो'];
     return greetings.some(greeting => text.toLowerCase().includes(greeting));
   };
-
   const handleWhatsAppClick = () => {
     const phoneNumber = '+919921612155';
     const message = 'Hello! I need assistance with jewelry inquiries from Shree Alankar website.';
     const whatsappUrl = `https://wa.me/${phoneNumber.replace('+', '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
-
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
-
     const userMessage: Message = {
       id: messages.length + 1,
       text: text,
       isUser: true,
-      timestamp: new Date(),
+      timestamp: new Date()
     };
-
     let botResponse: Message;
-
     if (isGreeting(text)) {
       botResponse = {
         id: messages.length + 2,
         text: t('chat.hello'),
         isUser: false,
-        timestamp: new Date(),
+        timestamp: new Date()
       };
       setShowQuickQuestions(true);
     } else {
@@ -141,15 +108,13 @@ const Index = () => {
         id: messages.length + 2,
         text: getResponse(text),
         isUser: false,
-        timestamp: new Date(),
+        timestamp: new Date()
       };
       setShowQuickQuestions(false);
     }
-
     setMessages(prev => [...prev, userMessage, botResponse]);
     setInputText('');
   };
-
   const handleQuestionClick = (question: string) => {
     handleSendMessage(question);
   };
@@ -163,27 +128,19 @@ const Index = () => {
       }
     }
   }, [messages]);
-
   if (showLoading) {
     return <LoadingAnimation onComplete={() => setShowLoading(false)} />;
   }
-
   if (showLanguageSelector) {
     return <LanguageSelector onLanguageSelect={() => setShowLanguageSelector(false)} />;
   }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       {/* Header */}
       <header className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-xl">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <img 
-                src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" 
-                alt="Shree Alankar Logo" 
-                className="w-12 h-12 object-contain"
-              />
+              <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar Logo" className="w-12 h-12 object-contain" />
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold">{t('header.title')}</h1>
                 <p className="text-primary-foreground/80 text-sm">{t('header.subtitle')}</p>
@@ -191,21 +148,10 @@ const Index = () => {
             </div>
             <div className="flex items-center space-x-4">
               {/* Theme Toggle */}
-              <div className="flex items-center space-x-2">
-                <Sun className="w-4 h-4" />
-                <Switch
-                  checked={isDarkMode}
-                  onCheckedChange={setIsDarkMode}
-                />
-                <Moon className="w-4 h-4" />
-              </div>
+              
               
               {/* WhatsApp Customer Support */}
-              <Badge 
-                variant="secondary" 
-                className="bg-green-500 text-white hover:bg-green-600 cursor-pointer transition-colors"
-                onClick={handleWhatsAppClick}
-              >
+              <Badge variant="secondary" className="bg-green-500 text-white hover:bg-green-600 cursor-pointer transition-colors" onClick={handleWhatsAppClick}>
                 <MessageCircle className="w-4 h-4 mr-1" />
                 {t('header.customerSupport')}
               </Badge>
@@ -254,67 +200,35 @@ const Index = () => {
                 
                 <ScrollArea className="h-[440px] p-4" ref={scrollAreaRef}>
                   <div className="space-y-4">
-                    {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-[80%] p-3 rounded-lg shadow-md ${
-                            message.isUser
-                              ? 'bg-amber-600 text-white'
-                              : 'bg-muted border border-border text-foreground'
-                          }`}
-                        >
+                    {messages.map(message => <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] p-3 rounded-lg shadow-md ${message.isUser ? 'bg-amber-600 text-white' : 'bg-muted border border-border text-foreground'}`}>
                           <p className="text-sm">{message.text}</p>
-                          <p className={`text-xs mt-1 ${
-                            message.isUser ? 'text-amber-100' : 'text-muted-foreground'
-                          }`}>
+                          <p className={`text-xs mt-1 ${message.isUser ? 'text-amber-100' : 'text-muted-foreground'}`}>
                             {message.timestamp.toLocaleTimeString()}
                           </p>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
 
                     {/* Quick Questions in Chat */}
-                    {showQuickQuestions && (
-                      <div className="flex justify-start">
+                    {showQuickQuestions && <div className="flex justify-start">
                         <div className="max-w-[90%] bg-muted border border-border rounded-lg p-4 shadow-md">
                           <p className="text-sm text-foreground font-medium mb-3">
                             {t('chat.quickQuestions')}
                           </p>
                           <div className="flex flex-wrap gap-2">
-                            {quickQuestions.map((question, index) => (
-                              <Button
-                                key={index}
-                                variant="outline"
-                                size="sm"
-                                className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8"
-                                onClick={() => handleQuestionClick(question)}
-                              >
+                            {quickQuestions.map((question, index) => <Button key={index} variant="outline" size="sm" className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8" onClick={() => handleQuestionClick(question)}>
                                 {question}
-                              </Button>
-                            ))}
+                              </Button>)}
                           </div>
                         </div>
-                      </div>
-                    )}
+                      </div>}
                   </div>
                 </ScrollArea>
 
                 <div className="p-4 border-t border-border">
                   <div className="flex space-x-2">
-                    <Input
-                      value={inputText}
-                      onChange={(e) => setInputText(e.target.value)}
-                      placeholder={t('chat.placeholder')}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputText)}
-                      className="flex-1 border-border focus:border-ring bg-background"
-                    />
-                    <Button
-                      onClick={() => handleSendMessage(inputText)}
-                      className="bg-amber-600 hover:bg-amber-700"
-                    >
+                    <Input value={inputText} onChange={e => setInputText(e.target.value)} placeholder={t('chat.placeholder')} onKeyPress={e => e.key === 'Enter' && handleSendMessage(inputText)} className="flex-1 border-border focus:border-ring bg-background" />
+                    <Button onClick={() => handleSendMessage(inputText)} className="bg-amber-600 hover:bg-amber-700">
                       <Send className="w-4 h-4" />
                     </Button>
                   </div>
@@ -332,16 +246,9 @@ const Index = () => {
                 <CardContent className="p-4">
                   <ScrollArea className="h-[300px]">
                     <div className="space-y-2">
-                      {predefinedQuestions.map((question, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          className="w-full text-left justify-start text-sm border-border hover:bg-accent hover:text-accent-foreground"
-                          onClick={() => handleQuestionClick(question)}
-                        >
+                      {predefinedQuestions.map((question, index) => <Button key={index} variant="outline" className="w-full text-left justify-start text-sm border-border hover:bg-accent hover:text-accent-foreground" onClick={() => handleQuestionClick(question)}>
                           {question}
-                        </Button>
-                      ))}
+                        </Button>)}
                     </div>
                   </ScrollArea>
                 </CardContent>
@@ -354,12 +261,7 @@ const Index = () => {
                 </div>
                 <CardContent className="p-4">
                   <div className="space-y-4">
-                    <a
-                      href="https://shreealankar.lovable.app/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center p-3 bg-amber-50 dark:bg-amber-950 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors"
-                    >
+                    <a href="https://shreealankar.lovable.app/" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-amber-50 dark:bg-amber-950 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors">
                       <Sparkles className="w-5 h-5 text-amber-600 mr-3" />
                       <div>
                         <p className="font-medium text-amber-900 dark:text-amber-100">{t('social.website')}</p>
@@ -367,12 +269,7 @@ const Index = () => {
                       </div>
                     </a>
                     
-                    <a
-                      href="https://www.instagram.com/shreealankar2112"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center p-3 bg-pink-50 dark:bg-pink-950 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900 transition-colors"
-                    >
+                    <a href="https://www.instagram.com/shreealankar2112" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-pink-50 dark:bg-pink-950 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900 transition-colors">
                       <Instagram className="w-5 h-5 text-pink-600 mr-3" />
                       <div>
                         <p className="font-medium text-pink-900 dark:text-pink-100">{t('social.instagram')}</p>
@@ -380,12 +277,7 @@ const Index = () => {
                       </div>
                     </a>
                     
-                    <a
-                      href="http://www.youtube.com/@Shreealankar2112"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center p-3 bg-red-50 dark:bg-red-950 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
-                    >
+                    <a href="http://www.youtube.com/@Shreealankar2112" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-red-50 dark:bg-red-950 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 transition-colors">
                       <Youtube className="w-5 h-5 text-red-600 mr-3" />
                       <div>
                         <p className="font-medium text-red-900 dark:text-red-100">{t('social.youtube')}</p>
@@ -417,8 +309,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
