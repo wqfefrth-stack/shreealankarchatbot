@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,7 +24,19 @@ const Index = () => {
     }
   ]);
   const [inputText, setInputText] = useState('');
-  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [showQuickQuestions, setShowQuickQuestions] = useState(true);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const quickQuestions = [
+    "What are your business hours?",
+    "Do you offer custom jewelry design?",
+    "How often are gold and silver rates updated?",
+    "Do you provide jewelry valuation services?",
+    "What types of jewelry do you sell?",
+    "Do you offer gold coins and bars?",
+    "What is your return policy?",
+    "Do you provide jewelry repair services?"
+  ];
 
   const predefinedQuestions = [
     "What are your business hours?",
@@ -79,11 +91,22 @@ const Index = () => {
 
     setMessages(prev => [...prev, userMessage, botResponse]);
     setInputText('');
+    setShowQuickQuestions(false);
   };
 
   const handleQuestionClick = (question: string) => {
     handleSendMessage(question);
   };
+
+  // Auto-scroll to bottom when new messages are added
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollElement) {
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+      }
+    }
+  }, [messages]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-100">
@@ -148,7 +171,7 @@ const Index = () => {
                   </h3>
                 </div>
                 
-                <ScrollArea className="h-[440px] p-4">
+                <ScrollArea className="h-[440px] p-4" ref={scrollAreaRef}>
                   <div className="space-y-4">
                     {messages.map((message) => (
                       <div
@@ -171,6 +194,30 @@ const Index = () => {
                         </div>
                       </div>
                     ))}
+
+                    {/* Quick Questions in Chat */}
+                    {showQuickQuestions && (
+                      <div className="flex justify-start">
+                        <div className="max-w-[90%] bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-lg p-4 shadow-md">
+                          <p className="text-sm text-amber-900 font-medium mb-3">
+                            💡 Quick Questions - Click to ask:
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {quickQuestions.map((question, index) => (
+                              <Button
+                                key={index}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs border-amber-300 hover:bg-amber-200 hover:border-amber-400 text-amber-800 h-8"
+                                onClick={() => handleQuestionClick(question)}
+                              >
+                                {question}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </ScrollArea>
 
@@ -199,7 +246,7 @@ const Index = () => {
               {/* Quick Questions */}
               <Card className="shadow-xl border-amber-200">
                 <div className="bg-gradient-to-r from-amber-100 to-amber-200 p-4 rounded-t-lg">
-                  <h3 className="text-lg font-semibold text-amber-900">Quick Questions</h3>
+                  <h3 className="text-lg font-semibold text-amber-900">All Questions</h3>
                 </div>
                 <CardContent className="p-4">
                   <ScrollArea className="h-[300px]">
