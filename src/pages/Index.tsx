@@ -71,19 +71,9 @@ const Index = () => {
   };
 
   const getCurrentRates = () => {
-    const currentTime = new Date();
-    const timeString = currentTime.toLocaleString();
-    
-    // Use actual rates from the website
-    const rateData = {
-      gold: rates.gold,
-      silver: rates.silver,
-      lastUpdated: rates.lastUpdated
-    };
-
     return {
-      message: `🏆 **Current Rates - Shree Alankar**\n\n💰 **Gold Rate:** ${rateData.gold}\n🥈 **Silver Rate:** ${rateData.silver}\n\n📅 **Last Updated:** ${rateData.lastUpdated}\n\n🌐 **Visit our website for live rates:** https://shreealankar.lovable.app/\n\n📞 **Contact us:** +91 9921612155\n📍 **Address:** Shop No. 21, Shree Alankar, Pune\n\n*Rates are subject to market fluctuations. Please contact us for the most current rates.*`,
-      marathi: `🏆 **सध्याचे दर - श्री अलंकार**\n\n💰 **सोन्याचा दर:** ${rateData.gold}\n🥈 **चांदीचा दर:** ${rateData.silver}\n\n📅 **शेवटी अपडेट केले:** ${rateData.lastUpdated}\n\n🌐 **लाइव्ह दरांसाठी आमची वेबसाइट भेट द्या:** https://shreealankar.lovable.app/\n\n📞 **संपर्क:** +91 9921612155\n📍 **पत्ता:** शॉप नं. 21, श्री अलंकार, पुणे\n\n*दर बाजारातील चढ-उतारांच्या अधीन आहेत. अत्याधुनिक दरांसाठी कृपया आमच्याशी संपर्क साधा.*`
+      message: `🌐 **For current gold and silver rates, please visit our website:**\n\nhttps://shreealankar.lovable.app/`,
+      marathi: `🌐 **सध्याच्या सोने आणि चांदीच्या दरांसाठी, कृपया आमची वेबसाइट भेट द्या:**\n\nhttps://shreealankar.lovable.app/`
     };
   };
 
