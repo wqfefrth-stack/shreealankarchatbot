@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -70,10 +71,25 @@ const Index = () => {
     return rateKeywords.some(keyword => text.toLowerCase().includes(keyword.toLowerCase()));
   };
 
+  const isSocialMediaQuery = (text: string): boolean => {
+    const socialKeywords = [
+      'instagram', 'youtube', 'social media', 'follow', 'subscribe',
+      'इंस्टाग्राम', 'यूट्यूब', 'सोशल मीडिया'
+    ];
+    return socialKeywords.some(keyword => text.toLowerCase().includes(keyword.toLowerCase()));
+  };
+
   const getCurrentRates = () => {
     return {
-      message: `🌐 **For current gold and silver rates, please visit our website:**\n\nhttps://shreealankar.lovable.app/`,
-      marathi: `🌐 **सध्याच्या सोने आणि चांदीच्या दरांसाठी, कृपया आमची वेबसाइट भेट द्या:**\n\nhttps://shreealankar.lovable.app/`
+      message: `🌐 **For current gold and silver rates, please visit our website:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **Follow us on social media:**\n📸 Instagram: https://www.instagram.com/shreealankar2112\n📺 YouTube: http://www.youtube.com/@Shreealankar2112`,
+      marathi: `🌐 **सध्याच्या सोने आणि चांदीच्या दरांसाठी, कृपया आमची वेबसाइट भेट द्या:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **सोशल मीडियावर आमचे अनुसरण करा:**\n📸 Instagram: https://www.instagram.com/shreealankar2112\n📺 YouTube: http://www.youtube.com/@Shreealankar2112`
+    };
+  };
+
+  const getSocialMediaResponse = () => {
+    return {
+      message: `📱 **Follow Shree Alankar on Social Media:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112\n📺 **YouTube:** http://www.youtube.com/@Shreealankar2112\n\n🌐 **Website:** https://shreealankar.lovable.app/\n\n📞 **Contact:** +91 9921612155`,
+      marathi: `📱 **सोशल मीडियावर श्री अलंकार चे अनुसरण करा:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112\n📺 **YouTube:** http://www.youtube.com/@Shreealankar2112\n\n🌐 **वेबसाइट:** https://shreealankar.lovable.app/\n\n📞 **संपर्क:** +91 9921612155`
     };
   };
 
@@ -82,6 +98,12 @@ const Index = () => {
     if (isRateQuery(question)) {
       const rateInfo = getCurrentRates();
       return rateInfo.message;
+    }
+
+    // Check if it's a social media query
+    if (isSocialMediaQuery(question)) {
+      const socialInfo = getSocialMediaResponse();
+      return socialInfo.message;
     }
 
     const responses: { [key: string]: string } = {
@@ -248,7 +270,24 @@ const Index = () => {
                     {messages.map(message => (
                       <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[80%] p-3 rounded-lg shadow-md ${message.isUser ? 'bg-amber-600 text-white' : 'bg-muted border border-border text-foreground'}`}>
-                          <div className="text-sm whitespace-pre-line">{message.text}</div>
+                          <div className="text-sm whitespace-pre-line">
+                            {message.text.split(/(https?:\/\/[^\s]+)/g).map((part, index) => {
+                              if (part.match(/https?:\/\/[^\s]+/)) {
+                                return (
+                                  <a
+                                    key={index}
+                                    href={part}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-400 hover:text-blue-300 underline break-all"
+                                  >
+                                    {part}
+                                  </a>
+                                );
+                              }
+                              return part;
+                            })}
+                          </div>
                           <p className={`text-xs mt-1 ${message.isUser ? 'text-amber-100' : 'text-muted-foreground'}`}>
                             {message.timestamp.toLocaleTimeString()}
                           </p>
