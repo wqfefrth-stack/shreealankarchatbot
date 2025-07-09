@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import LoadingAnimation from '@/components/LoadingAnimation';
+import { useRates } from '@/hooks/useRates';
 
 interface Message {
   id: number;
@@ -20,6 +20,7 @@ interface Message {
 
 const Index = () => {
   const { t } = useLanguage();
+  const { rates, isLoading: ratesLoading, refetchRates } = useRates();
   const [messages, setMessages] = useState<Message[]>([{
     id: 1,
     text: t('chat.greeting'),
@@ -73,15 +74,16 @@ const Index = () => {
     const currentTime = new Date();
     const timeString = currentTime.toLocaleString();
     
-    // Mock rates - in production, you would fetch from your API
-    const rates = {
-      gold: '₹6,250 per gram',
-      silver: '₹75 per gram'
+    // Use actual rates from the website
+    const rateData = {
+      gold: rates.gold,
+      silver: rates.silver,
+      lastUpdated: rates.lastUpdated
     };
 
     return {
-      message: `🏆 **Current Rates - Shree Alankar**\n\n💰 **Gold Rate:** ${rates.gold}\n🥈 **Silver Rate:** ${rates.silver}\n\n📅 **Last Updated:** ${timeString}\n\n🌐 **Visit our website for live rates:** https://shreealankar.lovable.app/\n\n📞 **Contact us:** +91 9921612155\n📍 **Address:** Shop No. 21, Shree Alankar, Pune\n\n*Rates are subject to market fluctuations. Please contact us for the most current rates.*`,
-      marathi: `🏆 **सध्याचे दर - श्री अलंकार**\n\n💰 **सोन्याचा दर:** ${rates.gold}\n🥈 **चांदीचा दर:** ${rates.silver}\n\n📅 **शेवटी अपडेट केले:** ${timeString}\n\n🌐 **लाइव्ह दरांसाठी आमची वेबसाइट भेट द्या:** https://shreealankar.lovable.app/\n\n📞 **संपर्क:** +91 9921612155\n📍 **पत्ता:** शॉप नं. 21, श्री अलंकार, पुणे\n\n*दर बाजारातील चढ-उतारांच्या अधीन आहेत. अत्याधुनिक दरांसाठी कृपया आमच्याशी संपर्क साधा.*`
+      message: `🏆 **Current Rates - Shree Alankar**\n\n💰 **Gold Rate:** ${rateData.gold}\n🥈 **Silver Rate:** ${rateData.silver}\n\n📅 **Last Updated:** ${rateData.lastUpdated}\n\n🌐 **Visit our website for live rates:** https://shreealankar.lovable.app/\n\n📞 **Contact us:** +91 9921612155\n📍 **Address:** Shop No. 21, Shree Alankar, Pune\n\n*Rates are subject to market fluctuations. Please contact us for the most current rates.*`,
+      marathi: `🏆 **सध्याचे दर - श्री अलंकार**\n\n💰 **सोन्याचा दर:** ${rateData.gold}\n🥈 **चांदीचा दर:** ${rateData.silver}\n\n📅 **शेवटी अपडेट केले:** ${rateData.lastUpdated}\n\n🌐 **लाइव्ह दरांसाठी आमची वेबसाइट भेट द्या:** https://shreealankar.lovable.app/\n\n📞 **संपर्क:** +91 9921612155\n📍 **पत्ता:** शॉप नं. 21, श्री अलंकार, पुणे\n\n*दर बाजारातील चढ-उतारांच्या अधीन आहेत. अत्याधुनिक दरांसाठी कृपया आमच्याशी संपर्क साधा.*`
     };
   };
 
@@ -123,6 +125,12 @@ const Index = () => {
 
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
+    
+    // Refresh rates when user asks for rate-related queries
+    if (isRateQuery(text)) {
+      refetchRates();
+    }
+    
     const userMessage: Message = {
       id: messages.length + 1,
       text: text,
@@ -189,6 +197,14 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              {/* Rate Loading Indicator */}
+              {ratesLoading && (
+                <Badge variant="secondary" className="bg-blue-500 text-white">
+                  <Clock className="w-4 h-4 mr-1 animate-spin" />
+                  Updating Rates...
+                </Badge>
+              )}
+              
               {/* WhatsApp Customer Support */}
               <Badge variant="secondary" className="bg-green-500 text-white hover:bg-green-600 cursor-pointer transition-colors" onClick={handleWhatsAppClick}>
                 <MessageCircle className="w-4 h-4 mr-1" />
