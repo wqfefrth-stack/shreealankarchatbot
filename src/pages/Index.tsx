@@ -72,6 +72,11 @@ const Index = () => {
     return responses[question] || "Thank you for your question! For detailed information, please contact us at 9921612155 or visit our store near Bank Of Maharashtra, Lohoner 423301. Our team will be happy to assist you personally.";
   };
 
+  const isGreeting = (text: string): boolean => {
+    const greetings = ['hi', 'hello', 'hey', 'namaste', 'good morning', 'good afternoon', 'good evening'];
+    return greetings.some(greeting => text.toLowerCase().includes(greeting));
+  };
+
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
 
@@ -82,16 +87,29 @@ const Index = () => {
       timestamp: new Date(),
     };
 
-    const botResponse: Message = {
-      id: messages.length + 2,
-      text: getResponse(text),
-      isUser: false,
-      timestamp: new Date(),
-    };
+    let botResponse: Message;
+
+    // Check if it's a greeting
+    if (isGreeting(text)) {
+      botResponse = {
+        id: messages.length + 2,
+        text: "🙏 Hello! Welcome to Shree Alankar! I'm here to help you with all your jewelry needs. Please feel free to ask any questions or select from the quick questions below.",
+        isUser: false,
+        timestamp: new Date(),
+      };
+      setShowQuickQuestions(true);
+    } else {
+      botResponse = {
+        id: messages.length + 2,
+        text: getResponse(text),
+        isUser: false,
+        timestamp: new Date(),
+      };
+      setShowQuickQuestions(false);
+    }
 
     setMessages(prev => [...prev, userMessage, botResponse]);
     setInputText('');
-    setShowQuickQuestions(false);
   };
 
   const handleQuestionClick = (question: string) => {
