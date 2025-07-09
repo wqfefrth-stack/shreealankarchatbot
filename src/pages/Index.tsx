@@ -25,10 +25,15 @@ const Index = () => {
   ]);
   const [inputText, setInputText] = useState('');
   const [showQuickQuestions, setShowQuickQuestions] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Apply dark theme
+  // Apply dark theme by default
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
+
+  // Apply dark theme when toggled
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
