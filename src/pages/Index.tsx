@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSelector from '@/components/LanguageSelector';
+import LoadingAnimation from '@/components/LoadingAnimation';
 
 interface Message {
   id: number;
@@ -15,10 +19,11 @@ interface Message {
 }
 
 const Index = () => {
+  const { t } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "🙏 Namaste! Welcome to Shree Alankar - Your trusted jewelry partner since 1998. How may I assist you today?",
+      text: t('chat.greeting'),
       isUser: false,
       timestamp: new Date(),
     }
@@ -26,6 +31,8 @@ const Index = () => {
   const [inputText, setInputText] = useState('');
   const [showQuickQuestions, setShowQuickQuestions] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [showLanguageSelector, setShowLanguageSelector] = useState(true);
+  const [showLoading, setShowLoading] = useState(true);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Apply dark theme by default
@@ -42,53 +49,63 @@ const Index = () => {
     }
   }, [isDarkMode]);
 
+  // Update initial message when language changes
+  useEffect(() => {
+    setMessages([{
+      id: 1,
+      text: t('chat.greeting'),
+      isUser: false,
+      timestamp: new Date(),
+    }]);
+  }, [t]);
+
   const quickQuestions = [
-    "What are your business hours?",
-    "Do you offer custom jewelry design?",
-    "How often are gold and silver rates updated?",
-    "Do you provide jewelry valuation services?",
-    "What types of jewelry do you sell?",
-    "Do you offer gold coins and bars?",
-    "What is your return policy?",
-    "Do you provide jewelry repair services?"
+    t('question.hours'),
+    t('question.custom'),
+    t('question.rates'),
+    t('question.valuation'),
+    t('question.types'),
+    t('question.coins'),
+    t('question.return'),
+    t('question.repair')
   ];
 
   const predefinedQuestions = [
-    "What are your business hours?",
-    "Do you offer custom jewelry design?",
-    "How often are gold and silver rates updated?",
-    "Do you provide jewelry valuation services?",
-    "What types of jewelry do you sell?",
-    "Do you offer gold coins and bars?",
-    "What is your return policy?",
-    "Do you provide jewelry repair services?",
-    "How can I check current gold rates?",
-    "Do you offer wedding jewelry collections?",
-    "What certifications do you provide?",
-    "Do you offer online shopping?",
+    t('question.hours'),
+    t('question.custom'),
+    t('question.rates'),
+    t('question.valuation'),
+    t('question.types'),
+    t('question.coins'),
+    t('question.return'),
+    t('question.repair'),
+    t('question.checkRates'),
+    t('question.wedding'),
+    t('question.certificates'),
+    t('question.online'),
   ];
 
   const getResponse = (question: string): string => {
     const responses: { [key: string]: string } = {
-      "What are your business hours?": "We are open Monday to Saturday from 10:00 AM to 8:00 PM, and on Sundays from 11:00 AM to 6:00 PM. We're located near Bank Of Maharashtra, Lohoner 423301.",
-      "Do you offer custom jewelry design?": "Yes, we offer custom jewelry design services! Please visit our store or contact us to discuss your requirements. Our experienced craftsmen can create unique pieces tailored to your preferences.",
-      "How often are gold and silver rates updated?": "Our rates are updated daily based on market fluctuations. You can always check the latest rates on our homepage or call us at 9921612155 for current pricing.",
-      "Do you provide jewelry valuation services?": "Yes, we provide jewelry valuation services. Please bring your items to our store during business hours for professional assessment.",
-      "What types of jewelry do you sell?": "We offer a wide range of jewelry including gold ornaments, silver jewelry, diamond pieces, traditional Indian jewelry, modern designs, rings, necklaces, earrings, bracelets, and more.",
-      "Do you offer gold coins and bars?": "Yes, we deal in gold coins and bars of various weights and purities. Please visit our store or contact us for current availability and pricing.",
-      "What is your return policy?": "We have a customer-friendly return policy. Please contact us at 9921612155 or visit our store to discuss specific return requirements for your purchase.",
-      "Do you provide jewelry repair services?": "Yes, we provide professional jewelry repair and maintenance services. Our skilled craftsmen can handle various types of repairs and restorations.",
-      "How can I check current gold rates?": "You can check current gold and silver rates by visiting our website, calling us at 9921612155, or visiting our store. Rates are updated daily.",
-      "Do you offer wedding jewelry collections?": "Absolutely! We specialize in wedding jewelry collections including bridal sets, mangalsutras, bangles, and complete bridal jewelry ensembles.",
-      "What certifications do you provide?": "We provide proper certifications and bills for all our jewelry purchases. For precious stones and diamonds, we also provide relevant quality certificates.",
-      "Do you offer online shopping?": "Currently, we recommend visiting our store for the best experience. However, you can contact us at 9921612155 to discuss specific requirements and availability.",
+      [t('question.hours')]: t('response.hours'),
+      [t('question.custom')]: t('response.custom'),
+      [t('question.rates')]: t('response.rates'),
+      [t('question.valuation')]: t('response.valuation'),
+      [t('question.types')]: t('response.types'),
+      [t('question.coins')]: t('response.coins'),
+      [t('question.return')]: t('response.return'),
+      [t('question.repair')]: t('response.repair'),
+      [t('question.checkRates')]: t('response.checkRates'),
+      [t('question.wedding')]: t('response.wedding'),
+      [t('question.certificates')]: t('response.certificates'),
+      [t('question.online')]: t('response.online'),
     };
 
-    return responses[question] || "Thank you for your question! For detailed information, please contact us at 9921612155 or visit our store near Bank Of Maharashtra, Lohoner 423301. Our team will be happy to assist you personally.";
+    return responses[question] || t('response.default');
   };
 
   const isGreeting = (text: string): boolean => {
-    const greetings = ['hi', 'hello', 'hey', 'namaste', 'good morning', 'good afternoon', 'good evening'];
+    const greetings = ['hi', 'hello', 'hey', 'namaste', 'good morning', 'good afternoon', 'good evening', 'नमस्कार', 'हॅलो'];
     return greetings.some(greeting => text.toLowerCase().includes(greeting));
   };
 
@@ -111,11 +128,10 @@ const Index = () => {
 
     let botResponse: Message;
 
-    // Check if it's a greeting
     if (isGreeting(text)) {
       botResponse = {
         id: messages.length + 2,
-        text: "🙏 Hello! Welcome to Shree Alankar! I'm here to help you with all your jewelry needs. Please feel free to ask any questions or select from the quick questions below.",
+        text: t('chat.hello'),
         isUser: false,
         timestamp: new Date(),
       };
@@ -148,6 +164,14 @@ const Index = () => {
     }
   }, [messages]);
 
+  if (showLoading) {
+    return <LoadingAnimation onComplete={() => setShowLoading(false)} />;
+  }
+
+  if (showLanguageSelector) {
+    return <LanguageSelector onLanguageSelect={() => setShowLanguageSelector(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       {/* Header */}
@@ -155,12 +179,14 @@ const Index = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-amber-600 rounded-full flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
+              <img 
+                src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" 
+                alt="Shree Alankar Logo" 
+                className="w-12 h-12 object-contain"
+              />
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold">Shree Alankar</h1>
-                <p className="text-primary-foreground/80 text-sm">Fine Jewelry Seller Since 1998</p>
+                <h1 className="text-2xl md:text-3xl font-bold">{t('header.title')}</h1>
+                <p className="text-primary-foreground/80 text-sm">{t('header.subtitle')}</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -181,7 +207,7 @@ const Index = () => {
                 onClick={handleWhatsAppClick}
               >
                 <MessageCircle className="w-4 h-4 mr-1" />
-                Customer Support
+                {t('header.customerSupport')}
               </Badge>
             </div>
           </div>
@@ -193,22 +219,22 @@ const Index = () => {
           {/* Welcome Section */}
           <Card className="mb-8 bg-gradient-to-r from-amber-600 to-amber-700 text-white border-none shadow-2xl">
             <CardContent className="p-8 text-center">
-              <h2 className="text-3xl font-bold mb-4">Welcome to Shree Alankar ChatBot Assistant</h2>
+              <h2 className="text-3xl font-bold mb-4">{t('welcome.title')}</h2>
               <p className="text-amber-100 text-lg mb-6">
-                Your 24/7 customer support for all jewelry-related queries
+                {t('welcome.subtitle')}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                 <div className="flex flex-col items-center">
                   <Phone className="w-8 h-8 mb-2 text-amber-200" />
-                  <p className="text-sm">Contact: 9921612155</p>
+                  <p className="text-sm">{t('welcome.contact')}</p>
                 </div>
                 <div className="flex flex-col items-center">
                   <MapPin className="w-8 h-8 mb-2 text-amber-200" />
-                  <p className="text-sm">Near Bank Of Maharashtra, Lohoner</p>
+                  <p className="text-sm">{t('welcome.address')}</p>
                 </div>
                 <div className="flex flex-col items-center">
                   <Clock className="w-8 h-8 mb-2 text-amber-200" />
-                  <p className="text-sm">Mon-Sat: 10AM-8PM, Sun: 11AM-6PM</p>
+                  <p className="text-sm">{t('welcome.hours')}</p>
                 </div>
               </div>
             </CardContent>
@@ -222,7 +248,7 @@ const Index = () => {
                 <div className="bg-gradient-to-r from-amber-600 to-amber-700 text-white p-4 rounded-t-lg">
                   <h3 className="text-xl font-semibold flex items-center">
                     <MessageCircle className="w-5 h-5 mr-2" />
-                    Chat with Shree Alankar Assistant
+                    {t('chat.title')}
                   </h3>
                 </div>
                 
@@ -255,7 +281,7 @@ const Index = () => {
                       <div className="flex justify-start">
                         <div className="max-w-[90%] bg-muted border border-border rounded-lg p-4 shadow-md">
                           <p className="text-sm text-foreground font-medium mb-3">
-                            💡 Quick Questions - Click to ask:
+                            {t('chat.quickQuestions')}
                           </p>
                           <div className="flex flex-wrap gap-2">
                             {quickQuestions.map((question, index) => (
@@ -281,7 +307,7 @@ const Index = () => {
                     <Input
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
-                      placeholder="Type your message..."
+                      placeholder={t('chat.placeholder')}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputText)}
                       className="flex-1 border-border focus:border-ring bg-background"
                     />
@@ -336,7 +362,7 @@ const Index = () => {
                     >
                       <Sparkles className="w-5 h-5 text-amber-600 mr-3" />
                       <div>
-                        <p className="font-medium text-amber-900 dark:text-amber-100">Visit Our Website</p>
+                        <p className="font-medium text-amber-900 dark:text-amber-100">{t('social.website')}</p>
                         <p className="text-sm text-amber-700 dark:text-amber-300">shreealankar.lovable.app</p>
                       </div>
                     </a>
@@ -349,7 +375,7 @@ const Index = () => {
                     >
                       <Instagram className="w-5 h-5 text-pink-600 mr-3" />
                       <div>
-                        <p className="font-medium text-pink-900 dark:text-pink-100">Follow on Instagram</p>
+                        <p className="font-medium text-pink-900 dark:text-pink-100">{t('social.instagram')}</p>
                         <p className="text-sm text-pink-700 dark:text-pink-300">@shreealankar2112</p>
                       </div>
                     </a>
@@ -362,7 +388,7 @@ const Index = () => {
                     >
                       <Youtube className="w-5 h-5 text-red-600 mr-3" />
                       <div>
-                        <p className="font-medium text-red-900 dark:text-red-100">Subscribe YouTube</p>
+                        <p className="font-medium text-red-900 dark:text-red-100">{t('social.youtube')}</p>
                         <p className="text-sm text-red-700 dark:text-red-300">@Shreealankar2112</p>
                       </div>
                     </a>
@@ -378,15 +404,15 @@ const Index = () => {
       <footer className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground mt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <h3 className="text-xl font-bold mb-2">Shree Alankar</h3>
-            <p className="text-primary-foreground/80 mb-4">Fine Jewelry Seller Since 1998</p>
+            <h3 className="text-xl font-bold mb-2">{t('footer.title')}</h3>
+            <p className="text-primary-foreground/80 mb-4">{t('footer.subtitle')}</p>
             <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-8 text-sm">
-              <p>📍 Near Bank Of Maharashtra, Lohoner 423301</p>
-              <p>📞 Contact: 9921612155</p>
-              <p>🕒 Mon-Sat: 10AM-8PM | Sun: 11AM-6PM</p>
+              <p>📍 {t('welcome.address')}</p>
+              <p>📞 {t('welcome.contact')}</p>
+              <p>🕒 {t('welcome.hours')}</p>
             </div>
             <div className="mt-6 pt-6 border-t border-primary-foreground/20">
-              <p className="text-primary-foreground/60 text-sm">© 2024 Shree Alankar. All rights reserved.</p>
+              <p className="text-primary-foreground/60 text-sm">{t('footer.copyright')}</p>
             </div>
           </div>
         </div>
