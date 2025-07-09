@@ -53,7 +53,7 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
           <img 
             src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" 
             alt="Shree Alankar Logo" 
-            className="w-32 h-32 mx-auto object-contain filter brightness-0 invert"
+            className="w-32 h-32 mx-auto object-contain"
           />
         </div>
         
