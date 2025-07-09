@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,16 +10,16 @@ import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import LoadingAnimation from '@/components/LoadingAnimation';
+
 interface Message {
   id: number;
   text: string;
   isUser: boolean;
   timestamp: Date;
 }
+
 const Index = () => {
-  const {
-    t
-  } = useLanguage();
+  const { t } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([{
     id: 1,
     text: t('chat.greeting'),
@@ -55,12 +56,43 @@ const Index = () => {
       timestamp: new Date()
     }]);
   }, [t]);
+
   const quickQuestions = [t('question.hours'), t('question.custom'), t('question.rates'), t('question.valuation'), t('question.types'), t('question.coins'), t('question.return'), t('question.repair')];
   const predefinedQuestions = [t('question.hours'), t('question.custom'), t('question.rates'), t('question.valuation'), t('question.types'), t('question.coins'), t('question.return'), t('question.repair'), t('question.checkRates'), t('question.wedding'), t('question.certificates'), t('question.online')];
+
+  const isRateQuery = (text: string): boolean => {
+    const rateKeywords = [
+      'gold rate', 'silver rate', 'today rate', 'current rate', 'price',
+      'सोन्याचा दर', 'चांदीचा दर', 'आजचा दर', 'किंमत', 'भाव',
+      'gold price', 'silver price', 'today price', 'current price'
+    ];
+    return rateKeywords.some(keyword => text.toLowerCase().includes(keyword.toLowerCase()));
+  };
+
+  const getCurrentRates = () => {
+    const currentTime = new Date();
+    const timeString = currentTime.toLocaleString();
+    
+    // Mock rates - in production, you would fetch from your API
+    const rates = {
+      gold: '₹6,250 per gram',
+      silver: '₹75 per gram'
+    };
+
+    return {
+      message: `🏆 **Current Rates - Shree Alankar**\n\n💰 **Gold Rate:** ${rates.gold}\n🥈 **Silver Rate:** ${rates.silver}\n\n📅 **Last Updated:** ${timeString}\n\n🌐 **Visit our website for live rates:** https://shreealankar.lovable.app/\n\n📞 **Contact us:** +91 9921612155\n📍 **Address:** Shop No. 21, Shree Alankar, Pune\n\n*Rates are subject to market fluctuations. Please contact us for the most current rates.*`,
+      marathi: `🏆 **सध्याचे दर - श्री अलंकार**\n\n💰 **सोन्याचा दर:** ${rates.gold}\n🥈 **चांदीचा दर:** ${rates.silver}\n\n📅 **शेवटी अपडेट केले:** ${timeString}\n\n🌐 **लाइव्ह दरांसाठी आमची वेबसाइट भेट द्या:** https://shreealankar.lovable.app/\n\n📞 **संपर्क:** +91 9921612155\n📍 **पत्ता:** शॉप नं. 21, श्री अलंकार, पुणे\n\n*दर बाजारातील चढ-उतारांच्या अधीन आहेत. अत्याधुनिक दरांसाठी कृपया आमच्याशी संपर्क साधा.*`
+    };
+  };
+
   const getResponse = (question: string): string => {
-    const responses: {
-      [key: string]: string;
-    } = {
+    // Check if it's a rate-related query
+    if (isRateQuery(question)) {
+      const rateInfo = getCurrentRates();
+      return rateInfo.message;
+    }
+
+    const responses: { [key: string]: string } = {
       [t('question.hours')]: t('response.hours'),
       [t('question.custom')]: t('response.custom'),
       [t('question.rates')]: t('response.rates'),
@@ -76,16 +108,19 @@ const Index = () => {
     };
     return responses[question] || t('response.default');
   };
+
   const isGreeting = (text: string): boolean => {
     const greetings = ['hi', 'hello', 'hey', 'namaste', 'good morning', 'good afternoon', 'good evening', 'नमस्कार', 'हॅलो'];
     return greetings.some(greeting => text.toLowerCase().includes(greeting));
   };
+
   const handleWhatsAppClick = () => {
     const phoneNumber = '+919921612155';
     const message = 'Hello! I need assistance with jewelry inquiries from Shree Alankar website.';
     const whatsappUrl = `https://wa.me/${phoneNumber.replace('+', '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
+
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
     const userMessage: Message = {
@@ -94,6 +129,7 @@ const Index = () => {
       isUser: true,
       timestamp: new Date()
     };
+
     let botResponse: Message;
     if (isGreeting(text)) {
       botResponse = {
@@ -112,9 +148,11 @@ const Index = () => {
       };
       setShowQuickQuestions(false);
     }
+
     setMessages(prev => [...prev, userMessage, botResponse]);
     setInputText('');
   };
+
   const handleQuestionClick = (question: string) => {
     handleSendMessage(question);
   };
@@ -128,13 +166,17 @@ const Index = () => {
       }
     }
   }, [messages]);
+
   if (showLoading) {
     return <LoadingAnimation onComplete={() => setShowLoading(false)} />;
   }
+
   if (showLanguageSelector) {
     return <LanguageSelector onLanguageSelect={() => setShowLanguageSelector(false)} />;
   }
-  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       {/* Header */}
       <header className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-xl">
         <div className="container mx-auto px-4 py-6">
@@ -147,9 +189,6 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              {/* Theme Toggle */}
-              
-              
               {/* WhatsApp Customer Support */}
               <Badge variant="secondary" className="bg-green-500 text-white hover:bg-green-600 cursor-pointer transition-colors" onClick={handleWhatsAppClick}>
                 <MessageCircle className="w-4 h-4 mr-1" />
@@ -200,34 +239,52 @@ const Index = () => {
                 
                 <ScrollArea className="h-[440px] p-4" ref={scrollAreaRef}>
                   <div className="space-y-4">
-                    {messages.map(message => <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+                    {messages.map(message => (
+                      <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[80%] p-3 rounded-lg shadow-md ${message.isUser ? 'bg-amber-600 text-white' : 'bg-muted border border-border text-foreground'}`}>
-                          <p className="text-sm">{message.text}</p>
+                          <div className="text-sm whitespace-pre-line">{message.text}</div>
                           <p className={`text-xs mt-1 ${message.isUser ? 'text-amber-100' : 'text-muted-foreground'}`}>
                             {message.timestamp.toLocaleTimeString()}
                           </p>
                         </div>
-                      </div>)}
+                      </div>
+                    ))}
 
                     {/* Quick Questions in Chat */}
-                    {showQuickQuestions && <div className="flex justify-start">
+                    {showQuickQuestions && (
+                      <div className="flex justify-start">
                         <div className="max-w-[90%] bg-muted border border-border rounded-lg p-4 shadow-md">
                           <p className="text-sm text-foreground font-medium mb-3">
                             {t('chat.quickQuestions')}
                           </p>
                           <div className="flex flex-wrap gap-2">
-                            {quickQuestions.map((question, index) => <Button key={index} variant="outline" size="sm" className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8" onClick={() => handleQuestionClick(question)}>
+                            {quickQuestions.map((question, index) => (
+                              <Button
+                                key={index}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8"
+                                onClick={() => handleQuestionClick(question)}
+                              >
                                 {question}
-                              </Button>)}
+                              </Button>
+                            ))}
                           </div>
                         </div>
-                      </div>}
+                      </div>
+                    )}
                   </div>
                 </ScrollArea>
 
                 <div className="p-4 border-t border-border">
                   <div className="flex space-x-2">
-                    <Input value={inputText} onChange={e => setInputText(e.target.value)} placeholder={t('chat.placeholder')} onKeyPress={e => e.key === 'Enter' && handleSendMessage(inputText)} className="flex-1 border-border focus:border-ring bg-background" />
+                    <Input
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      placeholder={t('chat.placeholder')}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputText)}
+                      className="flex-1 border-border focus:border-ring bg-background"
+                    />
                     <Button onClick={() => handleSendMessage(inputText)} className="bg-amber-600 hover:bg-amber-700">
                       <Send className="w-4 h-4" />
                     </Button>
@@ -246,9 +303,16 @@ const Index = () => {
                 <CardContent className="p-4">
                   <ScrollArea className="h-[300px]">
                     <div className="space-y-2">
-                      {predefinedQuestions.map((question, index) => <Button key={index} variant="outline" className="w-full text-left justify-start text-sm border-border hover:bg-accent hover:text-accent-foreground" onClick={() => handleQuestionClick(question)}>
+                      {predefinedQuestions.map((question, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          className="w-full text-left justify-start text-sm border-border hover:bg-accent hover:text-accent-foreground"
+                          onClick={() => handleQuestionClick(question)}
+                        >
                           {question}
-                        </Button>)}
+                        </Button>
+                      ))}
                     </div>
                   </ScrollArea>
                 </CardContent>
@@ -309,6 +373,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
