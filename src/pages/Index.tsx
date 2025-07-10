@@ -10,6 +10,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import LoadingAnimation from '@/components/LoadingAnimation';
 import { useRates } from '@/hooks/useRates';
+import { useAIChat } from '@/hooks/useAIChat';
 
 interface Message {
   id: number;
@@ -22,6 +23,7 @@ interface Message {
 const Index = () => {
   const { t } = useLanguage();
   const { rates, isLoading: ratesLoading, refetchRates } = useRates();
+  const { sendAIMessage, isLoading: aiLoading } = useAIChat();
   const [messages, setMessages] = useState<Message[]>([{
     id: 1,
     text: t('chat.greeting'),
@@ -100,7 +102,7 @@ const Index = () => {
     };
   };
 
-  const getResponse = (question: string): string => {
+  const getResponse = async (question: string): Promise<string> => {
     // Check if it's a rate-related query
     if (isRateQuery(question)) {
       const rateInfo = getCurrentRates();
@@ -113,6 +115,7 @@ const Index = () => {
       return socialInfo.message;
     }
 
+    // Check if it's a predefined question
     const responses: { [key: string]: string } = {
       [t('question.hours')]: t('response.hours'),
       [t('question.custom')]: t('response.custom'),
@@ -127,7 +130,15 @@ const Index = () => {
       [t('question.certificates')]: t('response.certificates'),
       [t('question.online')]: t('response.online')
     };
-    return responses[question] || t('response.default');
+
+    // If it's a predefined question, return the predefined response
+    if (responses[question]) {
+      return responses[question];
+    }
+
+    // For all other questions, use AI
+    console.log('Using AI for question:', question);
+    return await sendAIMessage(question);
   };
 
   const isGreeting = (text: string): boolean => {
@@ -216,7 +227,7 @@ const Index = () => {
       shouldShowQuickQuestions = true;
       shouldShowOtherQuestions = false;
     } else {
-      botResponseText = getResponse(text);
+      botResponseText = await getResponse(text);
       shouldShowQuickQuestions = false;
       shouldShowOtherQuestions = false;
     }
@@ -258,8 +269,8 @@ const Index = () => {
     // Wait 1 second for loading
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Get response
-    const botResponseText = getResponse(question);
+    // Get response (now with AI support)
+    const botResponseText = await getResponse(question);
 
     // Start typing animation
     await typeMessage(botResponseText, loadingMessage.id);
@@ -349,6 +360,14 @@ const Index = () => {
                 <Badge variant="secondary" className="bg-blue-500 text-white">
                   <Clock className="w-4 h-4 mr-1 animate-spin" />
                   Updating Rates...
+                </Badge>
+              )}
+              
+              {/* AI Loading Indicator */}
+              {aiLoading && (
+                <Badge variant="secondary" className="bg-purple-500 text-white">
+                  <Sparkles className="w-4 h-4 mr-1 animate-spin" />
+                  AI Thinking...
                 </Badge>
               )}
               
