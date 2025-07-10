@@ -142,6 +142,35 @@ const Index = () => {
     window.open(whatsappUrl, '_blank');
   };
 
+  const typeMessage = async (text: string, messageId: number) => {
+    const words = text.split(' ');
+    let currentText = '';
+
+    for (let i = 0; i < words.length; i++) {
+      currentText += (i > 0 ? ' ' : '') + words[i];
+      
+      // Update the message with current typing progress
+      setMessages(prev => prev.map(msg => 
+        msg.id === messageId 
+          ? { ...msg, text: currentText + '|', isTyping: true }
+          : msg
+      ));
+
+      // Smooth typing speed - faster for shorter words, slower for longer
+      const wordLength = words[i].length;
+      const baseDelay = 40;
+      const wordDelay = Math.max(20, baseDelay - wordLength * 2);
+      await new Promise(resolve => setTimeout(resolve, wordDelay));
+    }
+
+    // Final message without typing cursor
+    setMessages(prev => prev.map(msg => 
+      msg.id === messageId 
+        ? { ...msg, text: text, isTyping: false }
+        : msg
+    ));
+  };
+
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isMessageLoading) return;
     
@@ -192,37 +221,8 @@ const Index = () => {
       shouldShowOtherQuestions = false;
     }
 
-    // Show typing animation for bot response
-    const typingSpeed = 30; // milliseconds per character
-    const words = botResponseText.split(' ');
-    let currentText = '';
-
-    for (let i = 0; i < words.length; i++) {
-      currentText += (i > 0 ? ' ' : '') + words[i];
-      
-      // Update the loading message with current typing progress
-      setMessages(prev => prev.map(msg => 
-        msg.id === loadingMessage.id 
-          ? { ...msg, text: currentText + '|', isTyping: true }
-          : msg
-      ));
-
-      // Wait between words
-      await new Promise(resolve => setTimeout(resolve, typingSpeed * words[i].length + 50));
-    }
-
-    // Final message without typing cursor
-    const finalBotResponse: Message = {
-      id: loadingMessage.id,
-      text: botResponseText,
-      isUser: false,
-      timestamp: new Date(),
-      isTyping: false
-    };
-
-    setMessages(prev => prev.map(msg => 
-      msg.id === loadingMessage.id ? finalBotResponse : msg
-    ));
+    // Start typing animation
+    await typeMessage(botResponseText, loadingMessage.id);
 
     // Update UI state
     setShowQuickQuestions(shouldShowQuickQuestions);
@@ -230,13 +230,86 @@ const Index = () => {
     setIsMessageLoading(false);
   };
 
-  const handleQuestionClick = (question: string) => {
-    handleSendMessage(question);
+  const handleQuestionClick = async (question: string) => {
+    if (isMessageLoading) return;
+    
+    // Add user message immediately
+    const userMessage: Message = {
+      id: messages.length + 1,
+      text: question,
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsMessageLoading(true);
+
+    // Show loading animation
+    const loadingMessage: Message = {
+      id: messages.length + 2,
+      text: '...',
+      isUser: false,
+      timestamp: new Date(),
+      isTyping: true
+    };
+
+    setMessages(prev => [...prev, loadingMessage]);
+
+    // Wait 1 second for loading
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Get response
+    const botResponseText = getResponse(question);
+
+    // Start typing animation
+    await typeMessage(botResponseText, loadingMessage.id);
+
+    // Hide quick questions after answering
+    setShowQuickQuestions(false);
+    setShowOtherQuestions(false);
+    setIsMessageLoading(false);
   };
 
-  const handleOtherClick = () => {
+  const handleOtherClick = async () => {
+    if (isMessageLoading) return;
+    
+    // Add user message for "Other"
+    const userMessage: Message = {
+      id: messages.length + 1,
+      text: t('language') === 'marathi' ? 'इतर' : 'Other',
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsMessageLoading(true);
+
+    // Show loading animation
+    const loadingMessage: Message = {
+      id: messages.length + 2,
+      text: '...',
+      isUser: false,
+      timestamp: new Date(),
+      isTyping: true
+    };
+
+    setMessages(prev => [...prev, loadingMessage]);
+
+    // Wait 1 second for loading
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Bot response for "Other"
+    const botResponseText = t('language') === 'marathi' 
+      ? 'येथे आणखी काही प्रश्न आहेत जे तुम्ही विचारू शकता:' 
+      : 'Here are some more questions you can ask:';
+
+    // Start typing animation
+    await typeMessage(botResponseText, loadingMessage.id);
+
+    // Show other questions
     setShowOtherQuestions(true);
     setShowQuickQuestions(false);
+    setIsMessageLoading(false);
   };
 
   // Auto-scroll to bottom when new messages are added
@@ -330,8 +403,8 @@ const Index = () => {
                 <ScrollArea className="h-[440px] p-4" ref={scrollAreaRef}>
                   <div className="space-y-4">
                     {messages.map(message => (
-                      <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] p-3 rounded-lg shadow-md ${message.isUser ? 'bg-amber-600 text-white' : 'bg-muted border border-border text-foreground'}`}>
+                      <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} animate-fade-in`}>
+                        <div className={`max-w-[80%] p-3 rounded-lg shadow-md transition-all duration-300 ${message.isUser ? 'bg-amber-600 text-white' : 'bg-muted border border-border text-foreground'}`}>
                           <div className={`text-sm whitespace-pre-line ${message.isTyping ? 'font-mono' : ''}`}>
                             {message.text.split(/(https?:\/\/[^\s]+)/g).map((part, index) => {
                               if (part.match(/https?:\/\/[^\s]+/)) {
@@ -341,7 +414,7 @@ const Index = () => {
                                     href={part}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-400 hover:text-blue-300 underline break-all"
+                                    className="text-blue-400 hover:text-blue-300 underline break-all transition-colors duration-200"
                                   >
                                     {part}
                                   </a>
@@ -361,7 +434,7 @@ const Index = () => {
 
                     {/* Initial Quick Questions in Chat */}
                     {showQuickQuestions && (
-                      <div className="flex justify-start">
+                      <div className="flex justify-start animate-fade-in">
                         <div className="max-w-[90%] bg-muted border border-border rounded-lg p-4 shadow-md">
                           <p className="text-sm text-foreground font-medium mb-3">
                             {t('chat.quickQuestions')}
@@ -372,7 +445,7 @@ const Index = () => {
                                 key={index}
                                 variant="outline"
                                 size="sm"
-                                className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8"
+                                className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8 transition-all duration-200 hover:scale-105"
                                 onClick={() => handleQuestionClick(question)}
                                 disabled={isMessageLoading}
                               >
@@ -382,7 +455,7 @@ const Index = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8 bg-amber-50 dark:bg-amber-950"
+                              className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8 bg-amber-50 dark:bg-amber-950 transition-all duration-200 hover:scale-105"
                               onClick={handleOtherClick}
                               disabled={isMessageLoading}
                             >
@@ -395,7 +468,7 @@ const Index = () => {
 
                     {/* Other Quick Questions in Chat */}
                     {showOtherQuestions && (
-                      <div className="flex justify-start">
+                      <div className="flex justify-start animate-fade-in">
                         <div className="max-w-[90%] bg-muted border border-border rounded-lg p-4 shadow-md">
                           <p className="text-sm text-foreground font-medium mb-3">
                             {t('language') === 'marathi' ? '💡 इतर प्रश्न - विचारण्यासाठी क्लिक करा:' : '💡 Other Questions - Click to ask:'}
@@ -406,7 +479,7 @@ const Index = () => {
                                 key={index}
                                 variant="outline"
                                 size="sm"
-                                className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8"
+                                className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8 transition-all duration-200 hover:scale-105"
                                 onClick={() => handleQuestionClick(question)}
                                 disabled={isMessageLoading}
                               >
@@ -427,12 +500,12 @@ const Index = () => {
                       onChange={(e) => setInputText(e.target.value)}
                       placeholder={t('chat.placeholder')}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputText)}
-                      className="flex-1 border-border focus:border-ring bg-background"
+                      className="flex-1 border-border focus:border-ring bg-background transition-all duration-200"
                       disabled={isMessageLoading}
                     />
                     <Button 
                       onClick={() => handleSendMessage(inputText)} 
-                      className="bg-amber-600 hover:bg-amber-700"
+                      className="bg-amber-600 hover:bg-amber-700 transition-all duration-200 hover:scale-105"
                       disabled={isMessageLoading}
                     >
                       <Send className="w-4 h-4" />
