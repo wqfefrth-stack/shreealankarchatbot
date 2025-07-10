@@ -136,9 +136,18 @@ const Index = () => {
       return responses[question];
     }
 
-    // For all other questions, use AI
-    console.log('Using AI for question:', question);
-    return await sendAIMessage(question);
+    // For all other questions, use AI with enhanced error handling
+    console.log('Using Advanced Gemini AI for question:', question);
+    try {
+      const aiResponse = await sendAIMessage(question);
+      return aiResponse;
+    } catch (error) {
+      console.error('Advanced AI error handling:', error);
+      // This fallback should rarely be reached due to improved error handling in useAIChat
+      return t('language') === 'marathi' 
+        ? 'तांत्रिक अडचण झाली आहे. कृपया पुन्हा प्रयत्न करा.'
+        : 'Technical difficulty occurred. Please try again.';
+    }
   };
 
   const isGreeting = (text: string): boolean => {
@@ -363,11 +372,11 @@ const Index = () => {
                 </Badge>
               )}
               
-              {/* Gemini AI Loading Indicator */}
+              {/* Advanced Gemini AI Loading Indicator */}
               {aiLoading && (
-                <Badge variant="secondary" className="bg-purple-500 text-white">
+                <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white animate-pulse">
                   <Sparkles className="w-4 h-4 mr-1 animate-spin" />
-                  Gemini AI Thinking...
+                  Advanced Gemini AI Processing...
                 </Badge>
               )}
               

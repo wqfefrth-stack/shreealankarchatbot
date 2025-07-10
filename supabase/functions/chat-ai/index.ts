@@ -7,6 +7,35 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Retry function with exponential backoff
+async function retryWithBackoff(fn: () => Promise<Response>, maxRetries = 3): Promise<Response> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fn();
+      if (response.ok) {
+        return response;
+      }
+      
+      // If it's a server error (5xx), retry
+      if (response.status >= 500 && attempt < maxRetries) {
+        console.log(`Attempt ${attempt} failed with status ${response.status}, retrying...`);
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+        continue;
+      }
+      
+      return response;
+    } catch (error) {
+      if (attempt === maxRetries) {
+        throw error;
+      }
+      console.log(`Attempt ${attempt} failed:`, error.message);
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+    }
+  }
+  
+  throw new Error('Max retries exceeded');
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -43,35 +72,94 @@ Store Information:
 - Instagram: @shreealankar2112
 - YouTube: @Shreealankar2112`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              { text: systemPrompt },
-              { text: `User message: ${message}` }
-            ]
-          }
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          topP: 0.8,
-          topK: 40,
-          maxOutputTokens: 500,
-        }
-      }),
-    });
+    // Function to make Gemini API call
+    const makeGeminiCall = async (): Promise<Response> => {
+      return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: systemPrompt },
+                { text: `User message: ${message}` }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            topP: 0.8,
+            topK: 40,
+            maxOutputTokens: 500,
+          },
+          safetySettings: [
+            {
+              category: "HARM_CATEGORY_HARASSMENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_HATE_SPEECH",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            }
+          ]
+        }),
+      });
+    };
+
+    console.log('Making Gemini API call...');
+    const response = await retryWithBackoff(makeGeminiCall, 3);
 
     if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`Gemini API error: ${response.status} - ${errorText}`);
+      
+      // Return a more helpful error message based on the status
+      let errorMessage = '';
+      if (response.status === 503) {
+        errorMessage = language === 'marathi' 
+          ? 'Gemini AI सेवा सध्या अनुपलब्ध आहे. कृपया काही क्षणांनी पुन्हा प्रयत्न करा.'
+          : 'Gemini AI service is temporarily unavailable. Please try again in a few moments.';
+      } else if (response.status === 429) {
+        errorMessage = language === 'marathi'
+          ? 'बर्याच विनंत्या आल्या आहेत. कृपया थोडा वेळ थांबा आणि पुन्हा प्रयत्न करा.'
+          : 'Too many requests. Please wait a moment and try again.';
+      } else if (response.status === 400) {
+        errorMessage = language === 'marathi'
+          ? 'तुमचा प्रश्न समजला नाही. कृपया पुन्हा प्रयत्न करा.'
+          : 'Could not understand your question. Please try again.';
+      } else {
+        errorMessage = language === 'marathi'
+          ? 'AI सेवेत तांत्रिक अडचण आली आहे. कृपया पुन्हा प्रयत्न करा.'
+          : 'AI service encountered a technical issue. Please try again.';
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
-    const aiResponse = data.candidates[0]?.content?.parts[0]?.text || 'Sorry, I could not generate a response.';
+    console.log('Gemini API response:', data);
+    
+    // Handle various response formats from Gemini
+    let aiResponse = '';
+    
+    if (data.candidates && data.candidates.length > 0) {
+      const candidate = data.candidates[0];
+      if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+        aiResponse = candidate.content.parts[0].text;
+      }
+    }
+    
+    // Fallback if no response found
+    if (!aiResponse) {
+      console.error('No valid response from Gemini API:', data);
+      aiResponse = language === 'marathi' 
+        ? 'माफ करा, मी तुमच्या प्रश्नाचे उत्तर देऊ शकत नाही. कृपया पुन्हा प्रयत्न करा किंवा आमच्याशी थेट संपर्क साधा.'
+        : 'Sorry, I could not generate a proper response. Please try again or contact us directly.';
+    }
+
+    console.log('Final AI response:', aiResponse);
 
     return new Response(
       JSON.stringify({ response: aiResponse }),
@@ -80,8 +168,12 @@ Store Information:
 
   } catch (error) {
     console.error('Error in chat-ai function:', error);
+    
+    // Provide language-specific error messages
+    const errorMessage = error.message || 'Unknown error occurred';
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
