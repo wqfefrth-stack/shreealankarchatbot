@@ -16,7 +16,7 @@ export const useAIChat = () => {
     setIsLoading(true);
     
     try {
-      console.log('Sending AI message:', message);
+      console.log('Sending Gemini AI message:', message);
       
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: { 
@@ -33,15 +33,15 @@ export const useAIChat = () => {
       const aiData = data as AIResponse;
       
       if (aiData.error) {
-        console.error('AI API error:', aiData.error);
+        console.error('Gemini AI API error:', aiData.error);
         throw new Error(aiData.error);
       }
 
-      console.log('AI response received:', aiData.response);
+      console.log('Gemini AI response received:', aiData.response);
       return aiData.response;
       
     } catch (error) {
-      console.error('Error sending AI message:', error);
+      console.error('Error sending Gemini AI message:', error);
       // Return a fallback response
       return language === 'marathi' 
         ? 'माफ करा, सध्या AI सेवा उपलब्ध नाही. कृपया नंतर प्रयत्न करा किंवा आमच्याशी थेट संपर्क साधा.'

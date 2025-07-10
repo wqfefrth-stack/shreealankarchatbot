@@ -363,11 +363,11 @@ const Index = () => {
                 </Badge>
               )}
               
-              {/* AI Loading Indicator */}
+              {/* Gemini AI Loading Indicator */}
               {aiLoading && (
                 <Badge variant="secondary" className="bg-purple-500 text-white">
                   <Sparkles className="w-4 h-4 mr-1 animate-spin" />
-                  AI Thinking...
+                  Gemini AI Thinking...
                 </Badge>
               )}
               
