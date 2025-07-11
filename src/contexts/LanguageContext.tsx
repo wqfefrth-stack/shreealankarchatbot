@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export type Language = 'english' | 'marathi';
@@ -20,8 +19,8 @@ const translations = {
     'welcome.title': 'Welcome to Shree Alankar ChatBot Assistant',
     'welcome.subtitle': 'Your 24/7 customer support for all jewelry-related queries',
     'welcome.contact': 'Contact: 9921612155',
-    'welcome.address': 'Near Bank Of Maharashtra, Lohoner',
-    'welcome.hours': 'Mon-Sat: 10AM-8PM, Sun: 11AM-6PM',
+    'welcome.address': 'Shree Alankar, Near Bank Of Maharashtra, Lohoner',
+    'welcome.hours': '9:00 AM to 7:30 PM Daily',
     
     // Chat
     'chat.title': 'Chat with Shree Alankar Assistant',
@@ -45,7 +44,7 @@ const translations = {
     'question.online': 'Do you offer online shopping?',
     
     // Responses
-    'response.hours': 'We are open Monday to Saturday from 10:00 AM to 8:00 PM, and on Sundays from 11:00 AM to 6:00 PM. We\'re located near Bank Of Maharashtra, Lohoner 423301.',
+    'response.hours': 'We are open daily from 9:00 AM to 7:30 PM. We\'re located at Shree Alankar, Near Bank Of Maharashtra, Lohoner.',
     'response.custom': 'Yes, we offer custom jewelry design services! Please visit our store or contact us to discuss your requirements. Our experienced craftsmen can create unique pieces tailored to your preferences.',
     'response.rates': 'Our rates are updated daily based on market fluctuations. You can always check the latest rates on our homepage or call us at 9921612155 for current pricing.',
     'response.valuation': 'Yes, we provide jewelry valuation services. Please bring your items to our store during business hours for professional assessment.',
@@ -57,7 +56,7 @@ const translations = {
     'response.wedding': 'Absolutely! We specialize in wedding jewelry collections including bridal sets, mangalsutras, bangles, and complete bridal jewelry ensembles.',
     'response.certificates': 'We provide proper certifications and bills for all our jewelry purchases. For precious stones and diamonds, we also provide relevant quality certificates.',
     'response.online': 'Currently, we recommend visiting our store for the best experience. However, you can contact us at 9921612155 to discuss specific requirements and availability.',
-    'response.default': 'Thank you for your question! For detailed information, please contact us at 9921612155 or visit our store near Bank Of Maharashtra, Lohoner 423301. Our team will be happy to assist you personally.',
+    'response.default': 'Thank you for your question! For detailed information, please contact us at 9921612155 or visit our store at Shree Alankar, Near Bank Of Maharashtra, Lohoner. Our team will be happy to assist you personally.',
     
     // Footer
     'footer.title': 'Shree Alankar',
@@ -86,8 +85,8 @@ const translations = {
     'welcome.title': 'श्री अलंकार चॅटबॉट सहाय्यकामध्ये आपले स्वागत',
     'welcome.subtitle': 'दागिन्यांच्या सर्व प्रश्नांसाठी आपली २४/७ ग्राहक सेवा',
     'welcome.contact': 'संपर्क: ९९२१६१२१५५',
-    'welcome.address': 'बँक ऑफ महाराष्ट्र जवळ, लोहोनेर',
-    'welcome.hours': 'सोम-शनि: १० सकाळ-८ संध्याकाळ, रवि: ११ सकाळ-६ संध्याकाळ',
+    'welcome.address': 'श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर',
+    'welcome.hours': 'दररोज सकाळी ९:०० ते संध्याकाळी ७:३०',
     
     // Chat
     'chat.title': 'श्री अलंकार सहाय्यकाशी संवाद',
@@ -111,7 +110,7 @@ const translations = {
     'question.online': 'तुम्ही ऑनलाइन खरेदी ऑफर करता का?',
     
     // Responses
-    'response.hours': 'आम्ही सोमवार ते शनिवार सकाळी १०:०० ते संध्याकाळी ८:०० आणि रविवारी सकाळी ११:०० ते संध्याकाळी ६:०० पर्यंत उघडे आहोत. आम्ही बँक ऑफ महाराष्ट्र जवळ, लोहोनेर ४२३३०१ येथे आहोत.',
+    'response.hours': 'आम्ही दररोज सकाळी ९:०० ते संध्याकाळी ७:३० पर्यंत उघडे आहोत. आम्ही श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर येथे आहोत.',
     'response.custom': 'होय, आम्ही सानुकूल दागिने डिझाइन सेवा ऑफर करतो! कृपया आमच्या दुकानाला भेट द्या किंवा आपल्या आवश्यकतांबद्दल चर्चा करण्यासाठी आमच्याशी संपर्क साधा. आमचे अनुभवी कारागीर आपल्या पसंतीनुसार अनन्य तुकडे तयार करू शकतात.',
     'response.rates': 'आमचे दर बाजारातील चढउतारांच्या आधारे दररोज अपडेट केले जातात. तुम्ही आमच्या होमपेजवर नवीनतम दर तपासू शकता किंवा सध्याच्या किंमतीसाठी ९९२१६१२१५५ वर कॉल करू शकता.',
     'response.valuation': 'होय, आम्ही दागिन्यांचे मूल्यांकन सेवा प्रदान करतो. कृपया व्यावसायिक मूल्यांकनासाठी व्यवसायिक वेळेत आपली वस्तू आमच्या दुकानात आणा.',
@@ -123,7 +122,7 @@ const translations = {
     'response.wedding': 'नक्कीच! आम्ही वधूचे सेट, मंगळसूत्र, कंकणे आणि संपूर्ण वधूचे दागिने संच यासह लग्नाच्या दागिन्यांच्या संग्रहात विशेषज्ञ आहोत.',
     'response.certificates': 'आम्ही आमच्या सर्व दागिन्यांच्या खरेदीसाठी योग्य प्रमाणपत्रे आणि बिले प्रदान करतो. मौल्यवान दगड आणि हिरे यासाठी आम्ही संबंधित गुणवत्ता प्रमाणपत्रे देखील प्रदान करतो.',
     'response.online': 'सध्या, आम्ही सर्वोत्तम अनुभवासाठी आमच्या दुकानाला भेट देण्याची शिफारस करतो. तथापि, विशिष्ट आवश्यकता आणि उपलब्धतेवर चर्चा करण्यासाठी तुम्ही ९९२१६१२१५५ वर आमच्याशी संपर्क साधू शकता.',
-    'response.default': 'आपल्या प्रश्नासाठी धन्यवाद! तपशीलवार माहिती यासाठी, कृपया ९९२१६१२१५५ वर आमच्याशी संपर्क साधा किंवा बँक ऑफ महाराष्ट्र जवळ, लोहोनेर ४२३३०१ येथील आमच्या दुकानाला भेट द्या. आमची टीम आपल्याला व्यक्तिशः मदत करण्यास आनंदित असेल.',
+    'response.default': 'आपल्या प्रश्नासाठी धन्यवाद! तपशीलवार माहिती यासाठी, कृपया ९९२१६१२१५५ वर आमच्याशी संपर्क साधा किंवा श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर येथील आमच्या दुकानाला भेट द्या. आमची टीम आपल्याला व्यक्तिशः मदत करण्यास आनंदित असेल.',
     
     // Footer
     'footer.title': 'श्री अलंकार',
