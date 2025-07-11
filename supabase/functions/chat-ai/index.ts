@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -62,7 +61,7 @@ serve(async (req) => {
 - **वेळ:** दररोज सकाळी ९:०० ते संध्याकाळी ७:३०
 - **Instagram:** https://www.instagram.com/shreealankar2112/#
 - **YouTube:** https://www.youtube.com/@Shreealankar2112
-- **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA
+- **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D
 
 **महत्वाचे सूचना:**
 - नेहमी अचूक आणि विश्वसनीय माहिती द्या
@@ -78,7 +77,7 @@ serve(async (req) => {
 - **Hours:** 9:00 AM to 7:30 PM Daily
 - **Instagram:** https://www.instagram.com/shreealankar2112/#
 - **YouTube:** https://www.youtube.com/@Shreealankar2112
-- **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA
+- **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D
 
 **Important Instructions:**
 - Always provide accurate and reliable information
@@ -185,7 +184,7 @@ serve(async (req) => {
 🕒 **वेळ:** दररोज सकाळी ९:०० ते संध्याकाळी ७:३०
 📱 **Instagram:** https://www.instagram.com/shreealankar2112/#
 📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
-🗺️ **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA`
+🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`
         : `Sorry, I could not generate a proper response. Please contact us directly:
 
 📞 **Phone:** +91 9921612155
@@ -193,7 +192,7 @@ serve(async (req) => {
 🕒 **Hours:** 9:00 AM to 7:30 PM Daily
 📱 **Instagram:** https://www.instagram.com/shreealankar2112/#
 📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
-🗺️ **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA`;
+🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`;
     }
 
     console.log('Final Enhanced AI response:', aiResponse);

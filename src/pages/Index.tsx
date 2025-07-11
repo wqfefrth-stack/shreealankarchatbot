@@ -90,15 +90,15 @@ const Index = () => {
 
   const getCurrentRates = () => {
     return {
-      message: `🌐 **For current gold and silver rates, please visit our website:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **Follow us on social media:**\n📸 Instagram: https://www.instagram.com/shreealankar2112/#\n📺 YouTube: https://www.youtube.com/@Shreealankar2112\n🗺️ Google Maps: https://maps.app.goo.gl/iuRDm7NZECG4no1RA`,
-      marathi: `🌐 **सध्याच्या सोने आणि चांदीच्या दरांसाठी, कृपया आमची वेबसाइट भेट द्या:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **सोशल मीडियावर आमचे अनुसरण करा:**\n📸 Instagram: https://www.instagram.com/shreealankar2112/#\n📺 YouTube: https://www.youtube.com/@Shreealankar2112\n🗺️ Google Maps: https://maps.app.goo.gl/iuRDm7NZECG4no1RA`
+      message: `🌐 **For current gold and silver rates, please visit our website:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **Follow us on social media:**\n📸 Instagram: https://www.instagram.com/shreealankar2112/#\n📺 YouTube: https://www.youtube.com/@Shreealankar2112\n🗺️ Google Maps: https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`,
+      marathi: `🌐 **सध्याच्या सोने आणि चांदीच्या दरांसाठी, कृपया आमची वेबसाइट भेट द्या:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **सोशल मीडियावर आमचे अनुसरण करा:**\n📸 Instagram: https://www.instagram.com/shreealankar2112/#\n📺 YouTube: https://www.youtube.com/@Shreealankar2112\n🗺️ Google Maps: https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`
     };
   };
 
   const getSocialMediaResponse = () => {
     return {
-      message: `📱 **Follow Shree Alankar on Social Media:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112/#\n📺 **YouTube:** https://www.youtube.com/@Shreealankar2112\n🗺️ **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA\n\n🌐 **Website:** https://shreealankar.lovable.app/\n\n📞 **Contact:** +91 9921612155`,
-      marathi: `📱 **सोशल मीडियावर श्री अलंकार चे अनुसरण करा:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112/#\n📺 **YouTube:** https://www.youtube.com/@Shreealankar2112\n🗺️ **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA\n\n🌐 **वेबसाइट:** https://shreealankar.lovable.app/\n\n📞 **संपर्क:** +91 9921612155`
+      message: `📱 **Follow Shree Alankar on Social Media:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112/#\n📺 **YouTube:** https://www.youtube.com/@Shreealankar2112\n🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D\n\n🌐 **Website:** https://shreealankar.lovable.app/\n\n📞 **Contact:** +91 9921612155`,
+      marathi: `📱 **सोशल मीडियावर श्री अलंकार चे अनुसरण करा:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112/#\n📺 **YouTube:** https://www.youtube.com/@Shreealankar2112\n🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D\n\n🌐 **वेबसाइट:** https://shreealankar.lovable.app/\n\n📞 **संपर्क:** +91 9921612155`
     };
   };
 
@@ -413,7 +413,7 @@ const Index = () => {
                   <p className="text-sm">{t('welcome.hours')}</p>
                 </div>
                 <div className="flex flex-col items-center">
-                  <a href="https://maps.app.goo.gl/iuRDm7NZECG4no1RA" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center hover:text-amber-300 transition-colors">
+                  <a href="https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center hover:text-amber-300 transition-colors">
                     <MapPin className="w-8 h-8 mb-2 text-amber-200" />
                     <p className="text-sm">Google Maps</p>
                   </a>
@@ -606,7 +606,7 @@ const Index = () => {
                       </div>
                     </a>
 
-                    <a href="https://maps.app.goo.gl/iuRDm7NZECG4no1RA" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-green-50 dark:bg-green-950 rounded-lg hover:bg-green-100 dark:hover:bg-green-900 transition-colors">
+                    <a href="https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-green-50 dark:bg-green-950 rounded-lg hover:bg-green-100 dark:hover:bg-green-900 transition-colors">
                       <MapPin className="w-5 h-5 text-green-600 mr-3" />
                       <div>
                         <p className="font-medium text-green-900 dark:text-green-100">Google Maps</p>
@@ -631,7 +631,7 @@ const Index = () => {
               <p>📍 {t('welcome.address')}</p>
               <p>📞 {t('welcome.contact')}</p>
               <p>🕒 {t('welcome.hours')}</p>
-              <a href="https://maps.app.goo.gl/iuRDm7NZECG4no1RA" target="_blank" rel="noopener noreferrer" className="hover:text-primary-foreground/80 transition-colors">
+              <a href="https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" className="hover:text-primary-foreground/80 transition-colors">
                 🗺️ Google Maps
               </a>
             </div>

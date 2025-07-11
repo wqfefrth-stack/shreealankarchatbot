@@ -84,7 +84,7 @@ export const useAIChat = () => {
 📱 **सोशल मीडिया:**
 📸 **Instagram:** https://www.instagram.com/shreealankar2112/#
 📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
-🗺️ **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA`
+🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`
         : `Sorry, Enhanced Gemini AI service is currently unavailable. We are working to resolve this quickly.
 
 📱 **For immediate assistance:**
@@ -95,7 +95,7 @@ export const useAIChat = () => {
 📱 **Social Media:**
 📸 **Instagram:** https://www.instagram.com/shreealankar2112/#
 📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
-🗺️ **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA`;
+🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`;
 
       // Show final fallback toast
       toast({
