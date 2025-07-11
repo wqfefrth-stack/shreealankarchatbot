@@ -90,15 +90,15 @@ const Index = () => {
 
   const getCurrentRates = () => {
     return {
-      message: `🌐 **For current gold and silver rates, please visit our website:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **Follow us on social media:**\n📸 Instagram: https://www.instagram.com/shreealankar2112\n📺 YouTube: http://www.youtube.com/@Shreealankar2112`,
-      marathi: `🌐 **सध्याच्या सोने आणि चांदीच्या दरांसाठी, कृपया आमची वेबसाइट भेट द्या:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **सोशल मीडियावर आमचे अनुसरण करा:**\n📸 Instagram: https://www.instagram.com/shreealankar2112\n📺 YouTube: http://www.youtube.com/@Shreealankar2112`
+      message: `🌐 **For current gold and silver rates, please visit our website:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **Follow us on social media:**\n📸 Instagram: https://www.instagram.com/shreealankar2112/#\n📺 YouTube: https://www.youtube.com/@Shreealankar2112\n🗺️ Google Maps: https://maps.app.goo.gl/iuRDm7NZECG4no1RA`,
+      marathi: `🌐 **सध्याच्या सोने आणि चांदीच्या दरांसाठी, कृपया आमची वेबसाइट भेट द्या:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **सोशल मीडियावर आमचे अनुसरण करा:**\n📸 Instagram: https://www.instagram.com/shreealankar2112/#\n📺 YouTube: https://www.youtube.com/@Shreealankar2112\n🗺️ Google Maps: https://maps.app.goo.gl/iuRDm7NZECG4no1RA`
     };
   };
 
   const getSocialMediaResponse = () => {
     return {
-      message: `📱 **Follow Shree Alankar on Social Media:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112\n📺 **YouTube:** http://www.youtube.com/@Shreealankar2112\n\n🌐 **Website:** https://shreealankar.lovable.app/\n\n📞 **Contact:** +91 9921612155`,
-      marathi: `📱 **सोशल मीडियावर श्री अलंकार चे अनुसरण करा:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112\n📺 **YouTube:** http://www.youtube.com/@Shreealankar2112\n\n🌐 **वेबसाइट:** https://shreealankar.lovable.app/\n\n📞 **संपर्क:** +91 9921612155`
+      message: `📱 **Follow Shree Alankar on Social Media:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112/#\n📺 **YouTube:** https://www.youtube.com/@Shreealankar2112\n🗺️ **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA\n\n🌐 **Website:** https://shreealankar.lovable.app/\n\n📞 **Contact:** +91 9921612155`,
+      marathi: `📱 **सोशल मीडियावर श्री अलंकार चे अनुसरण करा:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112/#\n📺 **YouTube:** https://www.youtube.com/@Shreealankar2112\n🗺️ **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA\n\n🌐 **वेबसाइट:** https://shreealankar.lovable.app/\n\n📞 **संपर्क:** +91 9921612155`
     };
   };
 
@@ -399,7 +399,7 @@ const Index = () => {
               <p className="text-amber-100 text-lg mb-6">
                 {t('welcome.subtitle')}
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
                 <div className="flex flex-col items-center">
                   <Phone className="w-8 h-8 mb-2 text-amber-200" />
                   <p className="text-sm">{t('welcome.contact')}</p>
@@ -411,6 +411,12 @@ const Index = () => {
                 <div className="flex flex-col items-center">
                   <Clock className="w-8 h-8 mb-2 text-amber-200" />
                   <p className="text-sm">{t('welcome.hours')}</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <a href="https://maps.app.goo.gl/iuRDm7NZECG4no1RA" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center hover:text-amber-300 transition-colors">
+                    <MapPin className="w-8 h-8 mb-2 text-amber-200" />
+                    <p className="text-sm">Google Maps</p>
+                  </a>
                 </div>
               </div>
             </CardContent>
@@ -424,7 +430,7 @@ const Index = () => {
                 <div className="bg-gradient-to-r from-amber-600 to-amber-700 text-white p-4 rounded-t-lg">
                   <h3 className="text-xl font-semibold flex items-center">
                     <MessageCircle className="w-5 h-5 mr-2" />
-                    {t('chat.title')}
+                    {t('chat.title')} - Enhanced AI
                   </h3>
                 </div>
                 
@@ -584,7 +590,7 @@ const Index = () => {
                       </div>
                     </a>
                     
-                    <a href="https://www.instagram.com/shreealankar2112" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-pink-50 dark:bg-pink-950 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900 transition-colors">
+                    <a href="https://www.instagram.com/shreealankar2112/#" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-pink-50 dark:bg-pink-950 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900 transition-colors">
                       <Instagram className="w-5 h-5 text-pink-600 mr-3" />
                       <div>
                         <p className="font-medium text-pink-900 dark:text-pink-100">{t('social.instagram')}</p>
@@ -592,11 +598,19 @@ const Index = () => {
                       </div>
                     </a>
                     
-                    <a href="http://www.youtube.com/@Shreealankar2112" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-red-50 dark:bg-red-950 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 transition-colors">
+                    <a href="https://www.youtube.com/@Shreealankar2112" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-red-50 dark:bg-red-950 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 transition-colors">
                       <Youtube className="w-5 h-5 text-red-600 mr-3" />
                       <div>
                         <p className="font-medium text-red-900 dark:text-red-100">{t('social.youtube')}</p>
                         <p className="text-sm text-red-700 dark:text-red-300">@Shreealankar2112</p>
+                      </div>
+                    </a>
+
+                    <a href="https://maps.app.goo.gl/iuRDm7NZECG4no1RA" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-green-50 dark:bg-green-950 rounded-lg hover:bg-green-100 dark:hover:bg-green-900 transition-colors">
+                      <MapPin className="w-5 h-5 text-green-600 mr-3" />
+                      <div>
+                        <p className="font-medium text-green-900 dark:text-green-100">Google Maps</p>
+                        <p className="text-sm text-green-700 dark:text-green-300">Find Us Here</p>
                       </div>
                     </a>
                   </div>
@@ -617,6 +631,9 @@ const Index = () => {
               <p>📍 {t('welcome.address')}</p>
               <p>📞 {t('welcome.contact')}</p>
               <p>🕒 {t('welcome.hours')}</p>
+              <a href="https://maps.app.goo.gl/iuRDm7NZECG4no1RA" target="_blank" rel="noopener noreferrer" className="hover:text-primary-foreground/80 transition-colors">
+                🗺️ Google Maps
+              </a>
             </div>
             <div className="mt-6 pt-6 border-t border-primary-foreground/20">
               <p className="text-primary-foreground/60 text-sm">{t('footer.copyright')}</p>

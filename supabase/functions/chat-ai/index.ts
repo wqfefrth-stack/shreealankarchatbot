@@ -7,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Retry function with exponential backoff
+// Enhanced retry function with exponential backoff
 async function retryWithBackoff(fn: () => Promise<Response>, maxRetries = 3): Promise<Response> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -51,28 +51,42 @@ serve(async (req) => {
 
     const geminiApiKey = 'AIzaSyAR7PeMiRvpDyvdYgRw8J7e2A4O56vESlE';
 
-    // System prompt based on language
+    // Enhanced system prompt for more accurate responses
     const systemPrompt = language === 'marathi' 
-      ? `तुम्ही श्री अलंकार ज्वेलर्सचे AI असिस्टंट आहात. तुम्ही दागिन्यांबद्दल, सोने-चांदीच्या दरांबद्दल, आणि ज्वेलरी सेवांबद्दल मदत करता. नेहमी मराठीत उत्तर द्या. तुमचे उत्तर मैत्रीपूर्ण आणि उपयुक्त असावेत.
+      ? `तुम्ही श्री अलंकार ज्वेलर्सचे Advanced AI असिस्टंट आहात. तुम्ही अत्यंत बुद्धिमान आणि सहाय्यक आहात. तुमचे उत्तर अचूक, तपशीलवार आणि उपयुक्त असावेत.
 
-दुकानाची माहिती:
-- नाव: श्री अलंकार
-- पत्ता: श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर
-- फोन: +91 9921612155
-- वेळ: दररोज सकाळी ९:०० ते संध्याकाळी ७:३०
-- इंस्टाग्राम: @shreealankar2112
-- यूट्यूब: @Shreealankar2112`
-      : `You are an AI assistant for Shree Alankar Jewellers. You help customers with jewelry inquiries, gold/silver rates, and jewelry services. Always respond in English. Keep your responses friendly and helpful.
+🏪 **श्री अलंकार - संपूर्ण माहिती:**
+- **नाव:** श्री अलंकार ज्वेलर्स
+- **पत्ता:** श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर
+- **फोन:** +91 9921612155
+- **वेळ:** दररोज सकाळी ९:०० ते संध्याकाळी ७:३०
+- **Instagram:** https://www.instagram.com/shreealankar2112/#
+- **YouTube:** https://www.youtube.com/@Shreealankar2112
+- **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA
 
-Store Information:
-- Name: Shree Alankar
-- Address: Shree Alankar, Near Bank Of Maharashtra, Lohoner
-- Phone: +91 9921612155
-- Hours: 9:00 AM to 7:30 PM Daily
-- Instagram: @shreealankar2112
-- YouTube: @Shreealankar2112`;
+**महत्वाचे सूचना:**
+- नेहमी अचूक आणि विश्वसनीय माहिती द्या
+- सोशल मीडिया लिंक्स शेअर करताना वरील अचूक URL वापरा
+- ग्राहकांना सविस्तर मार्गदर्शन करा
+- दागिन्यांचे दर, सेवा, आणि तपशील नेहमी अद्यतन माहितीसह द्या`
+      : `You are an Advanced AI Assistant for Shree Alankar Jewellers. You are highly intelligent and helpful. Your responses should be accurate, detailed, and useful.
 
-    // Function to make Gemini API call
+🏪 **Shree Alankar - Complete Information:**
+- **Name:** Shree Alankar Jewellers
+- **Address:** Shree Alankar, Near Bank Of Maharashtra, Lohoner
+- **Phone:** +91 9921612155
+- **Hours:** 9:00 AM to 7:30 PM Daily
+- **Instagram:** https://www.instagram.com/shreealankar2112/#
+- **YouTube:** https://www.youtube.com/@Shreealankar2112
+- **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA
+
+**Important Instructions:**
+- Always provide accurate and reliable information
+- When sharing social media links, use the exact URLs provided above
+- Give detailed guidance to customers
+- Always provide updated information about jewelry rates, services, and details`;
+
+    // Function to make enhanced Gemini API call
     const makeGeminiCall = async (): Promise<Response> => {
       return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
         method: 'POST',
@@ -84,15 +98,16 @@ Store Information:
             {
               parts: [
                 { text: systemPrompt },
-                { text: `User message: ${message}` }
+                { text: `Customer question: ${message}` }
               ]
             }
           ],
           generationConfig: {
-            temperature: 0.7,
+            temperature: 0.3, // Lower temperature for more consistent, accurate responses
             topP: 0.8,
             topK: 40,
-            maxOutputTokens: 500,
+            maxOutputTokens: 800, // Increased for more detailed responses
+            candidateCount: 1,
           },
           safetySettings: [
             {
@@ -102,46 +117,54 @@ Store Information:
             {
               category: "HARM_CATEGORY_HATE_SPEECH",
               threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
             }
           ]
         }),
       });
     };
 
-    console.log('Making Gemini API call...');
+    console.log('Making Enhanced Gemini AI call...');
     const response = await retryWithBackoff(makeGeminiCall, 3);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Gemini API error: ${response.status} - ${errorText}`);
+      console.error(`Enhanced Gemini API error: ${response.status} - ${errorText}`);
       
-      // Return a more helpful error message based on the status
+      // Enhanced error handling with more specific messages
       let errorMessage = '';
       if (response.status === 503) {
         errorMessage = language === 'marathi' 
-          ? 'Gemini AI सेवा सध्या अनुपलब्ध आहे. कृपया काही क्षणांनी पुन्हा प्रयत्न करा.'
-          : 'Gemini AI service is temporarily unavailable. Please try again in a few moments.';
+          ? 'Advanced Gemini AI सेवा सध्या अनुपलब्ध आहे. कृपया काही क्षणांनी पुन्हा प्रयत्न करा.'
+          : 'Advanced Gemini AI service is temporarily unavailable. Please try again in a few moments.';
       } else if (response.status === 429) {
         errorMessage = language === 'marathi'
           ? 'बर्याच विनंत्या आल्या आहेत. कृपया थोडा वेळ थांबा आणि पुन्हा प्रयत्न करा.'
           : 'Too many requests. Please wait a moment and try again.';
       } else if (response.status === 400) {
         errorMessage = language === 'marathi'
-          ? 'तुमचा प्रश्न समजला नाही. कृपया पुन्हा प्रयत्न करा.'
-          : 'Could not understand your question. Please try again.';
+          ? 'तुमचा प्रश्न समजला नाही. कृपया स्पष्टपणे प्रश्न विचारा.'
+          : 'Could not understand your question. Please ask your question clearly.';
       } else {
         errorMessage = language === 'marathi'
-          ? 'AI सेवेत तांत्रिक अडचण आली आहे. कृपया पुन्हा प्रयत्न करा.'
-          : 'AI service encountered a technical issue. Please try again.';
+          ? 'Advanced AI सेवेत तांत्रिक अडचण आली आहे. कृपया पुन्हा प्रयत्न करा.'
+          : 'Advanced AI service encountered a technical issue. Please try again.';
       }
       
       throw new Error(errorMessage);
     }
 
     const data = await response.json();
-    console.log('Gemini API response:', data);
+    console.log('Enhanced Gemini AI response:', data);
     
-    // Handle various response formats from Gemini
+    // Enhanced response processing
     let aiResponse = '';
     
     if (data.candidates && data.candidates.length > 0) {
@@ -151,15 +174,29 @@ Store Information:
       }
     }
     
-    // Fallback if no response found
+    // Enhanced fallback response
     if (!aiResponse) {
-      console.error('No valid response from Gemini API:', data);
+      console.error('No valid response from Enhanced Gemini AI:', data);
       aiResponse = language === 'marathi' 
-        ? 'माफ करा, मी तुमच्या प्रश्नाचे उत्तर देऊ शकत नाही. कृपया पुन्हा प्रयत्न करा किंवा आमच्याशी थेट संपर्क साधा.'
-        : 'Sorry, I could not generate a proper response. Please try again or contact us directly.';
+        ? `माफ करा, मी तुमच्या प्रश्नाचे योग्य उत्तर देऊ शकत नाही. कृपया आमच्याशी थेट संपर्क साधा:
+
+📞 **फोन:** +91 9921612155
+📍 **पत्ता:** श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर
+🕒 **वेळ:** दररोज सकाळी ९:०० ते संध्याकाळी ७:३०
+📱 **Instagram:** https://www.instagram.com/shreealankar2112/#
+📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
+🗺️ **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA`
+        : `Sorry, I could not generate a proper response. Please contact us directly:
+
+📞 **Phone:** +91 9921612155
+📍 **Address:** Shree Alankar, Near Bank Of Maharashtra, Lohoner
+🕒 **Hours:** 9:00 AM to 7:30 PM Daily
+📱 **Instagram:** https://www.instagram.com/shreealankar2112/#
+📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
+🗺️ **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA`;
     }
 
-    console.log('Final AI response:', aiResponse);
+    console.log('Final Enhanced AI response:', aiResponse);
 
     return new Response(
       JSON.stringify({ response: aiResponse }),
@@ -167,9 +204,9 @@ Store Information:
     );
 
   } catch (error) {
-    console.error('Error in chat-ai function:', error);
+    console.error('Error in enhanced chat-ai function:', error);
     
-    // Provide language-specific error messages
+    // Enhanced error response with contact information
     const errorMessage = error.message || 'Unknown error occurred';
     
     return new Response(
