@@ -1,18 +1,15 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-export type Language = 'english' | 'marathi';
-
 interface LanguageContextProps {
-  language: Language;
-  setLanguage: (language: Language) => void;
+  language: string;
+  setLanguage: (language: string) => void;
   t: (key: string) => string;
 }
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>((localStorage.getItem('language') as Language) || 'english');
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'english');
 
   useEffect(() => {
     localStorage.setItem('language', language);
