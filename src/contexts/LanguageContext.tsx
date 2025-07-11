@@ -1,150 +1,161 @@
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-
-export type Language = 'english' | 'marathi';
-
-interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
+interface LanguageContextProps {
+  language: string;
+  setLanguage: (language: string) => void;
   t: (key: string) => string;
 }
 
-const translations = {
-  english: {
-    // Header
-    'header.title': 'Shree Alankar',
-    'header.subtitle': 'Fine Jewelry Seller Since 1998',
-    'header.customerSupport': 'Customer Support',
-    
-    // Welcome Section
-    'welcome.title': 'Welcome to Shree Alankar ChatBot Assistant',
-    'welcome.subtitle': 'Your 24/7 customer support for all jewelry-related queries',
-    'welcome.contact': 'Contact: 9921612155',
-    'welcome.address': 'Near Bank Of Maharashtra, Lohoner',
-    'welcome.hours': 'Mon-Sat: 10AM-8PM, Sun: 11AM-6PM',
-    
-    // Chat
-    'chat.title': 'Chat with Shree Alankar Assistant',
-    'chat.placeholder': 'Type your message...',
-    'chat.quickQuestions': '💡 Quick Questions - Click to ask:',
-    'chat.greeting': '🙏 Namaste! Welcome to Shree Alankar - Your trusted jewelry partner since 1998. How may I assist you today?',
-    'chat.hello': '🙏 Hello! Welcome to Shree Alankar! I\'m here to help you with all your jewelry needs. Please feel free to ask any questions or select from the quick questions below.',
-    
-    // Questions
-    'question.hours': 'What are your business hours?',
-    'question.custom': 'Do you offer custom jewelry design?',
-    'question.rates': 'How often are gold and silver rates updated?',
-    'question.valuation': 'Do you provide jewelry valuation services?',
-    'question.types': 'What types of jewelry do you sell?',
-    'question.coins': 'Do you offer gold coins and bars?',
-    'question.return': 'What is your return policy?',
-    'question.repair': 'Do you provide jewelry repair services?',
-    'question.checkRates': 'How can I check current gold rates?',
-    'question.wedding': 'Do you offer wedding jewelry collections?',
-    'question.certificates': 'What certifications do you provide?',
-    'question.online': 'Do you offer online shopping?',
-    
-    // Responses
-    'response.hours': 'We are open Monday to Saturday from 10:00 AM to 8:00 PM, and on Sundays from 11:00 AM to 6:00 PM. We\'re located near Bank Of Maharashtra, Lohoner 423301.',
-    'response.custom': 'Yes, we offer custom jewelry design services! Please visit our store or contact us to discuss your requirements. Our experienced craftsmen can create unique pieces tailored to your preferences.',
-    'response.rates': 'Our rates are updated daily based on market fluctuations. You can always check the latest rates on our homepage or call us at 9921612155 for current pricing.',
-    'response.valuation': 'Yes, we provide jewelry valuation services. Please bring your items to our store during business hours for professional assessment.',
-    'response.types': 'We offer a wide range of jewelry including gold ornaments, silver jewelry, diamond pieces, traditional Indian jewelry, modern designs, rings, necklaces, earrings, bracelets, and more.',
-    'response.coins': 'Yes, we deal in gold coins and bars of various weights and purities. Please visit our store or contact us for current availability and pricing.',
-    'response.return': 'We have a customer-friendly return policy. Please contact us at 9921612155 or visit our store to discuss specific return requirements for your purchase.',
-    'response.repair': 'Yes, we provide professional jewelry repair and maintenance services. Our skilled craftsmen can handle various types of repairs and restorations.',
-    'response.checkRates': 'You can check current gold and silver rates by visiting our website, calling us at 9921612155, or visiting our store. Rates are updated daily.',
-    'response.wedding': 'Absolutely! We specialize in wedding jewelry collections including bridal sets, mangalsutras, bangles, and complete bridal jewelry ensembles.',
-    'response.certificates': 'We provide proper certifications and bills for all our jewelry purchases. For precious stones and diamonds, we also provide relevant quality certificates.',
-    'response.online': 'Currently, we recommend visiting our store for the best experience. However, you can contact us at 9921612155 to discuss specific requirements and availability.',
-    'response.default': 'Thank you for your question! For detailed information, please contact us at 9921612155 or visit our store near Bank Of Maharashtra, Lohoner 423301. Our team will be happy to assist you personally.',
-    
-    // Footer
-    'footer.title': 'Shree Alankar',
-    'footer.subtitle': 'Fine Jewelry Seller Since 1998',
-    'footer.copyright': '© 2024 Shree Alankar. All rights reserved.',
-    
-    // Social Links
-    'social.website': 'Visit Our Website',
-    'social.instagram': 'Follow on Instagram',
-    'social.youtube': 'Subscribe YouTube',
-    
-    // Language Selector
-    'language.title': 'Select Language / भाषा निवडा',
-    'language.english': 'English',
-    'language.marathi': 'मराठी',
-    'language.continue': 'Continue',
-    'language.select': 'Please select your preferred language'
-  },
-  marathi: {
-    // Header
-    'header.title': 'श्री अलंकार',
-    'header.subtitle': '१९९८ पासून उत्कृष्ट दागिने विक्रेता',
-    'header.customerSupport': 'ग्राहक सेवा',
-    
-    // Welcome Section
-    'welcome.title': 'श्री अलंकार चॅटबॉट सहाय्यकामध्ये आपले स्वागत',
-    'welcome.subtitle': 'दागिन्यांच्या सर्व प्रश्नांसाठी आपली २४/७ ग्राहक सेवा',
-    'welcome.contact': 'संपर्क: ९९२१६१२१५५',
-    'welcome.address': 'बँक ऑफ महाराष्ट्र जवळ, लोहोनेर',
-    'welcome.hours': 'सोम-शनि: १० सकाळ-८ संध्याकाळ, रवि: ११ सकाळ-६ संध्याकाळ',
-    
-    // Chat
-    'chat.title': 'श्री अलंकार सहाय्यकाशी संवाद',
-    'chat.placeholder': 'आपला संदेश टाइप करा...',
-    'chat.quickQuestions': '💡 त्वरित प्रश्न - विचारण्यासाठी क्लिक करा:',
-    'chat.greeting': '🙏 नमस्कार! श्री अलंकारमध्ये आपले स्वागत - १९९८ पासून आपला विश्वसनीय दागिने भागीदार. आज मी आपली कशी मदत करू शकतो?',
-    'chat.hello': '🙏 नमस्कार! श्री अलंकारमध्ये आपले स्वागत! मी आपल्या सर्व दागिन्यांच्या गरजांमध्ये मदत करण्यासाठी येथे आहे. कृपया कोणतेही प्रश्न विचारण्यास मोकळ्या मनाने किंवा खालील त्वरित प्रश्न निवडा.',
-    
-    // Questions
-    'question.hours': 'आपले व्यवसायिक वेळा काय आहेत?',
-    'question.custom': 'तुम्ही सानुकूल दागिने डिझाइन ऑफर करता का?',
-    'question.rates': 'सोने आणि चांदीचे दर कितीदा अपडेट होतात?',
-    'question.valuation': 'तुम्ही दागिन्यांचे मूल्यांकन सेवा प्रदान करता का?',
-    'question.types': 'तुम्ही कोणत्या प्रकारचे दागिने विकता?',
-    'question.coins': 'तुम्ही सोन्याची नाणी आणि बार ऑफर करता का?',
-    'question.return': 'तुमची परतावा धोरण काय आहे?',
-    'question.repair': 'तुम्ही दागिन्यांच्या दुरुस्तीच्या सेवा प्रदान करता का?',
-    'question.checkRates': 'मी सध्याचे सोन्याचे दर कसे तपासू शकतो?',
-    'question.wedding': 'तुम्ही लग्नाच्या दागिन्यांचे संग्रह ऑफर करता का?',
-    'question.certificates': 'तुम्ही कोणती प्रमाणपत्रे प्रदान करता?',
-    'question.online': 'तुम्ही ऑनलाइन खरेदी ऑफर करता का?',
-    
-    // Responses
-    'response.hours': 'आम्ही सोमवार ते शनिवार सकाळी १०:०० ते संध्याकाळी ८:०० आणि रविवारी सकाळी ११:०० ते संध्याकाळी ६:०० पर्यंत उघडे आहोत. आम्ही बँक ऑफ महाराष्ट्र जवळ, लोहोनेर ४२३३०१ येथे आहोत.',
-    'response.custom': 'होय, आम्ही सानुकूल दागिने डिझाइन सेवा ऑफर करतो! कृपया आमच्या दुकानाला भेट द्या किंवा आपल्या आवश्यकतांबद्दल चर्चा करण्यासाठी आमच्याशी संपर्क साधा. आमचे अनुभवी कारागीर आपल्या पसंतीनुसार अनन्य तुकडे तयार करू शकतात.',
-    'response.rates': 'आमचे दर बाजारातील चढउतारांच्या आधारे दररोज अपडेट केले जातात. तुम्ही आमच्या होमपेजवर नवीनतम दर तपासू शकता किंवा सध्याच्या किंमतीसाठी ९९२१६१२१५५ वर कॉल करू शकता.',
-    'response.valuation': 'होय, आम्ही दागिन्यांचे मूल्यांकन सेवा प्रदान करतो. कृपया व्यावसायिक मूल्यांकनासाठी व्यवसायिक वेळेत आपली वस्तू आमच्या दुकानात आणा.',
-    'response.types': 'आम्ही सोन्याचे अलंकार, चांदीचे दागिने, हिरे तुकडे, पारंपारिक भारतीय दागिने, आधुनिक डिझाइन, रिंग, हार, कानातले, कंकणे आणि बरेच काही यासह दागिन्यांची विस्तृत श्रेणी ऑफर करतो.',
-    'response.coins': 'होय, आम्ही विविध वजन आणि शुद्धतेच्या सोन्याच्या नाण्या आणि बारमध्ये व्यवहार करतो. कृपया सध्याच्या उपलब्धता आणि किंमतीसाठी आमच्या दुकानाला भेट द्या किंवा आमच्याशी संपर्क साधा.',
-    'response.return': 'आमची ग्राहक-अनुकूल परतावा धोरण आहे. कृपया ९९२१६१२१५५ वर आमच्याशी संपर्क साधा किंवा आपल्या खरेदीच्या विशिष्ट परतावा आवश्यकतांवर चर्चा करण्यासाठी आमच्या दुकानाला भेट द्या.',
-    'response.repair': 'होय, आम्ही व्यावसायिक दागिने दुरुस्ती आणि देखभाल सेवा प्रदान करतो. आमचे कुशल कारागीर विविध प्रकारच्या दुरुस्ती आणि जीर्णोद्धार हाताळू शकतात.',
-    'response.checkRates': 'तुम्ही आमची वेबसाइट भेट देऊन, ९९२१६१२१५५ वर आम्हाला कॉल करून किंवा आमच्या दुकानाला भेट देऊन सध्याचे सोने आणि चांदीचे दर तपासू शकता. दर दररोज अपडेट केले जातात.',
-    'response.wedding': 'नक्कीच! आम्ही वधूचे सेट, मंगळसूत्र, कंकणे आणि संपूर्ण वधूचे दागिने संच यासह लग्नाच्या दागिन्यांच्या संग्रहात विशेषज्ञ आहोत.',
-    'response.certificates': 'आम्ही आमच्या सर्व दागिन्यांच्या खरेदीसाठी योग्य प्रमाणपत्रे आणि बिले प्रदान करतो. मौल्यवान दगड आणि हिरे यासाठी आम्ही संबंधित गुणवत्ता प्रमाणपत्रे देखील प्रदान करतो.',
-    'response.online': 'सध्या, आम्ही सर्वोत्तम अनुभवासाठी आमच्या दुकानाला भेट देण्याची शिफारस करतो. तथापि, विशिष्ट आवश्यकता आणि उपलब्धतेवर चर्चा करण्यासाठी तुम्ही ९९२१६१२१५५ वर आमच्याशी संपर्क साधू शकता.',
-    'response.default': 'आपल्या प्रश्नासाठी धन्यवाद! तपशीलवार माहिती यासाठी, कृपया ९९२१६१२१५५ वर आमच्याशी संपर्क साधा किंवा बँक ऑफ महाराष्ट्र जवळ, लोहोनेर ४२३३०१ येथील आमच्या दुकानाला भेट द्या. आमची टीम आपल्याला व्यक्तिशः मदत करण्यास आनंदित असेल.',
-    
-    // Footer
-    'footer.title': 'श्री अलंकार',
-    'footer.subtitle': '१९९८ पासून उत्कृष्ट दागिने विक्रेता',
-    'footer.copyright': '© २०२४ श्री अलंकार. सर्व हक्क राखीव.',
-    
-    // Social Links
-    'social.website': 'आमची वेबसाइट पहा',
-    'social.instagram': 'इन्स्टाग्रामवर फॉलो करा',
-    'social.youtube': 'यूट्यूब सब्सक्राइब करा',
-    
-    // Language Selector
-    'language.title': 'Select Language / भाषा निवडा',
-    'language.english': 'English',
-    'language.marathi': 'मराठी',
-    'language.continue': 'पुढे',
-    'language.select': 'कृपया आपली पसंतीची भाषा निवडा'
-  }
-};
+const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'english');
+
+  useEffect(() => {
+    localStorage.setItem('language', language);
+  }, [language]);
+
+  const translations = {
+    english: {
+      language: "English",
+      chat: {
+        title: "Chat with us",
+        greeting: "Hello! How can I assist you today?",
+        placeholder: "Type your message...",
+        quickQuestions: "Here are some quick questions you can ask:",
+        hello: "Hello! How can I help you? Here are some quick questions you can ask:"
+      },
+      question: {
+        hours: "What are your opening hours?",
+        custom: "Do you offer custom jewelry design?",
+        rates: "What are the current gold and silver rates?",
+        valuation: "Can you provide a valuation for my jewelry?",
+        types: "What types of jewelry do you offer?",
+        coins: "Do you sell gold or silver coins?",
+        return: "What is your return policy?",
+        repair: "Do you offer jewelry repair services?",
+        checkRates: "How can I check today's gold and silver rates?",
+        wedding: "Do you have a wedding jewelry collection?",
+        certificates: "Are your diamonds certified?",
+        online: "Can I purchase jewelry online?"
+      },
+      header: {
+        title: "Shree Alankar Jewellers",
+        subtitle: "Premium Gold & Silver Jewelry",
+        customerSupport: "WhatsApp Support"
+      },
+      welcome: {
+        title: "Welcome to Shree Alankar Jewellers",
+        subtitle: "Your trusted partner for exquisite gold and silver jewelry since generations",
+        contact: "+91 9921612155",
+        address: "Near Bank Of Maharashtra, Lohoner 423301",
+        hours: "9:00 AM - 7:30 PM Daily",
+        mapLink: "View on Google Maps"
+      },
+      social: {
+        website: "Visit Our Website",
+        instagram: "Follow us on Instagram",
+        youtube: "Subscribe on YouTube"
+      },
+      footer: {
+        title: "Shree Alankar Jewellers",
+        subtitle: "Premium Gold & Silver Jewelry",
+        copyright: "© 2024 Shree Alankar Jewellers. All rights reserved."
+      },
+      response: {
+        hours: "🕒 **Business Hours:**\n\n📅 **Daily:** 9:00 AM to 7:30 PM\n\n📍 **Location:** Shree Alankar, Near Bank Of Maharashtra, Lohoner 423301\n\n🗺️ **Google Maps:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA\n\n📞 **Contact:** +91 9921612155\n\nWe're open every day to serve you with the finest jewelry collection!",
+        custom: "💍 Yes, we offer custom jewelry design services! Bring in your ideas, and our skilled artisans will craft a unique piece just for you.",
+        rates: "💰 Current gold and silver rates can vary. Please check our website or contact us directly for the most up-to-date information.",
+        valuation: "💎 Yes, we provide jewelry valuation services. Our experts will assess your jewelry and provide an accurate appraisal.",
+        types: "✨ We offer a wide range of jewelry, including gold, silver, diamond, and gemstone pieces. Visit our store to explore our collection!",
+        coins: "🪙 Yes, we sell gold and silver coins. They are available in various weights and purities.",
+        return: "↩️ Our return policy allows returns within [number] days with the original receipt. Please see our full policy for details.",
+        repair: "🛠️ Yes, we offer jewelry repair services. Our experienced jewelers can fix your precious pieces with care.",
+        checkRates: "🌐 You can check today's gold and silver rates on our website or by contacting our store directly.",
+        wedding: "👰 We have an exquisite wedding jewelry collection, including bridal sets, rings, and necklaces. Visit us to find the perfect pieces for your special day!",
+        certificates: "✅ Yes, our diamonds are certified by reputable gemological labs, ensuring their quality and authenticity.",
+        online: "💻 Currently, we do not offer online purchasing. However, you can browse our catalog online and visit our store to make a purchase."
+      }
+    },
+    marathi: {
+      language: "मराठी",
+      chat: {
+        title: "आमच्याशी चॅट करा",
+        greeting: "नमस्कार! मी तुम्हाला आज कशी मदत करू शकतो?",
+        placeholder: "तुमचा संदेश टाइप करा...",
+        quickQuestions: "तुम्ही विचारू शकता असे काही झटपट प्रश्न येथे आहेत:",
+        hello: "नमस्कार! मी तुम्हाला कशी मदत करू शकतो? तुम्ही विचारू शकता असे काही झटपट प्रश्न येथे आहेत:"
+      },
+      question: {
+        hours: "तुमचे व्यावसायिक तास काय आहेत?",
+        custom: "तुम्ही कस्टम ज्वेलरी डिझाइन ऑफर करता का?",
+        rates: "सोन्याचे आणि चांदीचे सध्याचे दर काय आहेत?",
+        valuation: "तुम्ही माझ्या ज्वेलरीसाठी मूल्यांकन देऊ शकता का?",
+        types: "तुम्ही कोणत्या प्रकारची ज्वेलरी ऑफर करता?",
+        coins: "तुम्ही सोने किंवा चांदीची नाणी विकता का?",
+        return: "तुमची रिटर्न पॉलिसी काय आहे?",
+        repair: "तुम्ही ज्वेलरी दुरुस्ती सेवा पुरवता का?",
+        checkRates: "मी आजचे सोने आणि चांदीचे दर कसे तपासू शकतो?",
+        wedding: "तुमच्याकडे वेडिंग ज्वेलरी कलेक्शन आहे का?",
+        certificates: "तुमचे हिरे प्रमाणित आहेत का?",
+        online: "मी ऑनलाइन ज्वेलरी खरेदी करू शकतो का?"
+      },
+      header: {
+        title: "श्री अलंकार ज्वेलर्स",
+        subtitle: "प्रीमियम सोने आणि चांदीचे दागिने",
+        customerSupport: "WhatsApp सपोर्ट"
+      },
+      welcome: {
+        title: "श्री अलंकार ज्वेलर्स मध्ये आपले स्वागत",
+        subtitle: "पिढ्यानपिढ्या आपले विश्वसनीय भागीदार उत्कृष्ट सोने आणि चांदीच्या दागिन्यांसाठी",
+        contact: "+91 9921612155",
+        address: "बँक ऑफ महाराष्ट्र जवळ, लोहोनेर 423301",
+        hours: "सकाळी 9:00 - संध्याकाळी 7:30 दररोज",
+        mapLink: "गूगल मॅप्सवर पहा"
+      },
+      social: {
+        website: "आमच्या वेबसाइटला भेट द्या",
+        instagram: "Instagram वर फॉलो करा",
+        youtube: "YouTube वर सदस्यता घ्या"
+      },
+      footer: {
+        title: "श्री अलंकार ज्वेलर्स",
+        subtitle: "प्रीमियम सोने आणि चांदीचे दागिने",
+        copyright: "© 2024 श्री अलंकार ज्वेलर्स. सर्व हक्क राखीव."
+      },
+      response: {
+        hours: "🕒 **व्यावसायिक वेळ:**\n\n📅 **दररोज:** सकाळी 9:00 ते संध्याकाळी 7:30\n\n📍 **स्थान:** श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर 423301\n\n🗺️ **गूगल मॅप्स:** https://maps.app.goo.gl/iuRDm7NZECG4no1RA\n\n📞 **संपर्क:** +91 9921612155\n\nआम्ही दररोज उपलब्ध आहोत तुमच्या सेवेसाठी उत्कृष्ट दागिन्यांच्या संग्रहासह!",
+        custom: "💍 होय, आम्ही कस्टम ज्वेलरी डिझाइन सेवा ऑफर करतो! तुमच्या कल्पना आणा, आणि आमचे कुशल कारागीर तुमच्यासाठी एक अद्वितीय तुकडा तयार करतील.",
+        rates: "💰 सोन्याचे आणि चांदीचे सध्याचे दर बदलू शकतात. कृपया नवीनतम माहितीसाठी आमच्या वेबसाइटला भेट द्या किंवा आमच्याशी थेट संपर्क साधा.",
+        valuation: "💎 होय, आम्ही ज्वेलरी मूल्यांकन सेवा प्रदान करतो. आमचे तज्ञ तुमच्या ज्वेलरीचे मूल्यांकन करतील आणि अचूक मूल्यांकन प्रदान करतील.",
+        types: "✨ आम्ही सोन्याचे, चांदीचे, हिऱ्यांचे आणि रत्नांचे दागिने विविध प्रकारात ऑफर करतो. आमचा संग्रह पाहण्यासाठी आमच्या स्टोअरला भेट द्या!",
+        coins: "🪙 होय, आम्ही सोने आणि चांदीची नाणी विकतो. ते विविध वजनात आणि शुद्धतेत उपलब्ध आहेत.",
+        return: "↩️ आमच्या रिटर्न पॉलिसीनुसार मूळ पावतीसह [number] दिवसांच्या आत रिटर्न्स स्वीकारले जातात. तपशीलांसाठी कृपया आमची संपूर्ण पॉलिसी पहा.",
+        repair: "🛠️ होय, आम्ही ज्वेलरी दुरुस्ती सेवा पुरवतो. आमचे अनुभवी ज्वेलर्स तुमच्या मौल्यवान वस्तूंची काळजीपूर्वक दुरुस्ती करू शकतात.",
+        checkRates: "🌐 तुम्ही आजचे सोन्याचे आणि चांदीचे दर आमच्या वेबसाइटवर तपासू शकता किंवा आमच्या स्टोअरशी थेट संपर्क साधू शकता.",
+        wedding: "👰 आमच्याकडे उत्कृष्ट वेडिंग ज्वेलरी कलेक्शन आहे, ज्यात ब्राइडल सेट्स, अंगठ्या आणि नेकलेस समाविष्ट आहेत. तुमच्या विशेष दिवसासाठी योग्य वस्तू शोधण्यासाठी आम्हाला भेट द्या!",
+        certificates: "✅ होय, आमचे हिरे प्रतिष्ठित जेमोलॉजिकल लॅबद्वारे प्रमाणित आहेत, जे त्यांची गुणवत्ता आणि सत्यता सुनिश्चित करतात.",
+        online: "💻 सध्या, आम्ही ऑनलाइन खरेदीची सुविधा देत नाही. तथापि, तुम्ही आमची कॅटलॉग ऑनलाइन ब्राउझ करू शकता आणि खरेदी करण्यासाठी आमच्या स्टोअरला भेट देऊ शकता."
+      }
+    }
+  };
+
+  const t = useCallback((key: string) => {
+    return translations[language as keyof typeof translations]?.[key] || key;
+  }, [language]);
+
+  const value: LanguageContextProps = {
+    language,
+    setLanguage,
+    t,
+  };
+
+  return (
+    <LanguageContext.Provider value={value}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
@@ -152,18 +163,4 @@ export const useLanguage = () => {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
-};
-
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('english');
-
-  const t = (key: string): string => {
-    return translations[language][key as keyof typeof translations[typeof language]] || key;
-  };
-
-  return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
-      {children}
-    </LanguageContext.Provider>
-  );
 };

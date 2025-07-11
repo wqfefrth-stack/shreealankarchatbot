@@ -399,18 +399,31 @@ const Index = () => {
               <p className="text-amber-100 text-lg mb-6">
                 {t('welcome.subtitle')}
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
                 <div className="flex flex-col items-center">
                   <Phone className="w-8 h-8 mb-2 text-amber-200" />
-                  <p className="text-sm">{t('welcome.contact')}</p>
+                  <p className="text-sm font-medium">{t('welcome.contact')}</p>
                 </div>
                 <div className="flex flex-col items-center">
                   <MapPin className="w-8 h-8 mb-2 text-amber-200" />
-                  <p className="text-sm">{t('welcome.address')}</p>
+                  <p className="text-sm font-medium">{t('welcome.address')}</p>
+                  <a 
+                    href="https://maps.app.goo.gl/iuRDm7NZECG4no1RA" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-xs text-amber-200 hover:text-amber-100 mt-1 underline transition-colors"
+                  >
+                    {t('welcome.mapLink')}
+                  </a>
                 </div>
                 <div className="flex flex-col items-center">
                   <Clock className="w-8 h-8 mb-2 text-amber-200" />
-                  <p className="text-sm">{t('welcome.hours')}</p>
+                  <p className="text-sm font-medium">{t('welcome.hours')}</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <Sparkles className="w-8 h-8 mb-2 text-amber-200" />
+                  <p className="text-sm font-medium">Premium Quality</p>
+                  <p className="text-xs text-amber-200">Certified Jewelry</p>
                 </div>
               </div>
             </CardContent>
@@ -614,9 +627,26 @@ const Index = () => {
             <h3 className="text-xl font-bold mb-2">{t('footer.title')}</h3>
             <p className="text-primary-foreground/80 mb-4">{t('footer.subtitle')}</p>
             <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-8 text-sm">
-              <p>📍 {t('welcome.address')}</p>
-              <p>📞 {t('welcome.contact')}</p>
-              <p>🕒 {t('welcome.hours')}</p>
+              <div className="flex items-center space-x-2">
+                <MapPin className="w-4 h-4" />
+                <span>{t('welcome.address')}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Phone className="w-4 h-4" />
+                <span>{t('welcome.contact')}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Clock className="w-4 h-4" />
+                <span>{t('welcome.hours')}</span>
+              </div>
+              <a 
+                href="https://maps.app.goo.gl/iuRDm7NZECG4no1RA" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 text-primary-foreground/80 hover:text-primary-foreground transition-colors underline"
+              >
+                <span>📍 {t('welcome.mapLink')}</span>
+              </a>
             </div>
             <div className="mt-6 pt-6 border-t border-primary-foreground/20">
               <p className="text-primary-foreground/60 text-sm">{t('footer.copyright')}</p>
