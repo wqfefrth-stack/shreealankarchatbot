@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,34 +39,24 @@ const Index = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Handle customer name submission
-  const handleNameSubmit = (name: string) => {
+  const handleNameSubmit = useCallback((name: string) => {
     setCustomerName(name);
     setShowNameSelector(false);
     setShowLoading(true);
-  };
+  }, [setCustomerName]);
 
   // Handle loading completion
-  const handleLoadingComplete = () => {
+  const handleLoadingComplete = useCallback(() => {
     setShowLoading(false);
     setShowLanguageSelector(true);
-  };
+  }, []);
 
   // Handle language selection completion
-  const handleLanguageSelectionComplete = () => {
+  const handleLanguageSelectionComplete = useCallback(() => {
     setShowLanguageSelector(false);
-    // Initialize first message with customer name
-    const personalizedGreeting = t('chat.greeting').replace('{{name}}', customerName) || 
-      `Hello ${customerName}! Welcome to Shree Alankar. How can I assist you today?`;
-    
-    setMessages([{
-      id: 1,
-      text: personalizedGreeting,
-      isUser: false,
-      timestamp: new Date()
-    }]);
-  };
+  }, []);
 
-  // Apply dark theme by default
+  // Apply dark theme by default - only run once
   useEffect(() => {
     document.documentElement.classList.add('dark');
   }, []);
@@ -80,8 +70,8 @@ const Index = () => {
     }
   }, [isDarkMode]);
 
-  // Update initial message when language changes (with customer name)
-  useEffect(() => {
+  // Initialize messages when ready - stabilized with useCallback
+  const initializeMessages = useCallback(() => {
     if (customerName && !showNameSelector && !showLanguageSelector && !showLoading) {
       const personalizedGreeting = t('chat.greeting').replace('{{name}}', customerName) || 
         `Hello ${customerName}! Welcome to Shree Alankar. How can I assist you today?`;
@@ -93,7 +83,12 @@ const Index = () => {
         timestamp: new Date()
       }]);
     }
-  }, [t, customerName, showNameSelector, showLanguageSelector, showLoading]);
+  }, [customerName, showNameSelector, showLanguageSelector, showLoading, t]);
+
+  // Use the stabilized initialize function
+  useEffect(() => {
+    initializeMessages();
+  }, [initializeMessages]);
 
   // Show name selector first
   if (showNameSelector) {
