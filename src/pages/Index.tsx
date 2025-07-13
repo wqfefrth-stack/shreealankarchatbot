@@ -23,10 +23,13 @@ interface Message {
 }
 
 const Index = () => {
+  // ALL HOOKS MUST BE DECLARED AT THE TOP - NO CONDITIONAL CALLS
   const { t } = useLanguage();
   const { customerName, setCustomerName } = useCustomer();
   const { rates, isLoading: ratesLoading, refetchRates } = useRates();
   const { sendAIMessage, isLoading: aiLoading, conversationHistory, clearConversationHistory } = useAIChat();
+  
+  // ALL STATE HOOKS
   const [showNameSelector, setShowNameSelector] = useState(true);
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
@@ -36,41 +39,26 @@ const Index = () => {
   const [showOtherQuestions, setShowOtherQuestions] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMessageLoading, setIsMessageLoading] = useState(false);
+  
+  // ALL REF HOOKS
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Handle customer name submission
+  // ALL CALLBACK HOOKS
   const handleNameSubmit = useCallback((name: string) => {
     setCustomerName(name);
     setShowNameSelector(false);
     setShowLoading(true);
   }, [setCustomerName]);
 
-  // Handle loading completion
   const handleLoadingComplete = useCallback(() => {
     setShowLoading(false);
     setShowLanguageSelector(true);
   }, []);
 
-  // Handle language selection completion
   const handleLanguageSelectionComplete = useCallback(() => {
     setShowLanguageSelector(false);
   }, []);
 
-  // Apply dark theme by default - only run once
-  useEffect(() => {
-    document.documentElement.classList.add('dark');
-  }, []);
-
-  // Apply dark theme when toggled
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
-
-  // Initialize messages when ready - stabilized with useCallback
   const initializeMessages = useCallback(() => {
     if (customerName && !showNameSelector && !showLanguageSelector && !showLoading) {
       const personalizedGreeting = t('chat.greeting').replace('{{name}}', customerName) || 
@@ -85,22 +73,41 @@ const Index = () => {
     }
   }, [customerName, showNameSelector, showLanguageSelector, showLoading, t]);
 
-  // Use the stabilized initialize function
+  // ALL EFFECT HOOKS
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
   useEffect(() => {
     initializeMessages();
   }, [initializeMessages]);
 
-  // Show name selector first
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollElement) {
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+      }
+    }
+  }, [messages]);
+
+  // NOW WE CAN DO CONDITIONAL RENDERING AFTER ALL HOOKS ARE DECLARED
   if (showNameSelector) {
     return <CustomerNameSelector onNameSubmit={handleNameSubmit} />;
   }
 
-  // Show loading animation
   if (showLoading) {
     return <LoadingAnimation onComplete={handleLoadingComplete} />;
   }
 
-  // Show language selector
   if (showLanguageSelector) {
     return <LanguageSelector onLanguageSelect={handleLanguageSelectionComplete} />;
   }
@@ -367,16 +374,6 @@ const Index = () => {
     setShowQuickQuestions(false);
     setIsMessageLoading(false);
   };
-
-  // Auto-scroll to bottom when new messages are added
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollElement) {
-        scrollElement.scrollTop = scrollElement.scrollHeight;
-      }
-    }
-  }, [messages]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
