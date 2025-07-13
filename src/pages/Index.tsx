@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun, RotateCcw } from 'lucide-react';
+import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun, RotateCcw, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,6 +11,8 @@ import { useCustomer } from '@/contexts/CustomerContext';
 import CustomerNameSelector from '@/components/CustomerNameSelector';
 import LanguageSelector from '@/components/LanguageSelector';
 import LoadingAnimation from '@/components/LoadingAnimation';
+import OwnerLogin from '@/components/OwnerLogin';
+import OwnerDashboard from '@/components/OwnerDashboard';
 import { useRates } from '@/hooks/useRates';
 import { useAIChat } from '@/hooks/useAIChat';
 
@@ -39,6 +41,8 @@ const Index = () => {
   const [showOtherQuestions, setShowOtherQuestions] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMessageLoading, setIsMessageLoading] = useState(false);
+  const [showOwnerLogin, setShowOwnerLogin] = useState(false);
+  const [showOwnerDashboard, setShowOwnerDashboard] = useState(false);
   
   // ALL REF HOOKS
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -377,6 +381,22 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+      {/* Owner Login Modal */}
+      {showOwnerLogin && (
+        <OwnerLogin
+          onClose={() => setShowOwnerLogin(false)}
+          onLoginSuccess={() => {
+            setShowOwnerLogin(false);
+            setShowOwnerDashboard(true);
+          }}
+        />
+      )}
+
+      {/* Owner Dashboard Modal */}
+      {showOwnerDashboard && (
+        <OwnerDashboard onClose={() => setShowOwnerDashboard(false)} />
+      )}
+
       {/* Header */}
       <header className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-xl">
         <div className="container mx-auto px-4 py-6">
@@ -679,7 +699,21 @@ const Index = () => {
                 🗺️ Google Maps
               </a>
             </div>
-            <div className="mt-6 pt-6 border-t border-primary-foreground/20">
+            
+            {/* Owner Login Button */}
+            <div className="mt-6 pt-4 border-t border-primary-foreground/20">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowOwnerLogin(true)}
+                className="text-primary-foreground/60 hover:text-primary-foreground/80 text-xs"
+              >
+                <Shield className="w-3 h-3 mr-1" />
+                Owner Login
+              </Button>
+            </div>
+            
+            <div className="mt-4">
               <p className="text-primary-foreground/60 text-sm">{t('footer.copyright')}</p>
             </div>
           </div>
