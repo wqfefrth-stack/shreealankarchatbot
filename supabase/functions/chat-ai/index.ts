@@ -1,4 +1,5 @@
 
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -18,7 +19,7 @@ serve(async (req) => {
     const requestBody = await req.json();
     console.log('Request body:', requestBody);
     
-    const { message, language = 'english', conversationHistory = [] } = requestBody;
+    const { message, language = 'english', conversationHistory = [], customerName = '' } = requestBody;
 
     if (!message || message.trim() === '') {
       console.error('Message is required');
@@ -44,9 +45,11 @@ serve(async (req) => {
       );
     }
 
-    // Enhanced system prompt for conversational AI
+    // Enhanced system prompt for conversational AI with customer name
     const systemPrompt = language === 'marathi' 
       ? `तुम्ही श्री अलंकार ज्वेलर्सचे Advanced Conversational AI असिस्टंट आहात. तुम्ही अत्यंत बुद्धिमान, सहाय्यक आणि संवादशील आहात. तुमचे उत्तर अचूक, तपशीलवार आणि संदर्भानुसार असावेत. तुम्ही आधी काय चर्चा झाली आहे ते लक्षात ठेवता आणि त्यानुसार उत्तर देता.
+
+${customerName ? `**ग्राहकाचे नाव:** ${customerName} - कृपया त्यांना नावाने संबोधा आणि व्यक्तिगत सेवा द्या.` : ''}
 
 🏪 **श्री अलंकार - संपूर्ण माहिती:**
 - **नाव:** श्री अलंकार ज्वेलर्स
@@ -62,8 +65,11 @@ serve(async (req) => {
 - फॉलो-अप प्रश्नांना योग्य रीतीने उत्तर द्या
 - नेहमी अचूक आणि विश्वसनीय माहिती द्या
 - सोशल मीडिया लिंक्स शेअर करताना वरील अचूक URL वापरा
-- ग्राहकांना सविस्तर मार्गदर्शन करा`
+- ग्राहकांना सविस्तर मार्गदर्शन करा
+${customerName ? `- ${customerName} यांना नेहमी नावाने संबोधा` : ''}`
       : `You are an Advanced Conversational AI Assistant for Shree Alankar Jewellers. You are highly intelligent, helpful, and conversational. Your responses should be accurate, detailed, contextual, and should reference previous parts of the conversation when relevant.
+
+${customerName ? `**Customer Name:** ${customerName} - Please address them by name and provide personalized service.` : ''}
 
 🏪 **Shree Alankar - Complete Information:**
 - **Name:** Shree Alankar Jewellers
@@ -79,7 +85,8 @@ serve(async (req) => {
 - Handle follow-up questions naturally and contextually
 - Always provide accurate and reliable information
 - When sharing social media links, use the exact URLs provided above
-- Give detailed guidance to customers based on conversation history`;
+- Give detailed guidance to customers based on conversation history
+${customerName ? `- Always address ${customerName} by name` : ''}`;
 
     console.log('Building conversation context...');
     
@@ -90,7 +97,7 @@ serve(async (req) => {
     if (conversationHistory && conversationHistory.length > 0) {
       conversationHistory.forEach((msg) => {
         if (msg.role === 'user') {
-          conversationText += `Customer: ${msg.content}\n`;
+          conversationText += `Customer${customerName ? ` (${customerName})` : ''}: ${msg.content}\n`;
         } else if (msg.role === 'assistant') {
           conversationText += `Assistant: ${msg.content}\n`;
         }
@@ -98,7 +105,7 @@ serve(async (req) => {
     }
     
     // Add current user message
-    conversationText += `Customer: ${message}\nAssistant: `;
+    conversationText += `Customer${customerName ? ` (${customerName})` : ''}: ${message}\nAssistant: `;
 
     console.log('Making Gemini API call...');
 
@@ -147,9 +154,9 @@ serve(async (req) => {
       const errorText = await response.text();
       console.error(`Gemini API error: ${response.status} - ${errorText}`);
       
-      // Return fallback response
+      // Return fallback response with customer name
       const fallbackResponse = language === 'marathi' 
-        ? `माफ करा, सध्या AI सेवा अनुपलब्ध आहे. कृपया आमच्याशी थेट संपर्क साधा:
+        ? `${customerName ? `${customerName} जी, ` : ''}माफ करा, सध्या AI सेवा अनुपलब्ध आहे. कृपया आमच्याशी थेट संपर्क साधा:
 
 📞 **फोन:** +91 9921612155
 📍 **पत्ता:** श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर
@@ -157,7 +164,7 @@ serve(async (req) => {
 📱 **Instagram:** https://www.instagram.com/shreealankar2112/#
 📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
 🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`
-        : `Sorry, AI service is currently unavailable. Please contact us directly:
+        : `${customerName ? `${customerName}, ` : ''}Sorry, AI service is currently unavailable. Please contact us directly:
 
 📞 **Phone:** +91 9921612155
 📍 **Address:** Shree Alankar, Near Bank Of Maharashtra, Lohoner
@@ -188,11 +195,11 @@ serve(async (req) => {
     if (!aiResponse) {
       console.log('No valid response from Gemini, using fallback');
       aiResponse = language === 'marathi' 
-        ? `माफ करा, मी तुमच्या प्रश्नाचे योग्य उत्तर देऊ शकत नाही. कृपया आमच्याशी थेट संपर्क साधा:
+        ? `${customerName ? `${customerName} जी, ` : ''}माफ करा, मी तुमच्या प्रश्नाचे योग्य उत्तर देऊ शकत नाही. कृपया आमच्याशी थेट संपर्क साधा:
 
 📞 **फोन:** +91 9921612155
 📍 **पत्ता:** श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर`
-        : `Sorry, I could not generate a proper response. Please contact us directly:
+        : `${customerName ? `${customerName}, ` : ''}Sorry, I could not generate a proper response. Please contact us directly:
 
 📞 **Phone:** +91 9921612155
 📍 **Address:** Shree Alankar, Near Bank Of Maharashtra, Lohoner`;
@@ -220,3 +227,4 @@ serve(async (req) => {
     );
   }
 });
+

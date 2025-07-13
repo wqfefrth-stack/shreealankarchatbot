@@ -7,6 +7,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCustomer } from '@/contexts/CustomerContext';
+import CustomerNameSelector from '@/components/CustomerNameSelector';
 import LanguageSelector from '@/components/LanguageSelector';
 import LoadingAnimation from '@/components/LoadingAnimation';
 import { useRates } from '@/hooks/useRates';
@@ -22,22 +24,47 @@ interface Message {
 
 const Index = () => {
   const { t } = useLanguage();
+  const { customerName, setCustomerName } = useCustomer();
   const { rates, isLoading: ratesLoading, refetchRates } = useRates();
   const { sendAIMessage, isLoading: aiLoading, conversationHistory, clearConversationHistory } = useAIChat();
-  const [messages, setMessages] = useState<Message[]>([{
-    id: 1,
-    text: t('chat.greeting'),
-    isUser: false,
-    timestamp: new Date()
-  }]);
+  const [showNameSelector, setShowNameSelector] = useState(true);
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [showQuickQuestions, setShowQuickQuestions] = useState(true);
   const [showOtherQuestions, setShowOtherQuestions] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const [showLanguageSelector, setShowLanguageSelector] = useState(true);
-  const [showLoading, setShowLoading] = useState(true);
   const [isMessageLoading, setIsMessageLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Handle customer name submission
+  const handleNameSubmit = (name: string) => {
+    setCustomerName(name);
+    setShowNameSelector(false);
+    setShowLoading(true);
+  };
+
+  // Handle loading completion
+  const handleLoadingComplete = () => {
+    setShowLoading(false);
+    setShowLanguageSelector(true);
+  };
+
+  // Handle language selection completion
+  const handleLanguageSelectionComplete = () => {
+    setShowLanguageSelector(false);
+    // Initialize first message with customer name
+    const personalizedGreeting = t('chat.greeting').replace('{{name}}', customerName) || 
+      `Hello ${customerName}! Welcome to Shree Alankar. How can I assist you today?`;
+    
+    setMessages([{
+      id: 1,
+      text: personalizedGreeting,
+      isUser: false,
+      timestamp: new Date()
+    }]);
+  };
 
   // Apply dark theme by default
   useEffect(() => {
@@ -53,15 +80,35 @@ const Index = () => {
     }
   }, [isDarkMode]);
 
-  // Update initial message when language changes
+  // Update initial message when language changes (with customer name)
   useEffect(() => {
-    setMessages([{
-      id: 1,
-      text: t('chat.greeting'),
-      isUser: false,
-      timestamp: new Date()
-    }]);
-  }, [t]);
+    if (customerName && !showNameSelector && !showLanguageSelector && !showLoading) {
+      const personalizedGreeting = t('chat.greeting').replace('{{name}}', customerName) || 
+        `Hello ${customerName}! Welcome to Shree Alankar. How can I assist you today?`;
+      
+      setMessages([{
+        id: 1,
+        text: personalizedGreeting,
+        isUser: false,
+        timestamp: new Date()
+      }]);
+    }
+  }, [t, customerName, showNameSelector, showLanguageSelector, showLoading]);
+
+  // Show name selector first
+  if (showNameSelector) {
+    return <CustomerNameSelector onNameSubmit={handleNameSubmit} />;
+  }
+
+  // Show loading animation
+  if (showLoading) {
+    return <LoadingAnimation onComplete={handleLoadingComplete} />;
+  }
+
+  // Show language selector
+  if (showLanguageSelector) {
+    return <LanguageSelector onLanguageSelect={handleLanguageSelectionComplete} />;
+  }
 
   // Initial 4 quick questions
   const initialQuickQuestions = [t('question.hours'), t('question.custom'), t('question.rates'), t('question.valuation')];
@@ -136,10 +183,10 @@ const Index = () => {
       return responses[question];
     }
 
-    // For all other questions, use AI with conversation context
+    // For all other questions, use AI with conversation context and customer name
     console.log('Using Advanced Conversational Gemini AI for question:', question);
     try {
-      const aiResponse = await sendAIMessage(question);
+      const aiResponse = await sendAIMessage(question, customerName);
       return aiResponse;
     } catch (error) {
       console.error('Advanced Conversational AI error handling:', error);
@@ -156,15 +203,18 @@ const Index = () => {
 
   const handleWhatsAppClick = () => {
     const phoneNumber = '+919921612155';
-    const message = 'Hello! I need assistance with jewelry inquiries from Shree Alankar website.';
+    const message = `Hello! I'm ${customerName}. I need assistance with jewelry inquiries from Shree Alankar website.`;
     const whatsappUrl = `https://wa.me/${phoneNumber.replace('+', '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
   const handleClearChat = () => {
+    const personalizedGreeting = t('chat.greeting').replace('{{name}}', customerName) || 
+      `Hello ${customerName}! Welcome to Shree Alankar. How can I assist you today?`;
+    
     setMessages([{
       id: 1,
-      text: t('chat.greeting'),
+      text: personalizedGreeting,
       isUser: false,
       timestamp: new Date()
     }]);
@@ -235,7 +285,9 @@ const Index = () => {
     let shouldShowOtherQuestions = false;
 
     if (isGreeting(text)) {
-      botResponseText = t('chat.hello');
+      const personalizedHello = t('chat.hello').replace('{{name}}', customerName) || 
+        `Hello ${customerName}! How can I help you today?`;
+      botResponseText = personalizedHello;
       shouldShowQuickQuestions = true;
       shouldShowOtherQuestions = false;
     } else {
@@ -311,8 +363,8 @@ const Index = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const botResponseText = t('language') === 'marathi' 
-      ? 'येथे आणखी काही प्रश्न आहेत जे तुम्ही विचारू शकता:' 
-      : 'Here are some more questions you can ask:';
+      ? `${customerName} जी, येथे आणखी काही प्रश्न आहेत जे तुम्ही विचारू शकता:` 
+      : `${customerName}, here are some more questions you can ask:`;
 
     await typeMessage(botResponseText, loadingMessage.id);
 
@@ -331,14 +383,6 @@ const Index = () => {
     }
   }, [messages]);
 
-  if (showLoading) {
-    return <LoadingAnimation onComplete={() => setShowLoading(false)} />;
-  }
-
-  if (showLanguageSelector) {
-    return <LanguageSelector onLanguageSelect={() => setShowLanguageSelector(false)} />;
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       {/* Header */}
@@ -349,7 +393,9 @@ const Index = () => {
               <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar Logo" className="w-12 h-12 object-contain" />
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold">{t('header.title')}</h1>
-                <p className="text-primary-foreground/80 text-sm">{t('header.subtitle')}</p>
+                <p className="text-primary-foreground/80 text-sm">
+                  {customerName ? `Welcome ${customerName}! ${t('header.subtitle')}` : t('header.subtitle')}
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -381,7 +427,9 @@ const Index = () => {
           {/* Welcome Section */}
           <Card className="mb-8 bg-gradient-to-r from-amber-600 to-amber-700 text-white border-none shadow-2xl">
             <CardContent className="p-8 text-center">
-              <h2 className="text-3xl font-bold mb-4">{t('welcome.title')}</h2>
+              <h2 className="text-3xl font-bold mb-4">
+                {customerName ? `${t('welcome.title')}, ${customerName}!` : t('welcome.title')}
+              </h2>
               <p className="text-amber-100 text-lg mb-6">
                 {t('welcome.subtitle')}
               </p>
@@ -417,7 +465,7 @@ const Index = () => {
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl font-semibold flex items-center">
                       <MessageCircle className="w-5 h-5 mr-2" />
-                      {t('chat.title')} - Conversational AI
+                      {customerName ? `${t('chat.title')} - ${customerName}` : t('chat.title')} - Conversational AI
                     </h3>
                     <Button
                       size="sm"
@@ -475,7 +523,7 @@ const Index = () => {
                       <div className="flex justify-start animate-fade-in">
                         <div className="max-w-[90%] bg-muted border border-border rounded-lg p-4 shadow-md">
                           <p className="text-sm text-foreground font-medium mb-3">
-                            {t('chat.quickQuestions')}
+                            {customerName ? `${customerName}, ${t('chat.quickQuestions')}` : t('chat.quickQuestions')}
                           </p>
                           <div className="flex flex-wrap gap-2">
                             {initialQuickQuestions.map((question, index) => (
@@ -536,7 +584,7 @@ const Index = () => {
                     <Input
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
-                      placeholder={t('chat.placeholder')}
+                      placeholder={customerName ? `${customerName}, ${t('chat.placeholder')}` : t('chat.placeholder')}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputText)}
                       className="flex-1 border-border focus:border-ring bg-background transition-all duration-200"
                       disabled={isMessageLoading}

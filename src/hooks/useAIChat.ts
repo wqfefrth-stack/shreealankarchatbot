@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -20,18 +21,20 @@ export const useAIChat = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
 
-  const sendAIMessage = async (message: string): Promise<string> => {
+  const sendAIMessage = async (message: string, customerName?: string): Promise<string> => {
     setIsLoading(true);
     
     try {
       console.log('Sending message to AI:', message);
+      console.log('Customer name:', customerName);
       console.log('Current conversation history:', conversationHistory);
       
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: { 
           message: message.trim(),
           language: language === 'marathi' ? 'marathi' : 'english',
-          conversationHistory: conversationHistory
+          conversationHistory: conversationHistory,
+          customerName: customerName || ''
         }
       });
 
@@ -83,9 +86,9 @@ export const useAIChat = () => {
     } catch (error) {
       console.error('Error in sendAIMessage:', error);
       
-      // Enhanced fallback response
+      // Enhanced fallback response with customer name
       const fallbackMessage = language === 'marathi' 
-        ? `माफ करा, सध्या AI सेवा अनुपलब्ध आहे. कृपया आमच्याशी थेट संपर्क साधा:
+        ? `${customerName ? `${customerName} जी, ` : ''}माफ करा, सध्या AI सेवा अनुपलब्ध आहे. कृपया आमच्याशी थेट संपर्क साधा:
 
 📞 **फोन:** +91 9921612155
 📍 **पत्ता:** श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर
@@ -95,7 +98,7 @@ export const useAIChat = () => {
 📸 **Instagram:** https://www.instagram.com/shreealankar2112/#
 📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
 🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`
-        : `Sorry, AI service is currently unavailable. Please contact us directly:
+        : `${customerName ? `${customerName}, ` : ''}Sorry, AI service is currently unavailable. Please contact us directly:
 
 📞 **Phone:** +91 9921612155
 📍 **Address:** Shree Alankar, Near Bank Of Maharashtra, Lohoner
