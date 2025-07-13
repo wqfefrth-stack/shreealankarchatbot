@@ -1,131 +1,85 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useToast } from '@/hooks/use-toast';
 
-interface AIResponse {
-  response: string;
-  error?: string;
-}
-
-interface ConversationMessage {
-  role: 'user' | 'assistant';
-  content: string;
+interface Message {
+  id: string;
+  text: string;
+  sender: 'user' | 'ai';
   timestamp: Date;
 }
 
-export const useAIChat = () => {
+export const useAIChat = (customerName: string) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
-  const { language } = useLanguage();
-  const { toast } = useToast();
 
-  const sendAIMessage = async (message: string, customerName?: string): Promise<string> => {
+  const sendMessage = async (text: string) => {
+    if (!text.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: text.trim(),
+      sender: 'user',
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
-    
+
     try {
-      console.log('Sending message to AI:', message);
-      console.log('Customer name:', customerName);
-      console.log('Current conversation history:', conversationHistory);
-      
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: { 
-          message: message.trim(),
-          language: language === 'marathi' ? 'marathi' : 'english',
-          conversationHistory: conversationHistory,
-          customerName: customerName || ''
+          message: text.trim(),
+          customerName: customerName || 'Anonymous'
         }
       });
 
-      console.log('Supabase function response:', { data, error });
-
       if (error) {
-        console.error('Supabase function error:', error);
-        throw new Error('Failed to get AI response');
+        console.error('Edge function error:', error);
+        throw error;
       }
 
-      const aiData = data as AIResponse;
-      
-      if (aiData.error) {
-        console.error('AI service error:', aiData.error);
-        throw new Error(aiData.error);
-      }
+      const aiResponse = data?.response || 'Sorry, I encountered an error. Please try again.';
 
-      if (!aiData.response) {
-        console.error('No response from AI service');
-        throw new Error('No response received from AI');
-      }
-
-      console.log('AI response received:', aiData.response);
-      
-      // Update conversation history
-      const newUserMessage: ConversationMessage = {
-        role: 'user',
-        content: message,
-        timestamp: new Date()
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: aiResponse,
+        sender: 'ai',
+        timestamp: new Date(),
       };
-      
-      const newAIMessage: ConversationMessage = {
-        role: 'assistant',
-        content: aiData.response,
-        timestamp: new Date()
-      };
-      
-      setConversationHistory(prev => [...prev, newUserMessage, newAIMessage]);
-      
-      toast({
-        title: language === 'marathi' ? 'उत्तर मिळाले' : 'Response Received',
-        description: language === 'marathi' 
-          ? 'AI ने तुमच्या प्रश्नाचे उत्तर दिले आहे.'
-          : 'AI has responded to your question.',
-      });
-      
-      return aiData.response;
-      
+
+      setMessages(prev => [...prev, aiMessage]);
+
+      // Save to database
+      try {
+        const { error: insertError } = await supabase
+          .from('chat_logs')
+          .insert({
+            customer_name: customerName || 'Anonymous',
+            message: text.trim(),
+            response: aiResponse
+          });
+
+        if (insertError) {
+          console.error('Error saving chat log:', insertError);
+        }
+      } catch (dbError) {
+        console.error('Database error:', dbError);
+      }
+
     } catch (error) {
-      console.error('Error in sendAIMessage:', error);
-      
-      // Enhanced fallback response with customer name
-      const fallbackMessage = language === 'marathi' 
-        ? `${customerName ? `${customerName} जी, ` : ''}माफ करा, सध्या AI सेवा अनुपलब्ध आहे. कृपया आमच्याशी थेट संपर्क साधा:
-
-📞 **फोन:** +91 9921612155
-📍 **पत्ता:** श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर
-🕒 **वेळ:** दररोज सकाळी ९:०० ते संध्याकाळी ७:३०
-
-📱 **सोशल मीडिया:**
-📸 **Instagram:** https://www.instagram.com/shreealankar2112/#
-📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
-🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`
-        : `${customerName ? `${customerName}, ` : ''}Sorry, AI service is currently unavailable. Please contact us directly:
-
-📞 **Phone:** +91 9921612155
-📍 **Address:** Shree Alankar, Near Bank Of Maharashtra, Lohoner
-🕒 **Hours:** 9:00 AM to 7:30 PM Daily
-
-📱 **Social Media:**
-📸 **Instagram:** https://www.instagram.com/shreealankar2112/#
-📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
-🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`;
-
-      toast({
-        title: language === 'marathi' ? 'AI सेवा अनुपलब्ध' : 'AI Service Unavailable',
-        description: language === 'marathi' 
-          ? 'कृपया थेट संपर्क साधा किंवा काही वेळानंतर प्रयत्न करा.'
-          : 'Please contact us directly or try again later.',
-        variant: "destructive",
-      });
-      
-      return fallbackMessage;
+      console.error('Error sending message:', error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: 'Sorry, I encountered an error. Please try again.',
+        sender: 'ai',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const clearConversationHistory = () => {
-    setConversationHistory([]);
-  };
-
-  return { sendAIMessage, isLoading, conversationHistory, clearConversationHistory };
+  return { messages, sendMessage, isLoading };
 };
