@@ -9,8 +9,15 @@ interface AIResponse {
   error?: string;
 }
 
+interface ConversationMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
 export const useAIChat = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
   const { language } = useLanguage();
   const { toast } = useToast();
 
@@ -19,18 +26,19 @@ export const useAIChat = () => {
     
     try {
       console.log('Sending Enhanced Gemini AI message:', message);
+      console.log('Current conversation history:', conversationHistory);
       
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: { 
           message: message.trim(),
-          language: language === 'marathi' ? 'marathi' : 'english'
+          language: language === 'marathi' ? 'marathi' : 'english',
+          conversationHistory: conversationHistory
         }
       });
 
       if (error) {
         console.error('Supabase function error:', error);
         
-        // Show user-friendly toast notification
         toast({
           title: language === 'marathi' ? 'तांत्रिक अडचण' : 'Technical Issue',
           description: language === 'marathi' 
@@ -47,7 +55,6 @@ export const useAIChat = () => {
       if (aiData.error) {
         console.error('Enhanced Gemini AI API error:', aiData.error);
         
-        // Show specific error message from AI
         toast({
           title: language === 'marathi' ? 'AI सेवा अनुपलब्ध' : 'AI Service Unavailable',
           description: aiData.error,
@@ -59,7 +66,21 @@ export const useAIChat = () => {
 
       console.log('Enhanced Gemini AI response received:', aiData.response);
       
-      // Show success toast for successful AI responses
+      // Update conversation history
+      const newUserMessage: ConversationMessage = {
+        role: 'user',
+        content: message,
+        timestamp: new Date()
+      };
+      
+      const newAIMessage: ConversationMessage = {
+        role: 'assistant',
+        content: aiData.response,
+        timestamp: new Date()
+      };
+      
+      setConversationHistory(prev => [...prev, newUserMessage, newAIMessage]);
+      
       toast({
         title: language === 'marathi' ? 'उन्नत उत्तर मिळाले' : 'Advanced Response Received',
         description: language === 'marathi' 
@@ -97,7 +118,6 @@ export const useAIChat = () => {
 📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
 🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`;
 
-      // Show final fallback toast
       toast({
         title: language === 'marathi' ? 'Enhanced AI सेवा अनुपलब्ध' : 'Enhanced AI Service Unavailable',
         description: language === 'marathi' 
@@ -112,5 +132,9 @@ export const useAIChat = () => {
     }
   };
 
-  return { sendAIMessage, isLoading };
+  const clearConversationHistory = () => {
+    setConversationHistory([]);
+  };
+
+  return { sendAIMessage, isLoading, conversationHistory, clearConversationHistory };
 };

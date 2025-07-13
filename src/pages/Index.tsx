@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun } from 'lucide-react';
+import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,7 +23,7 @@ interface Message {
 const Index = () => {
   const { t } = useLanguage();
   const { rates, isLoading: ratesLoading, refetchRates } = useRates();
-  const { sendAIMessage, isLoading: aiLoading } = useAIChat();
+  const { sendAIMessage, isLoading: aiLoading, conversationHistory, clearConversationHistory } = useAIChat();
   const [messages, setMessages] = useState<Message[]>([{
     id: 1,
     text: t('chat.greeting'),
@@ -136,14 +136,13 @@ const Index = () => {
       return responses[question];
     }
 
-    // For all other questions, use AI with enhanced error handling
-    console.log('Using Advanced Gemini AI for question:', question);
+    // For all other questions, use AI with conversation context
+    console.log('Using Advanced Conversational Gemini AI for question:', question);
     try {
       const aiResponse = await sendAIMessage(question);
       return aiResponse;
     } catch (error) {
-      console.error('Advanced AI error handling:', error);
-      // This fallback should rarely be reached due to improved error handling in useAIChat
+      console.error('Advanced Conversational AI error handling:', error);
       return t('language') === 'marathi' 
         ? 'तांत्रिक अडचण झाली आहे. कृपया पुन्हा प्रयत्न करा.'
         : 'Technical difficulty occurred. Please try again.';
@@ -162,6 +161,19 @@ const Index = () => {
     window.open(whatsappUrl, '_blank');
   };
 
+  const handleClearChat = () => {
+    setMessages([{
+      id: 1,
+      text: t('chat.greeting'),
+      isUser: false,
+      timestamp: new Date()
+    }]);
+    clearConversationHistory();
+    setShowQuickQuestions(true);
+    setShowOtherQuestions(false);
+    setInputText('');
+  };
+
   const typeMessage = async (text: string, messageId: number) => {
     const words = text.split(' ');
     let currentText = '';
@@ -169,21 +181,18 @@ const Index = () => {
     for (let i = 0; i < words.length; i++) {
       currentText += (i > 0 ? ' ' : '') + words[i];
       
-      // Update the message with current typing progress
       setMessages(prev => prev.map(msg => 
         msg.id === messageId 
           ? { ...msg, text: currentText + '|', isTyping: true }
           : msg
       ));
 
-      // Smooth typing speed - faster for shorter words, slower for longer
       const wordLength = words[i].length;
       const baseDelay = 40;
       const wordDelay = Math.max(20, baseDelay - wordLength * 2);
       await new Promise(resolve => setTimeout(resolve, wordDelay));
     }
 
-    // Final message without typing cursor
     setMessages(prev => prev.map(msg => 
       msg.id === messageId 
         ? { ...msg, text: text, isTyping: false }
@@ -194,7 +203,6 @@ const Index = () => {
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isMessageLoading) return;
     
-    // Refresh rates when user asks for rate-related queries
     if (isRateQuery(text)) {
       refetchRates();
     }
@@ -206,12 +214,10 @@ const Index = () => {
       timestamp: new Date()
     };
 
-    // Add user message immediately
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
     setIsMessageLoading(true);
 
-    // Show loading animation for 1 second
     const loadingMessage: Message = {
       id: messages.length + 2,
       text: '...',
@@ -220,13 +226,10 @@ const Index = () => {
       isTyping: true
     };
 
-    // Add loading message
     setMessages(prev => [...prev, loadingMessage]);
 
-    // Wait 1 second for loading
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Prepare bot response
     let botResponseText: string;
     let shouldShowQuickQuestions = false;
     let shouldShowOtherQuestions = false;
@@ -241,10 +244,8 @@ const Index = () => {
       shouldShowOtherQuestions = false;
     }
 
-    // Start typing animation
     await typeMessage(botResponseText, loadingMessage.id);
 
-    // Update UI state
     setShowQuickQuestions(shouldShowQuickQuestions);
     setShowOtherQuestions(shouldShowOtherQuestions);
     setIsMessageLoading(false);
@@ -253,7 +254,6 @@ const Index = () => {
   const handleQuestionClick = async (question: string) => {
     if (isMessageLoading) return;
     
-    // Add user message immediately
     const userMessage: Message = {
       id: messages.length + 1,
       text: question,
@@ -264,7 +264,6 @@ const Index = () => {
     setMessages(prev => [...prev, userMessage]);
     setIsMessageLoading(true);
 
-    // Show loading animation
     const loadingMessage: Message = {
       id: messages.length + 2,
       text: '...',
@@ -275,16 +274,12 @@ const Index = () => {
 
     setMessages(prev => [...prev, loadingMessage]);
 
-    // Wait 1 second for loading
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Get response (now with AI support)
     const botResponseText = await getResponse(question);
 
-    // Start typing animation
     await typeMessage(botResponseText, loadingMessage.id);
 
-    // Hide quick questions after answering
     setShowQuickQuestions(false);
     setShowOtherQuestions(false);
     setIsMessageLoading(false);
@@ -293,7 +288,6 @@ const Index = () => {
   const handleOtherClick = async () => {
     if (isMessageLoading) return;
     
-    // Add user message for "Other"
     const userMessage: Message = {
       id: messages.length + 1,
       text: t('language') === 'marathi' ? 'इतर' : 'Other',
@@ -304,7 +298,6 @@ const Index = () => {
     setMessages(prev => [...prev, userMessage]);
     setIsMessageLoading(true);
 
-    // Show loading animation
     const loadingMessage: Message = {
       id: messages.length + 2,
       text: '...',
@@ -315,18 +308,14 @@ const Index = () => {
 
     setMessages(prev => [...prev, loadingMessage]);
 
-    // Wait 1 second for loading
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Bot response for "Other"
     const botResponseText = t('language') === 'marathi' 
       ? 'येथे आणखी काही प्रश्न आहेत जे तुम्ही विचारू शकता:' 
       : 'Here are some more questions you can ask:';
 
-    // Start typing animation
     await typeMessage(botResponseText, loadingMessage.id);
 
-    // Show other questions
     setShowOtherQuestions(true);
     setShowQuickQuestions(false);
     setIsMessageLoading(false);
@@ -364,7 +353,6 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              {/* Rate Loading Indicator */}
               {ratesLoading && (
                 <Badge variant="secondary" className="bg-blue-500 text-white">
                   <Clock className="w-4 h-4 mr-1 animate-spin" />
@@ -372,15 +360,13 @@ const Index = () => {
                 </Badge>
               )}
               
-              {/* Advanced Gemini AI Loading Indicator */}
               {aiLoading && (
                 <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white animate-pulse">
                   <Sparkles className="w-4 h-4 mr-1 animate-spin" />
-                  Advanced Gemini AI Processing...
+                  Conversational AI Processing...
                 </Badge>
               )}
               
-              {/* WhatsApp Customer Support */}
               <Badge variant="secondary" className="bg-green-500 text-white hover:bg-green-600 cursor-pointer transition-colors" onClick={handleWhatsAppClick}>
                 <MessageCircle className="w-4 h-4 mr-1" />
                 {t('header.customerSupport')}
@@ -428,10 +414,28 @@ const Index = () => {
             <div className="lg:col-span-2">
               <Card className="h-[600px] shadow-xl border-border bg-card">
                 <div className="bg-gradient-to-r from-amber-600 to-amber-700 text-white p-4 rounded-t-lg">
-                  <h3 className="text-xl font-semibold flex items-center">
-                    <MessageCircle className="w-5 h-5 mr-2" />
-                    {t('chat.title')} - Enhanced AI
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-semibold flex items-center">
+                      <MessageCircle className="w-5 h-5 mr-2" />
+                      {t('chat.title')} - Conversational AI
+                    </h3>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-white hover:bg-amber-800"
+                      onClick={handleClearChat}
+                      title={t('language') === 'marathi' ? 'नवीन संवाद सुरू करा' : 'Start New Conversation'}
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  {conversationHistory.length > 0 && (
+                    <p className="text-amber-200 text-xs mt-1">
+                      {t('language') === 'marathi' 
+                        ? `${conversationHistory.length / 2} संवाद संदेश संग्रहीत` 
+                        : `${conversationHistory.length / 2} conversation messages stored`}
+                    </p>
+                  )}
                 </div>
                 
                 <ScrollArea className="h-[440px] p-4" ref={scrollAreaRef}>
