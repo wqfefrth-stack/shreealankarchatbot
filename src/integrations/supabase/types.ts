@@ -22,6 +22,7 @@ export type Database = {
           message: string
           response: string
           seen: boolean
+          whatsapp_no: string | null
         }
         Insert: {
           created_at?: string
@@ -30,6 +31,7 @@ export type Database = {
           message: string
           response: string
           seen?: boolean
+          whatsapp_no?: string | null
         }
         Update: {
           created_at?: string
@@ -38,6 +40,7 @@ export type Database = {
           message?: string
           response?: string
           seen?: boolean
+          whatsapp_no?: string | null
         }
         Relationships: []
       }

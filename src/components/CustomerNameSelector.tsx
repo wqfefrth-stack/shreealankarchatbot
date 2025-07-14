@@ -6,19 +6,20 @@ import { Input } from '@/components/ui/input';
 import { User, Sparkles } from 'lucide-react';
 
 interface CustomerNameSelectorProps {
-  onNameSubmit: (name: string) => void;
+  onNameSubmit: (name: string, whatsappNo: string) => void;
 }
 
 const CustomerNameSelector = ({ onNameSubmit }: CustomerNameSelectorProps) => {
   const [customerName, setCustomerName] = useState('');
+  const [whatsappNo, setWhatsappNo] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (customerName.trim()) {
+    if (customerName.trim() && whatsappNo.trim()) {
       setIsSubmitting(true);
       setTimeout(() => {
-        onNameSubmit(customerName.trim());
+        onNameSubmit(customerName.trim(), whatsappNo.trim());
       }, 500);
     }
   };
@@ -57,10 +58,21 @@ const CustomerNameSelector = ({ onNameSubmit }: CustomerNameSelectorProps) => {
                 autoFocus
               />
             </div>
+            
+            <div>
+              <Input
+                type="tel"
+                placeholder="Enter WhatsApp number (e.g., +91 9876543210)"
+                value={whatsappNo}
+                onChange={(e) => setWhatsappNo(e.target.value)}
+                className="text-center text-lg py-3 border-2 border-amber-200 dark:border-amber-700 focus:border-amber-500 dark:focus:border-amber-400 bg-white/50 dark:bg-background/50"
+                disabled={isSubmitting}
+              />
+            </div>
 
             <Button
               type="submit"
-              disabled={!customerName.trim() || isSubmitting}
+              disabled={!customerName.trim() || !whatsappNo.trim() || isSubmitting}
               className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-3 text-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {isSubmitting ? (

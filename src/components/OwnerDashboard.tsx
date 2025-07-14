@@ -5,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { LogOut, MessageSquare, Clock, User, RefreshCw, Calendar, ArrowLeft, Menu, Trash2, Filter, Check, Eye, EyeOff } from 'lucide-react';
+import { LogOut, MessageSquare, Clock, User, RefreshCw, Calendar, ArrowLeft, Menu, Trash2, Filter, Check, Eye, EyeOff, Phone } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 interface ChatLog {
   id: string;
   customer_name: string;
+  whatsapp_no: string;
   message: string;
   response: string;
   created_at: string;
@@ -427,10 +428,23 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
                               <User className="w-4 h-4 text-blue-600 dark:text-blue-300" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-1">
+                              <div className="space-y-1 mb-1">
                                 <span className="font-medium text-blue-600 dark:text-blue-300 text-sm">
                                   {chat.customer_name}
                                 </span>
+                                {chat.whatsapp_no && (
+                                  <div className="flex items-center gap-2">
+                                    <Phone className="h-3 w-3 text-green-600" />
+                                    <a 
+                                      href={`https://wa.me/${chat.whatsapp_no.replace(/[^0-9]/g, '')}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-green-600 hover:text-green-700 text-xs font-medium"
+                                    >
+                                      {chat.whatsapp_no}
+                                    </a>
+                                  </div>
+                                )}
                               </div>
                               <div className="bg-muted/50 rounded-lg p-3">
                                 <p className="text-sm break-words">{chat.message}</p>
@@ -519,10 +533,25 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
                               <User className="w-4 h-4 text-blue-600 dark:text-blue-300" />
                             </div>
                             <div className="flex-1">
-                              <div className="flex items-center space-x-2 mb-1">
-                                <span className="font-medium text-blue-600 dark:text-blue-300">
-                                  {chat.customer_name}
-                                </span>
+                              <div className="space-y-1 mb-1">
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-medium text-blue-600 dark:text-blue-300">
+                                    {chat.customer_name}
+                                  </span>
+                                </div>
+                                {chat.whatsapp_no && (
+                                  <div className="flex items-center gap-2">
+                                    <Phone className="h-3 w-3 text-green-600" />
+                                    <a 
+                                      href={`https://wa.me/${chat.whatsapp_no.replace(/[^0-9]/g, '')}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-green-600 hover:text-green-700 text-xs font-medium"
+                                    >
+                                      {chat.whatsapp_no}
+                                    </a>
+                                  </div>
+                                )}
                               </div>
                               <div className="bg-muted/50 rounded-lg p-3">
                                 <p className="text-sm">{chat.message}</p>

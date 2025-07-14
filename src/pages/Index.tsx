@@ -28,7 +28,7 @@ interface Message {
 const Index = () => {
   // ALL HOOKS MUST BE DECLARED AT THE TOP - NO CONDITIONAL CALLS
   const { t } = useLanguage();
-  const { customerName, setCustomerName } = useCustomer();
+  const { customerName, whatsappNo, setCustomerName, setWhatsappNo } = useCustomer();
   const { rates, isLoading: ratesLoading, refetchRates } = useRates();
   const { sendAIMessage, isLoading: aiLoading, conversationHistory, clearConversationHistory } = useAIChat();
   
@@ -49,11 +49,12 @@ const Index = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // ALL CALLBACK HOOKS
-  const handleNameSubmit = useCallback((name: string) => {
+  const handleNameSubmit = useCallback((name: string, whatsapp: string) => {
     setCustomerName(name);
+    setWhatsappNo(whatsapp);
     setShowNameSelector(false);
     setShowLoading(true);
-  }, [setCustomerName]);
+  }, [setCustomerName, setWhatsappNo]);
 
   const handleLoadingComplete = useCallback(() => {
     setShowLoading(false);
@@ -313,6 +314,7 @@ const Index = () => {
     try {
       await supabase.from('chat_logs').insert({
         customer_name: customerName || 'Anonymous',
+        whatsapp_no: whatsappNo || '',
         message: text,
         response: botResponseText
       });
@@ -359,6 +361,7 @@ const Index = () => {
     try {
       await supabase.from('chat_logs').insert({
         customer_name: customerName || 'Anonymous',
+        whatsapp_no: whatsappNo || '',
         message: question,
         response: botResponseText
       });
@@ -407,6 +410,7 @@ const Index = () => {
     try {
       await supabase.from('chat_logs').insert({
         customer_name: customerName || 'Anonymous',
+        whatsapp_no: whatsappNo || '',
         message: t('language') === 'marathi' ? 'इतर' : 'Other',
         response: botResponseText
       });
