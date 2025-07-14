@@ -5,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { LogOut, MessageSquare, Clock, User, RefreshCw, Calendar, ArrowLeft, Menu } from 'lucide-react';
+import { LogOut, MessageSquare, Clock, User, RefreshCw, Calendar, ArrowLeft, Menu, Trash2, Filter, Check, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -16,6 +16,7 @@ interface ChatLog {
   message: string;
   response: string;
   created_at: string;
+  seen: boolean;
 }
 
 interface GroupedChats {
@@ -29,9 +30,11 @@ interface OwnerDashboardProps {
 const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
   const [chatLogs, setChatLogs] = useState<ChatLog[]>([]);
   const [groupedChats, setGroupedChats] = useState<GroupedChats>({});
+  const [filteredGroupedChats, setFilteredGroupedChats] = useState<GroupedChats>({});
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
+  const [filter, setFilter] = useState<'all' | 'seen' | 'unseen'>('all');
   const { toast } = useToast();
 
   const fetchChatLogs = async () => {
@@ -85,68 +88,171 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
     }
   };
 
+  const applyFilter = () => {
+    if (filter === 'all') {
+      setFilteredGroupedChats(groupedChats);
+    } else {
+      const filtered: GroupedChats = {};
+      Object.keys(groupedChats).forEach(customerName => {
+        const filteredChats = groupedChats[customerName].filter(chat => 
+          filter === 'seen' ? chat.seen : !chat.seen
+        );
+        if (filteredChats.length > 0) {
+          filtered[customerName] = filteredChats;
+        }
+      });
+      setFilteredGroupedChats(filtered);
+    }
+  };
+
+  const deleteChat = async (chatId: string) => {
+    try {
+      const { error } = await supabase
+        .from('chat_logs')
+        .delete()
+        .eq('id', chatId);
+
+      if (error) {
+        console.error('Error deleting chat:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete chat",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Chat deleted successfully",
+      });
+
+      fetchChatLogs();
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete chat",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleSeenStatus = async (chatId: string, currentSeen: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('chat_logs')
+        .update({ seen: !currentSeen })
+        .eq('id', chatId);
+
+      if (error) {
+        console.error('Error updating seen status:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update seen status",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      fetchChatLogs();
+    } catch (error) {
+      console.error('Error updating seen status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update seen status",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     fetchChatLogs();
   }, []);
 
-  const customerNames = Object.keys(groupedChats);
+  useEffect(() => {
+    applyFilter();
+  }, [groupedChats, filter]);
+
+  const filteredCustomerNames = Object.keys(filteredGroupedChats);
   const totalChats = chatLogs.length;
-  const uniqueCustomers = customerNames.length;
+  const uniqueCustomers = filteredCustomerNames.length;
 
   const formatDateTime = (dateString: string) => {
     return format(new Date(dateString), 'MMM dd, yyyy HH:mm');
   };
 
   const CustomerList = () => (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center text-lg">
-          <User className="w-5 h-5 mr-2" />
-          Customers ({uniqueCustomers})
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <ScrollArea className="h-[400px] md:h-[500px]">
-          {isLoading ? (
-            <div className="p-4 text-center text-muted-foreground">
-              Loading customers...
-            </div>
-          ) : customerNames.length === 0 ? (
-            <div className="p-4 text-center text-muted-foreground">
-              No chat history found for the last 48 hours
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {customerNames.map((customerName, index) => (
-                <div
-                  key={customerName}
-                  className={`p-4 cursor-pointer hover:bg-muted/50 transition-colors active:bg-muted/70 ${
-                    selectedCustomer === customerName ? 'bg-muted' : ''
-                  }`}
-                  onClick={() => {
-                    setSelectedCustomer(customerName);
-                    setIsMobileSheetOpen(false);
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-sm md:text-base">{customerName}</p>
-                      <p className="text-xs md:text-sm text-muted-foreground">
-                        {groupedChats[customerName].length} messages
-                      </p>
+    <div className="space-y-4">
+      {/* Filter Controls */}
+      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+        <Filter className="w-4 h-4" />
+        <span className="text-sm font-medium">Filter:</span>
+        <div className="flex gap-1">
+          {(['all', 'seen', 'unseen'] as const).map((filterType) => (
+            <Button
+              key={filterType}
+              variant={filter === filterType ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setFilter(filterType)}
+              className="text-xs px-2 py-1 h-auto"
+            >
+              {filterType === 'all' ? 'All' : filterType === 'seen' ? 'Seen' : 'Unseen'}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      <Card className="h-full">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center text-lg">
+            <User className="w-5 h-5 mr-2" />
+            Customers ({uniqueCustomers})
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <ScrollArea className="h-[400px] md:h-[500px]">
+            {isLoading ? (
+              <div className="p-4 text-center text-muted-foreground">
+                Loading customers...
+              </div>
+            ) : filteredCustomerNames.length === 0 ? (
+              <div className="p-4 text-center text-muted-foreground">
+                No chat history found for the selected filter
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {filteredCustomerNames.map((customerName, index) => (
+                  <div
+                    key={customerName}
+                    className={`p-4 cursor-pointer hover:bg-muted/50 transition-colors active:bg-muted/70 ${
+                      selectedCustomer === customerName ? 'bg-muted' : ''
+                    }`}
+                    onClick={() => {
+                      setSelectedCustomer(customerName);
+                      setIsMobileSheetOpen(false);
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-sm md:text-base">{customerName}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">
+                          {filteredGroupedChats[customerName].length} messages
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">
+                        {filteredGroupedChats[customerName].length}
+                      </Badge>
                     </div>
-                    <Badge variant="secondary" className="text-xs">
-                      {groupedChats[customerName].length}
-                    </Badge>
+                    {index < filteredCustomerNames.length - 1 && <Separator className="mt-4" />}
                   </div>
-                  {index < customerNames.length - 1 && <Separator className="mt-4" />}
-                </div>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
-      </CardContent>
-    </Card>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </CardContent>
+      </Card>
+    </div>
   );
 
   return (
@@ -283,8 +389,38 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
                 <CardContent className="p-0 h-full">
                   <ScrollArea className="h-full">
                     <div className="p-4 space-y-4">
-                      {groupedChats[selectedCustomer]?.map((chat) => (
+                      {filteredGroupedChats[selectedCustomer]?.map((chat) => (
                         <div key={chat.id} className="space-y-3">
+                          {/* Chat Header with Actions */}
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant={chat.seen ? "default" : "secondary"} className="text-xs">
+                                {chat.seen ? "Seen" : "Unseen"}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {formatDateTime(chat.created_at)}
+                              </span>
+                            </div>
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => toggleSeenStatus(chat.id, chat.seen)}
+                                className="h-auto p-1"
+                              >
+                                {chat.seen ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => deleteChat(chat.id)}
+                                className="h-auto p-1 text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+
                           {/* Customer Message */}
                           <div className="flex items-start space-x-3">
                             <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-full flex-shrink-0">
@@ -294,9 +430,6 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
                               <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-1">
                                 <span className="font-medium text-blue-600 dark:text-blue-300 text-sm">
                                   {chat.customer_name}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {formatDateTime(chat.created_at)}
                                 </span>
                               </div>
                               <div className="bg-muted/50 rounded-lg p-3">
@@ -348,8 +481,39 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
                 <ScrollArea className="h-full">
                   {selectedCustomer ? (
                     <div className="p-4 space-y-4">
-                      {groupedChats[selectedCustomer]?.map((chat) => (
+                      {filteredGroupedChats[selectedCustomer]?.map((chat) => (
                         <div key={chat.id} className="space-y-3">
+                          {/* Chat Header with Actions */}
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant={chat.seen ? "default" : "secondary"} className="text-xs">
+                                {chat.seen ? "Seen" : "Unseen"}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {formatDateTime(chat.created_at)}
+                              </span>
+                            </div>
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => toggleSeenStatus(chat.id, chat.seen)}
+                                className="h-auto p-1"
+                              >
+                                {chat.seen ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => deleteChat(chat.id)}
+                                className="h-auto p-1 text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Customer Message */}
                           <div className="flex items-start space-x-3">
                             <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-full">
                               <User className="w-4 h-4 text-blue-600 dark:text-blue-300" />
@@ -359,9 +523,6 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
                                 <span className="font-medium text-blue-600 dark:text-blue-300">
                                   {chat.customer_name}
                                 </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {formatDateTime(chat.created_at)}
-                                </span>
                               </div>
                               <div className="bg-muted/50 rounded-lg p-3">
                                 <p className="text-sm">{chat.message}</p>
@@ -369,6 +530,7 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
                             </div>
                           </div>
 
+                          {/* Assistant Response */}
                           <div className="flex items-start space-x-3">
                             <div className="p-2 bg-green-100 dark:bg-green-900 rounded-full">
                               <MessageSquare className="w-4 h-4 text-green-600 dark:text-green-300" />
