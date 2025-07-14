@@ -15,6 +15,7 @@ import OwnerLogin from '@/components/OwnerLogin';
 import OwnerDashboard from '@/components/OwnerDashboard';
 import { useRates } from '@/hooks/useRates';
 import { useAIChat } from '@/hooks/useAIChat';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   id: number;
@@ -308,6 +309,18 @@ const Index = () => {
 
     await typeMessage(botResponseText, loadingMessage.id);
 
+    // Save chat to database
+    try {
+      await supabase.from('chat_logs').insert({
+        customer_name: customerName || 'Anonymous',
+        message: text,
+        response: botResponseText
+      });
+      console.log('Chat saved to database successfully');
+    } catch (dbError) {
+      console.error('Error saving chat to database:', dbError);
+    }
+
     setShowQuickQuestions(shouldShowQuickQuestions);
     setShowOtherQuestions(shouldShowOtherQuestions);
     setIsMessageLoading(false);
@@ -341,6 +354,18 @@ const Index = () => {
     const botResponseText = await getResponse(question);
 
     await typeMessage(botResponseText, loadingMessage.id);
+
+    // Save chat to database
+    try {
+      await supabase.from('chat_logs').insert({
+        customer_name: customerName || 'Anonymous',
+        message: question,
+        response: botResponseText
+      });
+      console.log('Quick question chat saved to database successfully');
+    } catch (dbError) {
+      console.error('Error saving quick question chat to database:', dbError);
+    }
 
     setShowQuickQuestions(false);
     setShowOtherQuestions(false);
@@ -377,6 +402,18 @@ const Index = () => {
       : `${customerName}, here are some more questions you can ask:`;
 
     await typeMessage(botResponseText, loadingMessage.id);
+
+    // Save chat to database
+    try {
+      await supabase.from('chat_logs').insert({
+        customer_name: customerName || 'Anonymous',
+        message: t('language') === 'marathi' ? 'इतर' : 'Other',
+        response: botResponseText
+      });
+      console.log('Other questions chat saved to database successfully');
+    } catch (dbError) {
+      console.error('Error saving other questions chat to database:', dbError);
+    }
 
     setShowOtherQuestions(true);
     setShowQuickQuestions(false);

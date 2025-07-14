@@ -45,6 +45,8 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
         .gte('created_at', fortyEightHoursAgo.toISOString())
         .order('created_at', { ascending: false });
 
+      console.log('Chat logs query result:', { data, error, fortyEightHoursAgo: fortyEightHoursAgo.toISOString() });
+
       if (error) {
         console.error('Error fetching chat logs:', error);
         toast({
@@ -55,6 +57,7 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
         return;
       }
 
+      console.log('Fetched chat logs:', data);
       setChatLogs(data || []);
       
       // Group chats by customer name
