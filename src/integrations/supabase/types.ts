@@ -14,30 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      chat_logs: {
-        Row: {
-          created_at: string
-          customer_name: string
-          id: string
-          message: string
-          response: string
-        }
-        Insert: {
-          created_at?: string
-          customer_name: string
-          id?: string
-          message: string
-          response: string
-        }
-        Update: {
-          created_at?: string
-          customer_name?: string
-          id?: string
-          message?: string
-          response?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never

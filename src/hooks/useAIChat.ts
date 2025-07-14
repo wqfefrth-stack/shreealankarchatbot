@@ -1,138 +1,125 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
 
-interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'ai';
-  timestamp: Date;
+interface AIResponse {
+  response: string;
+  error?: string;
 }
 
 interface ConversationMessage {
   role: 'user' | 'assistant';
   content: string;
+  timestamp: Date;
 }
 
 export const useAIChat = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
+  const { language } = useLanguage();
+  const { toast } = useToast();
 
-  const sendMessage = async (text: string) => {
-    if (!text.trim()) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: text.trim(),
-      sender: 'user',
-      timestamp: new Date(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
+  const sendAIMessage = async (message: string, customerName?: string): Promise<string> => {
     setIsLoading(true);
-
+    
     try {
+      console.log('Sending message to AI:', message);
+      console.log('Customer name:', customerName);
+      console.log('Current conversation history:', conversationHistory);
+      
       const { data, error } = await supabase.functions.invoke('chat-ai', {
         body: { 
-          message: text.trim(),
-          customerName: 'Anonymous'
+          message: message.trim(),
+          language: language === 'marathi' ? 'marathi' : 'english',
+          conversationHistory: conversationHistory,
+          customerName: customerName || ''
         }
       });
 
+      console.log('Supabase function response:', { data, error });
+
       if (error) {
-        console.error('Edge function error:', error);
-        throw error;
+        console.error('Supabase function error:', error);
+        throw new Error('Failed to get AI response');
       }
 
-      const aiResponse = data?.response || 'Sorry, I encountered an error. Please try again.';
+      const aiData = data as AIResponse;
+      
+      if (aiData.error) {
+        console.error('AI service error:', aiData.error);
+        throw new Error(aiData.error);
+      }
 
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: aiResponse,
-        sender: 'ai',
-        timestamp: new Date(),
+      if (!aiData.response) {
+        console.error('No response from AI service');
+        throw new Error('No response received from AI');
+      }
+
+      console.log('AI response received:', aiData.response);
+      
+      // Update conversation history
+      const newUserMessage: ConversationMessage = {
+        role: 'user',
+        content: message,
+        timestamp: new Date()
       };
-
-      setMessages(prev => [...prev, aiMessage]);
-
-      // Save to database
-      try {
-        const { error: insertError } = await supabase
-          .from('chat_logs')
-          .insert({
-            customer_name: 'Anonymous',
-            message: text.trim(),
-            response: aiResponse
-          });
-
-        if (insertError) {
-          console.error('Error saving chat log:', insertError);
-        }
-      } catch (dbError) {
-        console.error('Database error:', dbError);
-      }
-
+      
+      const newAIMessage: ConversationMessage = {
+        role: 'assistant',
+        content: aiData.response,
+        timestamp: new Date()
+      };
+      
+      setConversationHistory(prev => [...prev, newUserMessage, newAIMessage]);
+      
+      toast({
+        title: language === 'marathi' ? 'उत्तर मिळाले' : 'Response Received',
+        description: language === 'marathi' 
+          ? 'AI ने तुमच्या प्रश्नाचे उत्तर दिले आहे.'
+          : 'AI has responded to your question.',
+      });
+      
+      return aiData.response;
+      
     } catch (error) {
-      console.error('Error sending message:', error);
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: 'Sorry, I encountered an error. Please try again.',
-        sender: 'ai',
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, errorMessage]);
+      console.error('Error in sendAIMessage:', error);
+      
+      // Enhanced fallback response with customer name
+      const fallbackMessage = language === 'marathi' 
+        ? `${customerName ? `${customerName} जी, ` : ''}माफ करा, सध्या AI सेवा अनुपलब्ध आहे. कृपया आमच्याशी थेट संपर्क साधा:
+
+📞 **फोन:** +91 9921612155
+📍 **पत्ता:** श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर
+🕒 **वेळ:** दररोज सकाळी ९:०० ते संध्याकाळी ७:३०
+
+📱 **सोशल मीडिया:**
+📸 **Instagram:** https://www.instagram.com/shreealankar2112/#
+📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
+🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`
+        : `${customerName ? `${customerName}, ` : ''}Sorry, AI service is currently unavailable. Please contact us directly:
+
+📞 **Phone:** +91 9921612155
+📍 **Address:** Shree Alankar, Near Bank Of Maharashtra, Lohoner
+🕒 **Hours:** 9:00 AM to 7:30 PM Daily
+
+📱 **Social Media:**
+📸 **Instagram:** https://www.instagram.com/shreealankar2112/#
+📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
+🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`;
+
+      toast({
+        title: language === 'marathi' ? 'AI सेवा अनुपलब्ध' : 'AI Service Unavailable',
+        description: language === 'marathi' 
+          ? 'कृपया थेट संपर्क साधा किंवा काही वेळानंतर प्रयत्न करा.'
+          : 'Please contact us directly or try again later.',
+        variant: "destructive",
+      });
+      
+      return fallbackMessage;
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const sendAIMessage = async (text: string, customerName: string = 'Anonymous') => {
-    // Add to conversation history
-    const userMessage: ConversationMessage = { role: 'user', content: text };
-    setConversationHistory(prev => [...prev, userMessage]);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('chat-ai', {
-        body: { 
-          message: text.trim(),
-          customerName: customerName,
-          conversationHistory: conversationHistory
-        }
-      });
-
-      if (error) {
-        console.error('Edge function error:', error);
-        throw error;
-      }
-
-      const aiResponse = data?.response || 'Sorry, I encountered an error. Please try again.';
-
-      // Add AI response to conversation history
-      const aiMessage: ConversationMessage = { role: 'assistant', content: aiResponse };
-      setConversationHistory(prev => [...prev, aiMessage]);
-
-      // Save to database
-      try {
-        const { error: insertError } = await supabase
-          .from('chat_logs')
-          .insert({
-            customer_name: customerName,
-            message: text.trim(),
-            response: aiResponse
-          });
-
-        if (insertError) {
-          console.error('Error saving chat log:', insertError);
-        }
-      } catch (dbError) {
-        console.error('Database error:', dbError);
-      }
-
-      return aiResponse;
-    } catch (error) {
-      console.error('Error sending AI message:', error);
-      throw error;
     }
   };
 
@@ -140,12 +127,5 @@ export const useAIChat = () => {
     setConversationHistory([]);
   };
 
-  return { 
-    messages, 
-    sendMessage, 
-    isLoading,
-    sendAIMessage,
-    conversationHistory,
-    clearConversationHistory
-  };
+  return { sendAIMessage, isLoading, conversationHistory, clearConversationHistory };
 };
