@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun, RotateCcw } from 'lucide-react';
+import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun, RotateCcw, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,6 +11,8 @@ import { useCustomer } from '@/contexts/CustomerContext';
 import CustomerNameSelector from '@/components/CustomerNameSelector';
 import LanguageSelector from '@/components/LanguageSelector';
 import LoadingAnimation from '@/components/LoadingAnimation';
+import OwnerLogin from '@/components/OwnerLogin';
+import OwnerDashboard from '@/components/OwnerDashboard';
 import { useRates } from '@/hooks/useRates';
 import { useAIChat } from '@/hooks/useAIChat';
 
@@ -39,6 +41,8 @@ const Index = () => {
   const [showOtherQuestions, setShowOtherQuestions] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMessageLoading, setIsMessageLoading] = useState(false);
+  const [showOwnerLogin, setShowOwnerLogin] = useState(false);
+  const [showOwnerDashboard, setShowOwnerDashboard] = useState(false);
   
   // ALL REF HOOKS
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -100,6 +104,10 @@ const Index = () => {
   }, [messages]);
 
   // NOW WE CAN DO CONDITIONAL RENDERING AFTER ALL HOOKS ARE DECLARED
+  if (showOwnerDashboard) {
+    return <OwnerDashboard onLogout={() => setShowOwnerDashboard(false)} />;
+  }
+
   if (showNameSelector) {
     return <CustomerNameSelector onNameSubmit={handleNameSubmit} />;
   }
@@ -680,11 +688,33 @@ const Index = () => {
               </a>
             </div>
             <div className="mt-6 pt-6 border-t border-primary-foreground/20">
-              <p className="text-primary-foreground/60 text-sm">{t('footer.copyright')}</p>
+              <div className="flex flex-col items-center space-y-3">
+                <p className="text-primary-foreground/60 text-sm">{t('footer.copyright')}</p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowOwnerLogin(true)}
+                  className="text-primary-foreground/40 hover:text-primary-foreground/60 text-xs transition-colors"
+                >
+                  <Shield className="w-3 h-3 mr-1" />
+                  Owner Login
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </footer>
+
+      {/* Owner Login Modal */}
+      {showOwnerLogin && (
+        <OwnerLogin
+          onLoginSuccess={() => {
+            setShowOwnerLogin(false);
+            setShowOwnerDashboard(true);
+          }}
+          onCancel={() => setShowOwnerLogin(false)}
+        />
+      )}
     </div>
   );
 };

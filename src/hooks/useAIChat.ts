@@ -74,6 +74,19 @@ export const useAIChat = () => {
       
       setConversationHistory(prev => [...prev, newUserMessage, newAIMessage]);
       
+      // Save chat to database
+      try {
+        await supabase.from('chat_logs').insert({
+          customer_name: customerName || 'Anonymous',
+          message: message,
+          response: aiData.response
+        });
+        console.log('Chat saved to database');
+      } catch (dbError) {
+        console.error('Error saving chat to database:', dbError);
+        // Don't throw error here, just log it
+      }
+
       toast({
         title: language === 'marathi' ? 'उत्तर मिळाले' : 'Response Received',
         description: language === 'marathi' 
