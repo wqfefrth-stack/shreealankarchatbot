@@ -13,6 +13,7 @@ import LanguageSelector from '@/components/LanguageSelector';
 import LoadingAnimation from '@/components/LoadingAnimation';
 import OwnerLogin from '@/components/OwnerLogin';
 import OwnerDashboard from '@/components/OwnerDashboard';
+import SpeechToText from '@/components/SpeechToText';
 import { useRates } from '@/hooks/useRates';
 import { useAIChat } from '@/hooks/useAIChat';
 import { supabase } from '@/integrations/supabase/client';
@@ -628,6 +629,10 @@ const Index = () => {
                       placeholder={customerName ? `${customerName}, ${t('chat.placeholder')}` : t('chat.placeholder')}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputText)}
                       className="flex-1 border-border focus:border-ring bg-background transition-all duration-200"
+                      disabled={isMessageLoading}
+                    />
+                    <SpeechToText
+                      onTranscription={(text) => setInputText(text)}
                       disabled={isMessageLoading}
                     />
                     <Button 

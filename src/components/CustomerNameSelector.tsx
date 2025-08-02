@@ -13,15 +13,78 @@ const CustomerNameSelector = ({ onNameSubmit }: CustomerNameSelectorProps) => {
   const [customerName, setCustomerName] = useState('');
   const [whatsappNo, setWhatsappNo] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [whatsappError, setWhatsappError] = useState('');
+
+  const validateWhatsAppNumber = (number: string): boolean => {
+    // Remove all spaces and special characters except +
+    const cleanNumber = number.replace(/[^\d+]/g, '');
+    
+    // Check if it starts with +91 and has 10 digits after that
+    if (cleanNumber.startsWith('+91')) {
+      const digits = cleanNumber.substring(3);
+      return digits.length === 10 && /^\d{10}$/.test(digits);
+    }
+    
+    // Check if it's just 10 digits (we'll add +91 prefix)
+    if (/^\d{10}$/.test(cleanNumber)) {
+      return true;
+    }
+    
+    return false;
+  };
+
+  const formatWhatsAppNumber = (number: string): string => {
+    const cleanNumber = number.replace(/[^\d+]/g, '');
+    
+    if (cleanNumber.startsWith('+91')) {
+      return cleanNumber;
+    }
+    
+    if (/^\d{10}$/.test(cleanNumber)) {
+      return `+91${cleanNumber}`;
+    }
+    
+    return cleanNumber;
+  };
+
+  const handleWhatsAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setWhatsappNo(value);
+    
+    if (value.trim()) {
+      if (validateWhatsAppNumber(value)) {
+        setWhatsappError('');
+      } else {
+        setWhatsappError('Please enter a valid WhatsApp number (10 digits or +91 followed by 10 digits)');
+      }
+    } else {
+      setWhatsappError('');
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (customerName.trim() && whatsappNo.trim()) {
-      setIsSubmitting(true);
-      setTimeout(() => {
-        onNameSubmit(customerName.trim(), whatsappNo.trim());
-      }, 500);
+    
+    if (!customerName.trim()) {
+      return;
     }
+    
+    if (!whatsappNo.trim()) {
+      setWhatsappError('WhatsApp number is required');
+      return;
+    }
+    
+    if (!validateWhatsAppNumber(whatsappNo)) {
+      setWhatsappError('Please enter a valid WhatsApp number');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    const formattedNumber = formatWhatsAppNumber(whatsappNo);
+    
+    setTimeout(() => {
+      onNameSubmit(customerName.trim(), formattedNumber);
+    }, 500);
   };
 
   return (
@@ -62,17 +125,20 @@ const CustomerNameSelector = ({ onNameSubmit }: CustomerNameSelectorProps) => {
             <div>
               <Input
                 type="tel"
-                placeholder="Enter WhatsApp number (e.g., +91 9876543210)"
+                placeholder="Enter WhatsApp number (e.g., 9876543210 or +91 9876543210)"
                 value={whatsappNo}
-                onChange={(e) => setWhatsappNo(e.target.value)}
-                className="text-center text-lg py-3 border-2 border-amber-200 dark:border-amber-700 focus:border-amber-500 dark:focus:border-amber-400 bg-white/50 dark:bg-background/50"
+                onChange={handleWhatsAppChange}
+                className={`text-center text-lg py-3 border-2 ${whatsappError ? 'border-red-500 focus:border-red-500' : 'border-amber-200 dark:border-amber-700 focus:border-amber-500 dark:focus:border-amber-400'} bg-white/50 dark:bg-background/50`}
                 disabled={isSubmitting}
               />
+              {whatsappError && (
+                <p className="text-red-500 text-sm text-center mt-2">{whatsappError}</p>
+              )}
             </div>
 
             <Button
               type="submit"
-              disabled={!customerName.trim() || !whatsappNo.trim() || isSubmitting}
+              disabled={!customerName.trim() || !whatsappNo.trim() || !!whatsappError || isSubmitting}
               className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-3 text-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {isSubmitting ? (
