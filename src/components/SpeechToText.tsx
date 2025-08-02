@@ -87,11 +87,11 @@ const SpeechToText = ({ onTranscription, disabled = false }: SpeechToTextProps) 
         const base64Audio = base64Data.split(',')[1]; // Remove data:audio/webm;base64, prefix
 
         // Call the speech-to-text edge function
-        const response = await fetch('https://e7f9138e-3cfd-419b-93f7-95eb92cdeabd.supabase.co/functions/v1/speech-to-text', {
+        const response = await fetch('https://ywwmgwktvzmfbhazqyig.supabase.co/functions/v1/speech-to-text', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3d21nd2t0dnptZmJoYXpxeWlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwNDc5OTQsImV4cCI6MjA2NzYyMzk5NH0.f5EKN8U7jMxQ-hXDgHI0MI-54n5WFFIIUqrYjX85xTU`
           },
           body: JSON.stringify({
             audio: base64Audio
