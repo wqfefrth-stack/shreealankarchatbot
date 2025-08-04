@@ -107,8 +107,60 @@ ${customerName ? `- Always address ${customerName} by name` : ''}`;
 
     console.log('Building conversation context...');
     
+    // Check if user is asking about rates or website info
+    const isRateQuery = message.toLowerCase().includes('rate') || 
+                       message.toLowerCase().includes('रेट') || 
+                       message.toLowerCase().includes('किंमत') ||
+                       message.toLowerCase().includes('price') ||
+                       message.toLowerCase().includes('gold') ||
+                       message.toLowerCase().includes('silver') ||
+                       message.toLowerCase().includes('सोने') ||
+                       message.toLowerCase().includes('चांदी');
+    
+    const isWebsiteInfoQuery = message.toLowerCase().includes('website') || 
+                              message.toLowerCase().includes('official') ||
+                              message.toLowerCase().includes('info') ||
+                              message.toLowerCase().includes('information') ||
+                              message.toLowerCase().includes('माहिती') ||
+                              message.toLowerCase().includes('वेबसाइट');
+    
+    let websiteAnalysis = '';
+    
+    // If asking about rates or website info, fetch live data from website
+    if (isRateQuery || isWebsiteInfoQuery) {
+      console.log('Rate or website info query detected, fetching live data...');
+      try {
+        const analysisResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/website-analyzer`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
+          },
+          body: JSON.stringify({
+            url: 'https://shreealankar.lovable.app/',
+            query: message
+          }),
+        });
+        
+        if (analysisResponse.ok) {
+          const analysisData = await analysisResponse.json();
+          websiteAnalysis = analysisData.analysis || '';
+          console.log('Website analysis retrieved successfully');
+        } else {
+          console.log('Website analysis failed, continuing without it');
+        }
+      } catch (error) {
+        console.log('Website analysis error:', error.message);
+      }
+    }
+    
     // Build conversation for Gemini API
     let conversationText = systemPrompt + "\n\n";
+    
+    // Add website analysis if available
+    if (websiteAnalysis) {
+      conversationText += `**LIVE WEBSITE DATA FROM https://shreealankar.lovable.app/:**\n${websiteAnalysis}\n\n`;
+    }
     
     // Add conversation history
     if (conversationHistory && conversationHistory.length > 0) {
