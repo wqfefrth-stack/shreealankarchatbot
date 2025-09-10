@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, MessageCircle, RotateCcw, Phone, ExternalLink } from 'lucide-react';
+import '@fontsource/poppins/400.css';
+import '@fontsource/poppins/500.css';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -324,7 +326,7 @@ const Index = () => {
 
     const loadingMessage: Message = {
       id: messages.length + 2,
-      text: '...',
+      text: 'Shree is Thinking',
       isUser: false,
       timestamp: new Date(),
       isTyping: true
@@ -385,7 +387,7 @@ const Index = () => {
 
     const loadingMessage: Message = {
       id: messages.length + 2,
-      text: '...',
+      text: 'Shree is Thinking',
       isUser: false,
       timestamp: new Date(),
       isTyping: true
@@ -432,7 +434,7 @@ const Index = () => {
 
     const loadingMessage: Message = {
       id: messages.length + 2,
-      text: '...',
+      text: 'Shree is Thinking',
       isUser: false,
       timestamp: new Date(),
       isTyping: true
@@ -505,9 +507,9 @@ const Index = () => {
                         ? 'bg-primary text-primary-foreground ml-auto' 
                         : 'bg-muted text-foreground'
                     }`}>
-                      <div className="whitespace-pre-wrap break-words text-sm leading-relaxed">
+                      <div className="chat-font whitespace-pre-wrap break-words text-sm leading-relaxed">
                         {message.isTyping ? (
-                          <span className="animate-pulse">{message.text}</span>
+                          <span className="thinking-dots">{message.text}</span>
                         ) : (
                           renderTextWithLinks(message.text)
                         )}
