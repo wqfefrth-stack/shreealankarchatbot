@@ -106,6 +106,19 @@ const Index = () => {
     }
   }, [messages]);
 
+  // Owner login keyboard shortcut (Ctrl+Shift+O)
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'O') {
+        e.preventDefault();
+        setShowOwnerLogin(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
+
   // NOW WE CAN DO CONDITIONAL RENDERING AFTER ALL HOOKS ARE DECLARED
   if (showOwnerDashboard) {
     return <OwnerDashboard onLogout={() => setShowOwnerDashboard(false)} />;
