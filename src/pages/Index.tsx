@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, MessageCircle, RotateCcw, Phone } from 'lucide-react';
+import { Send, MessageCircle, RotateCcw, Phone, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -24,6 +24,37 @@ interface Message {
 }
 
 const Index = () => {
+  // Function to render text with links as buttons
+  const renderTextWithLinks = (text: string) => {
+    // URL regex pattern
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    
+    return parts.map((part, index) => {
+      if (part.match(urlRegex)) {
+        // This is a URL, render as button
+        const cleanUrl = part.replace(/\\n$/, ''); // Remove trailing \n if present
+        const displayText = cleanUrl.length > 40 
+          ? cleanUrl.substring(0, 40) + '...' 
+          : cleanUrl;
+        
+        return (
+          <Button
+            key={index}
+            variant="outline"
+            size="sm"
+            onClick={() => window.open(cleanUrl, '_blank', 'noopener,noreferrer')}
+            className="mx-1 my-1 h-auto py-2 px-3 text-xs inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+          >
+            <ExternalLink className="w-3 h-3" />
+            {displayText}
+          </Button>
+        );
+      }
+      // Regular text
+      return <span key={index}>{part}</span>;
+    });
+  };
   // ALL HOOKS MUST BE DECLARED AT THE TOP - NO CONDITIONAL CALLS
   const { t } = useLanguage();
   const { customerName, whatsappNo, setCustomerName, setWhatsappNo } = useCustomer();
@@ -478,7 +509,7 @@ const Index = () => {
                         {message.isTyping ? (
                           <span className="animate-pulse">{message.text}</span>
                         ) : (
-                          message.text
+                          renderTextWithLinks(message.text)
                         )}
                       </div>
                     </div>
