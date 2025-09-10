@@ -437,8 +437,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Minimal Header - Gemini Style */}
-      <div className="flex-shrink-0 p-3 border-b border-border/10">
+      {/* Fixed Header - Always Visible */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm p-3 border-b border-border/10">
         <div className="flex items-center justify-between max-w-4xl mx-auto">
           <div className="flex items-center space-x-3">
             <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar" className="w-7 h-7 object-contain" />
@@ -460,9 +460,9 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Chat Container - Proper proportions like Gemini */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
-        {/* Messages Area - Better height calculation */}
+      {/* Chat Container with padding for fixed header and footer */}
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full pt-20 pb-32">
+        {/* Messages Area */}
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-full px-4 py-4" ref={scrollAreaRef}>
             <div className="space-y-4 min-h-[60vh] flex flex-col justify-end">
@@ -537,49 +537,42 @@ const Index = () => {
           </div>
         )}
 
-        {/* Input Area - Fixed at bottom like Gemini */}
-        <div className="flex-shrink-0 p-4 border-t border-border/10">
-          <div className="relative flex items-center space-x-2 bg-muted/30 rounded-3xl p-3 border border-border/20">
-            <Input
-              type="text"
-              placeholder={isMessageLoading ? t('chat.thinking') : t('chat.placeholder')}
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage(inputText)}
-              disabled={isMessageLoading}
-              className="flex-1 border-0 bg-transparent focus:ring-0 focus:ring-offset-0 placeholder:text-muted-foreground/60 text-base"
-            />
-            <SpeechToText onTranscription={setInputText} />
-            <Button
-              onClick={() => handleSendMessage(inputText)}
-              disabled={!inputText.trim() || isMessageLoading}
-              size="icon"
-              className="rounded-full h-9 w-9 bg-primary hover:bg-primary/90"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
-          </div>
-          
-          {/* Action buttons */}
-          <div className="flex justify-center space-x-6 mt-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClearChat}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <RotateCcw className="w-4 h-4 mr-2" />
-              {t('button.clear')}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleWhatsAppClick}
-              className="text-green-600 hover:text-green-700"
-            >
-              <Phone className="w-4 h-4 mr-2" />
-              WhatsApp
-            </Button>
+        {/* Fixed Input Area - Always Visible */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border/10">
+          <div className="max-w-4xl mx-auto p-4">
+            <div className="relative flex items-center space-x-2 bg-muted/30 rounded-3xl p-3 border border-border/20">
+              <Input
+                type="text"
+                placeholder={isMessageLoading ? t('chat.thinking') : t('chat.placeholder')}
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage(inputText)}
+                disabled={isMessageLoading}
+                className="flex-1 border-0 bg-transparent focus:ring-0 focus:ring-offset-0 placeholder:text-muted-foreground/60 text-base"
+              />
+              <SpeechToText onTranscription={setInputText} />
+              <Button
+                onClick={() => handleSendMessage(inputText)}
+                disabled={!inputText.trim() || isMessageLoading}
+                size="icon"
+                className="rounded-full h-9 w-9 bg-primary hover:bg-primary/90"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {/* Action buttons - Only WhatsApp */}
+            <div className="flex justify-center mt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleWhatsAppClick}
+                className="text-green-600 hover:text-green-700"
+              >
+                <Phone className="w-4 h-4 mr-2" />
+                WhatsApp
+              </Button>
+            </div>
           </div>
         </div>
       </div>
