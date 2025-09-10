@@ -131,26 +131,59 @@ const Index = () => {
   // Play welcome sound when chat becomes active
   useEffect(() => {
     if (!showNameSelector && !showLoading && !showLanguageSelector && !playedWelcomeRef.current) {
-      // Speak welcome message using Web Speech API
+      // Speak welcome message using Web Speech API with female voice
       const speakWelcome = () => {
         try {
           if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance('Welcome to Shree Alankar');
-            utterance.rate = 0.9;
-            utterance.pitch = 1.1;
-            utterance.volume = 0.8;
+            utterance.rate = 0.8;
+            utterance.pitch = 1.2;
+            utterance.volume = 0.9;
             
-            // Try to use a female voice if available
-            const voices = speechSynthesis.getVoices();
-            const femaleVoice = voices.find(voice => 
-              voice.name.toLowerCase().includes('female') || 
-              voice.name.toLowerCase().includes('woman') ||
-              voice.name.toLowerCase().includes('alice') ||
-              voice.name.toLowerCase().includes('samantha')
-            );
+            // Function to find best female voice
+            const findFemaleVoice = () => {
+              const voices = speechSynthesis.getVoices();
+              
+              // Priority list for female voices
+              const femaleVoiceNames = [
+                'microsoft zira - english (united states)',
+                'google us english female',
+                'female',
+                'woman',
+                'alice',
+                'samantha',
+                'victoria',
+                'karen',
+                'moira',
+                'fiona',
+                'susan',
+                'allison',
+                'ava',
+                'serena'
+              ];
+              
+              // First try to find by name
+              for (const femaleName of femaleVoiceNames) {
+                const voice = voices.find(v => 
+                  v.name.toLowerCase().includes(femaleName.toLowerCase())
+                );
+                if (voice) return voice;
+              }
+              
+              // Then try to find by language and assume female if available
+              const englishVoices = voices.filter(v => 
+                v.lang.startsWith('en') && !v.name.toLowerCase().includes('male')
+              );
+              
+              // Return the second english voice (often female) or first available
+              return englishVoices[1] || englishVoices[0] || voices[0];
+            };
             
+            // Set the best female voice
+            const femaleVoice = findFemaleVoice();
             if (femaleVoice) {
               utterance.voice = femaleVoice;
+              console.log('Using voice:', femaleVoice.name);
             }
             
             speechSynthesis.speak(utterance);
@@ -160,8 +193,15 @@ const Index = () => {
         }
       };
       
-      // Small delay to ensure voices are loaded
-      setTimeout(speakWelcome, 500);
+      // Wait for voices to be loaded
+      if (speechSynthesis.getVoices().length > 0) {
+        setTimeout(speakWelcome, 500);
+      } else {
+        speechSynthesis.addEventListener('voiceschanged', () => {
+          setTimeout(speakWelcome, 500);
+        }, { once: true });
+      }
+      
       playedWelcomeRef.current = true;
     }
   }, [showNameSelector, showLoading, showLanguageSelector]);
