@@ -425,333 +425,155 @@ const Index = () => {
     setIsMessageLoading(false);
   };
 
+  // Owner login keyboard shortcut (Ctrl+Shift+O)
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'O') {
+        e.preventDefault();
+        setShowOwnerLogin(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-xl">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar Logo" className="w-12 h-12 object-contain" />
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold">{t('header.title')}</h1>
-                <p className="text-primary-foreground/80 text-sm">
-                  {customerName ? `Welcome ${customerName}! ${t('header.subtitle')}` : t('header.subtitle')}
-                </p>
-              </div>
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Minimal Header - Gemini Style */}
+      <div className="flex-shrink-0 p-4 text-center border-b border-border/10">
+        <div className="flex items-center justify-center space-x-3 mb-2">
+          <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar" className="w-8 h-8 object-contain" />
+          <h1 className="text-xl font-medium text-foreground">Shree Alankar</h1>
+        </div>
+        <p className="text-sm text-muted-foreground">AI Assistant for Jewelry Services</p>
+      </div>
+
+      {/* Chat Container - Centered like Gemini */}
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4">
+        {/* Messages Area */}
+        <div className="flex-1 py-8">
+          <ScrollArea className="h-[calc(100vh-200px)]" ref={scrollAreaRef}>
+            <div className="space-y-6">
+              {messages.map((message) => (
+                <div key={message.id} className="flex flex-col space-y-2">
+                  <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                      message.isUser 
+                        ? 'bg-primary text-primary-foreground ml-auto' 
+                        : 'bg-muted text-foreground'
+                    }`}>
+                      <div className="whitespace-pre-wrap break-words">
+                        {message.isTyping ? (
+                          <span className="animate-pulse">{message.text}</span>
+                        ) : (
+                          message.text
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="flex items-center space-x-4">
-              {ratesLoading && (
-                <Badge variant="secondary" className="bg-blue-500 text-white">
-                  <Clock className="w-4 h-4 mr-1 animate-spin" />
-                  Updating Rates...
-                </Badge>
-              )}
-              
-              {aiLoading && (
-                <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white animate-pulse">
-                  <Sparkles className="w-4 h-4 mr-1 animate-spin" />
-                  Conversational AI Processing...
-                </Badge>
-              )}
-              
-              <Badge variant="secondary" className="bg-green-500 text-white hover:bg-green-600 cursor-pointer transition-colors" onClick={handleWhatsAppClick}>
-                <MessageCircle className="w-4 h-4 mr-1" />
-                {t('header.customerSupport')}
-              </Badge>
+          </ScrollArea>
+        </div>
+
+        {/* Quick Questions */}
+        {showQuickQuestions && (
+          <div className="pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+              {initialQuickQuestions.map((question, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  onClick={() => handleQuestionClick(question)}
+                  disabled={isMessageLoading}
+                  className="text-left justify-start h-auto py-3 px-4 whitespace-normal bg-card hover:bg-accent"
+                >
+                  {question}
+                </Button>
+              ))}
+            </div>
+            <div className="flex justify-center">
+              <Button
+                variant="ghost"
+                onClick={handleOtherClick}
+                disabled={isMessageLoading}
+                className="text-primary hover:text-primary/80"
+              >
+                {t('language') === 'marathi' ? 'इतर प्रश्न' : 'More Questions'}
+              </Button>
             </div>
           </div>
-        </div>
-      </header>
+        )}
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Welcome Section */}
-          <Card className="mb-8 bg-gradient-to-r from-amber-600 to-amber-700 text-white border-none shadow-2xl">
-            <CardContent className="p-8 text-center">
-              <h2 className="text-3xl font-bold mb-4">
-                {customerName ? `${t('welcome.title')}, ${customerName}!` : t('welcome.title')}
-              </h2>
-              <p className="text-amber-100 text-lg mb-6">
-                {t('welcome.subtitle')}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
-                <div className="flex flex-col items-center">
-                  <Phone className="w-8 h-8 mb-2 text-amber-200" />
-                  <p className="text-sm">{t('welcome.contact')}</p>
-                </div>
-                <div className="flex flex-col items-center">
-                  <MapPin className="w-8 h-8 mb-2 text-amber-200" />
-                  <p className="text-sm">{t('welcome.address')}</p>
-                </div>
-                <div className="flex flex-col items-center">
-                  <Clock className="w-8 h-8 mb-2 text-amber-200" />
-                  <p className="text-sm">{t('welcome.hours')}</p>
-                </div>
-                <div className="flex flex-col items-center">
-                  <a href="https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center hover:text-amber-300 transition-colors">
-                    <MapPin className="w-8 h-8 mb-2 text-amber-200" />
-                    <p className="text-sm">Google Maps</p>
-                  </a>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Chat Interface */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Chat Window */}
-            <div className="lg:col-span-2">
-              <Card className="h-[600px] shadow-xl border-border bg-card">
-                <div className="bg-gradient-to-r from-amber-600 to-amber-700 text-white p-4 rounded-t-lg">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold flex items-center">
-                      <MessageCircle className="w-5 h-5 mr-2" />
-                      {customerName ? `${t('chat.title')} - ${customerName}` : t('chat.title')} - Conversational AI
-                    </h3>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-white hover:bg-amber-800"
-                      onClick={handleClearChat}
-                      title={t('language') === 'marathi' ? 'नवीन संवाद सुरू करा' : 'Start New Conversation'}
-                    >
-                      <RotateCcw className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  {conversationHistory.length > 0 && (
-                    <p className="text-amber-200 text-xs mt-1">
-                      {t('language') === 'marathi' 
-                        ? `${conversationHistory.length / 2} संवाद संदेश संग्रहीत` 
-                        : `${conversationHistory.length / 2} conversation messages stored`}
-                    </p>
-                  )}
-                </div>
-                
-                <ScrollArea className="h-[440px] p-4" ref={scrollAreaRef}>
-                  <div className="space-y-4">
-                    {messages.map(message => (
-                      <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-                        <div className={`max-w-[80%] p-3 rounded-lg shadow-md transition-all duration-300 ${message.isUser ? 'bg-amber-600 text-white' : 'bg-muted border border-border text-foreground'}`}>
-                          <div className={`text-sm whitespace-pre-line ${message.isTyping ? 'font-mono' : ''}`}>
-                            {message.text.split(/(https?:\/\/[^\s]+)/g).map((part, index) => {
-                              if (part.match(/https?:\/\/[^\s]+/)) {
-                                return (
-                                  <a
-                                    key={index}
-                                    href={part}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-400 hover:text-blue-300 underline break-all transition-colors duration-200"
-                                  >
-                                    {part}
-                                  </a>
-                                );
-                              }
-                              return part;
-                            })}
-                          </div>
-                          {!message.isTyping && (
-                            <p className={`text-xs mt-1 ${message.isUser ? 'text-amber-100' : 'text-muted-foreground'}`}>
-                              {message.timestamp.toLocaleTimeString()}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-
-                    {/* Initial Quick Questions in Chat */}
-                    {showQuickQuestions && (
-                      <div className="flex justify-start animate-fade-in">
-                        <div className="max-w-[90%] bg-muted border border-border rounded-lg p-4 shadow-md">
-                          <p className="text-sm text-foreground font-medium mb-3">
-                            {customerName ? `${customerName}, ${t('chat.quickQuestions')}` : t('chat.quickQuestions')}
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {initialQuickQuestions.map((question, index) => (
-                              <Button
-                                key={index}
-                                variant="outline"
-                                size="sm"
-                                className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8 transition-all duration-200 hover:scale-105"
-                                onClick={() => handleQuestionClick(question)}
-                                disabled={isMessageLoading}
-                              >
-                                {question}
-                              </Button>
-                            ))}
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8 bg-amber-50 dark:bg-amber-950 transition-all duration-200 hover:scale-105"
-                              onClick={handleOtherClick}
-                              disabled={isMessageLoading}
-                            >
-                              {t('language') === 'marathi' ? 'इतर' : 'Other'}
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Other Quick Questions in Chat */}
-                    {showOtherQuestions && (
-                      <div className="flex justify-start animate-fade-in">
-                        <div className="max-w-[90%] bg-muted border border-border rounded-lg p-4 shadow-md">
-                          <p className="text-sm text-foreground font-medium mb-3">
-                            {t('language') === 'marathi' ? '💡 इतर प्रश्न - विचारण्यासाठी क्लिक करा:' : '💡 Other Questions - Click to ask:'}
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {otherQuickQuestions.map((question, index) => (
-                              <Button
-                                key={index}
-                                variant="outline"
-                                size="sm"
-                                className="text-xs border-border hover:bg-accent hover:text-accent-foreground h-8 transition-all duration-200 hover:scale-105"
-                                onClick={() => handleQuestionClick(question)}
-                                disabled={isMessageLoading}
-                              >
-                                {question}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
-
-                <div className="p-4 border-t border-border">
-                  <div className="flex space-x-2">
-                    <Input
-                      value={inputText}
-                      onChange={(e) => setInputText(e.target.value)}
-                      placeholder={customerName ? `${customerName}, ${t('chat.placeholder')}` : t('chat.placeholder')}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputText)}
-                      className="flex-1 border-border focus:border-ring bg-background transition-all duration-200"
-                      disabled={isMessageLoading}
-                    />
-                    <SpeechToText
-                      onTranscription={(text) => setInputText(text)}
-                      disabled={isMessageLoading}
-                    />
-                    <Button 
-                      onClick={() => handleSendMessage(inputText)} 
-                      className="bg-amber-600 hover:bg-amber-700 transition-all duration-200 hover:scale-105"
-                      disabled={isMessageLoading}
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </Card>
+        {/* Other Questions */}
+        {showOtherQuestions && (
+          <div className="pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {otherQuickQuestions.map((question, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  onClick={() => handleQuestionClick(question)}
+                  disabled={isMessageLoading}
+                  className="text-left justify-start h-auto py-3 px-4 whitespace-normal bg-card hover:bg-accent"
+                >
+                  {question}
+                </Button>
+              ))}
             </div>
+          </div>
+        )}
 
-            {/* Quick Questions & Info */}
-            <div className="space-y-6">
-              {/* Quick Questions */}
-              <Card className="shadow-xl border-border bg-card">
-                <div className="bg-muted p-4 rounded-t-lg">
-                  <h3 className="text-lg font-semibold text-foreground">All Questions</h3>
-                </div>
-                <CardContent className="p-4">
-                  <ScrollArea className="h-[300px]">
-                    <div className="space-y-2">
-                      {predefinedQuestions.map((question, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          className="w-full text-left justify-start text-sm border-border hover:bg-accent hover:text-accent-foreground"
-                          onClick={() => handleQuestionClick(question)}
-                          disabled={isMessageLoading}
-                        >
-                          {question}
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-
-              {/* Social Media & Links */}
-              <Card className="shadow-xl border-border bg-card">
-                <div className="bg-muted p-4 rounded-t-lg">
-                  <h3 className="text-lg font-semibold text-foreground">Connect With Us</h3>
-                </div>
-                <CardContent className="p-4">
-                  <div className="space-y-4">
-                    <a href="https://shreealankar.lovable.app/" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-amber-50 dark:bg-amber-950 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors">
-                      <Sparkles className="w-5 h-5 text-amber-600 mr-3" />
-                      <div>
-                        <p className="font-medium text-amber-900 dark:text-amber-100">{t('social.website')}</p>
-                        <p className="text-sm text-amber-700 dark:text-amber-300">shreealankar.lovable.app</p>
-                      </div>
-                    </a>
-                    
-                    <a href="https://www.instagram.com/shreealankar2112/#" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-pink-50 dark:bg-pink-950 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900 transition-colors">
-                      <Instagram className="w-5 h-5 text-pink-600 mr-3" />
-                      <div>
-                        <p className="font-medium text-pink-900 dark:text-pink-100">{t('social.instagram')}</p>
-                        <p className="text-sm text-pink-700 dark:text-pink-300">@shreealankar2112</p>
-                      </div>
-                    </a>
-                    
-                    <a href="https://www.youtube.com/@Shreealankar2112" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-red-50 dark:bg-red-950 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 transition-colors">
-                      <Youtube className="w-5 h-5 text-red-600 mr-3" />
-                      <div>
-                        <p className="font-medium text-red-900 dark:text-red-100">{t('social.youtube')}</p>
-                        <p className="text-sm text-red-700 dark:text-red-300">@Shreealankar2112</p>
-                      </div>
-                    </a>
-
-                    <a href="https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-green-50 dark:bg-green-950 rounded-lg hover:bg-green-100 dark:hover:bg-green-900 transition-colors">
-                      <MapPin className="w-5 h-5 text-green-600 mr-3" />
-                      <div>
-                        <p className="font-medium text-green-900 dark:text-green-100">Google Maps</p>
-                        <p className="text-sm text-green-700 dark:text-green-300">Find Us Here</p>
-                      </div>
-                    </a>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+        {/* Input Area - Fixed at bottom like Gemini */}
+        <div className="flex-shrink-0 pb-6">
+          <div className="relative flex items-center space-x-2 bg-muted/50 rounded-full p-2 border border-border/20">
+            <Input
+              type="text"
+              placeholder={isMessageLoading ? t('chat.thinking') : t('chat.placeholder')}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage(inputText)}
+              disabled={isMessageLoading}
+              className="flex-1 border-0 bg-transparent focus:ring-0 focus:ring-offset-0 placeholder:text-muted-foreground/60"
+            />
+            <SpeechToText onTranscription={setInputText} />
+            <Button
+              onClick={() => handleSendMessage(inputText)}
+              disabled={!inputText.trim() || isMessageLoading}
+              size="icon"
+              className="rounded-full h-8 w-8 bg-primary hover:bg-primary/90"
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          {/* Action buttons */}
+          <div className="flex justify-center space-x-4 mt-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearChat}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              {t('button.clear')}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleWhatsAppClick}
+              className="text-green-600 hover:text-green-700"
+            >
+              <Phone className="w-4 h-4 mr-2" />
+              WhatsApp
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground mt-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h3 className="text-xl font-bold mb-2">{t('footer.title')}</h3>
-            <p className="text-primary-foreground/80 mb-4">{t('footer.subtitle')}</p>
-            <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-8 text-sm">
-              <p>📍 {t('welcome.address')}</p>
-              <p>📞 {t('welcome.contact')}</p>
-              <p>🕒 {t('welcome.hours')}</p>
-              <a href="https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" className="hover:text-primary-foreground/80 transition-colors">
-                🗺️ Google Maps
-              </a>
-            </div>
-            <div className="mt-6 pt-6 border-t border-primary-foreground/20">
-              <div className="flex flex-col items-center space-y-3">
-                <p className="text-primary-foreground/60 text-sm">{t('footer.copyright')}</p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowOwnerLogin(true)}
-                  className="text-primary-foreground/40 hover:text-primary-foreground/60 text-xs transition-colors"
-                >
-                  <Shield className="w-3 h-3 mr-1" />
-                  Owner Login
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* Owner Login Modal */}
+      {/* Owner Login Modal - Hidden but accessible via Ctrl+Shift+O */}
       {showOwnerLogin && (
         <OwnerLogin
           onLoginSuccess={() => {
