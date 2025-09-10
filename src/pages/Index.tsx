@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, MessageCircle, Sparkles, Phone, Clock, MapPin, Instagram, Youtube, Moon, Sun, RotateCcw, Shield } from 'lucide-react';
+import { Send, MessageCircle, RotateCcw, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCustomer } from '@/contexts/CustomerContext';
 import CustomerNameSelector from '@/components/CustomerNameSelector';
@@ -163,15 +160,15 @@ const Index = () => {
 
   const getCurrentRates = () => {
     return {
-      message: `🌐 **For current gold and silver rates, please visit our website:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **Follow us on social media:**\n📸 Instagram: https://www.instagram.com/shreealankar2112/#\n📺 YouTube: https://www.youtube.com/@Shreealankar2112\n🗺️ Google Maps: https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`,
-      marathi: `🌐 **सध्याच्या सोने आणि चांदीच्या दरांसाठी, कृपया आमची वेबसाइट भेट द्या:**\n\nhttps://shreealankar.lovable.app/\n\n📱 **सोशल मीडियावर आमचे अनुसरण करा:**\n📸 Instagram: https://www.instagram.com/shreealankar2112/#\n📺 YouTube: https://www.youtube.com/@Shreealankar2112\n🗺️ Google Maps: https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`
+      message: `🌐 **For current gold and silver rates, please visit our website:**\\n\\nhttps://shreealankar.lovable.app/\\n\\n📱 **Follow us on social media:**\\n📸 Instagram: https://www.instagram.com/shreealankar2112/#\\n📺 YouTube: https://www.youtube.com/@Shreealankar2112\\n🗺️ Google Maps: https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`,
+      marathi: `🌐 **सध्याच्या सोने आणि चांदीच्या दरांसाठी, कृपया आमची वेबसाइट भेट द्या:**\\n\\nhttps://shreealankar.lovable.app/\\n\\n📱 **सोशल मीडियावर आमचे अनुसरण करा:**\\n📸 Instagram: https://www.instagram.com/shreealankar2112/#\\n📺 YouTube: https://www.youtube.com/@Shreealankar2112\\n🗺️ Google Maps: https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`
     };
   };
 
   const getSocialMediaResponse = () => {
     return {
-      message: `📱 **Follow Shree Alankar on Social Media:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112/#\n📺 **YouTube:** https://www.youtube.com/@Shreealankar2112\n🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D\n\n🌐 **Website:** https://shreealankar.lovable.app/\n\n📞 **Contact:** +91 9921612155`,
-      marathi: `📱 **सोशल मीडियावर श्री अलंकार चे अनुसरण करा:**\n\n📸 **Instagram:** https://www.instagram.com/shreealankar2112/#\n📺 **YouTube:** https://www.youtube.com/@Shreealankar2112\n🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D\n\n🌐 **वेबसाइट:** https://shreealankar.lovable.app/\n\n📞 **संपर्क:** +91 9921612155`
+      message: `📱 **Follow Shree Alankar on Social Media:**\\n\\n📸 **Instagram:** https://www.instagram.com/shreealankar2112/#\\n📺 **YouTube:** https://www.youtube.com/@Shreealankar2112\\n🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D\\n\\n🌐 **Website:** https://shreealankar.lovable.app/\\n\\n📞 **Contact:** +91 9921612155`,
+      marathi: `📱 **सोशल मीडियावर श्री अलंकार चे अनुसरण करा:**\\n\\n📸 **Instagram:** https://www.instagram.com/shreealankar2112/#\\n📺 **YouTube:** https://www.youtube.com/@Shreealankar2112\\n🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D\\n\\n🌐 **वेबसाइट:** https://shreealankar.lovable.app/\\n\\n📞 **संपर्क:** +91 9921612155`
     };
   };
 
@@ -437,19 +434,6 @@ const Index = () => {
     setShowQuickQuestions(false);
     setIsMessageLoading(false);
   };
-
-  // Owner login keyboard shortcut (Ctrl+Shift+O)
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'O') {
-        e.preventDefault();
-        setShowOwnerLogin(true);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
