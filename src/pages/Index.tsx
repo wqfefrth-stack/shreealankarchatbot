@@ -131,12 +131,42 @@ const Index = () => {
   // Play welcome sound when chat becomes active
   useEffect(() => {
     if (!showNameSelector && !showLoading && !showLanguageSelector && !playedWelcomeRef.current) {
-      const welcomeAudio = new Audio('/sounds/welcome.mp3');
-      welcomeAudio.volume = 0.7;
-      welcomeAudio.play().catch(() => {
-        // Ignore autoplay restrictions or missing file
-        console.log('Welcome sound could not be played');
-      });
+      // Create a pleasant welcome chime using Web Audio API
+      const playWelcomeChime = () => {
+        try {
+          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+          
+          // Create a pleasant chime sequence
+          const playNote = (frequency: number, startTime: number, duration: number) => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0, startTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+            
+            oscillator.start(startTime);
+            oscillator.stop(startTime + duration);
+          };
+          
+          const now = audioContext.currentTime;
+          // Pleasant welcome chime: C5 -> E5 -> G5
+          playNote(523.25, now, 0.3);      // C5
+          playNote(659.25, now + 0.15, 0.3); // E5
+          playNote(783.99, now + 0.3, 0.5);  // G5
+          
+        } catch (error) {
+          console.log('Welcome chime could not be played:', error);
+        }
+      };
+      
+      playWelcomeChime();
       playedWelcomeRef.current = true;
     }
   }, [showNameSelector, showLoading, showLanguageSelector]);
