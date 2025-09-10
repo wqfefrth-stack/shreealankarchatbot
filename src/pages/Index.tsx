@@ -131,42 +131,37 @@ const Index = () => {
   // Play welcome sound when chat becomes active
   useEffect(() => {
     if (!showNameSelector && !showLoading && !showLanguageSelector && !playedWelcomeRef.current) {
-      // Create a pleasant welcome chime using Web Audio API
-      const playWelcomeChime = () => {
+      // Speak welcome message using Web Speech API
+      const speakWelcome = () => {
         try {
-          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-          
-          // Create a pleasant chime sequence
-          const playNote = (frequency: number, startTime: number, duration: number) => {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
+          if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance('Welcome to Shree Alankar');
+            utterance.rate = 0.9;
+            utterance.pitch = 1.1;
+            utterance.volume = 0.8;
             
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
+            // Try to use a female voice if available
+            const voices = speechSynthesis.getVoices();
+            const femaleVoice = voices.find(voice => 
+              voice.name.toLowerCase().includes('female') || 
+              voice.name.toLowerCase().includes('woman') ||
+              voice.name.toLowerCase().includes('alice') ||
+              voice.name.toLowerCase().includes('samantha')
+            );
             
-            oscillator.frequency.value = frequency;
-            oscillator.type = 'sine';
+            if (femaleVoice) {
+              utterance.voice = femaleVoice;
+            }
             
-            gainNode.gain.setValueAtTime(0, startTime);
-            gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-            
-            oscillator.start(startTime);
-            oscillator.stop(startTime + duration);
-          };
-          
-          const now = audioContext.currentTime;
-          // Pleasant welcome chime: C5 -> E5 -> G5
-          playNote(523.25, now, 0.3);      // C5
-          playNote(659.25, now + 0.15, 0.3); // E5
-          playNote(783.99, now + 0.3, 0.5);  // G5
-          
+            speechSynthesis.speak(utterance);
+          }
         } catch (error) {
-          console.log('Welcome chime could not be played:', error);
+          console.log('Welcome speech could not be played:', error);
         }
       };
       
-      playWelcomeChime();
+      // Small delay to ensure voices are loaded
+      setTimeout(speakWelcome, 500);
       playedWelcomeRef.current = true;
     }
   }, [showNameSelector, showLoading, showLanguageSelector]);
