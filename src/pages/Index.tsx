@@ -438,29 +438,43 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Minimal Header - Gemini Style */}
-      <div className="flex-shrink-0 p-4 text-center border-b border-border/10">
-        <div className="flex items-center justify-center space-x-3 mb-2">
-          <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar" className="w-8 h-8 object-contain" />
-          <h1 className="text-xl font-medium text-foreground">Shree Alankar</h1>
+      <div className="flex-shrink-0 p-3 border-b border-border/10">
+        <div className="flex items-center justify-between max-w-4xl mx-auto">
+          <div className="flex items-center space-x-3">
+            <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar" className="w-7 h-7 object-contain" />
+            <div>
+              <h1 className="text-lg font-medium text-foreground">Shree Alankar</h1>
+              <p className="text-xs text-muted-foreground">AI Assistant for Jewelry Services</p>
+            </div>
+          </div>
+          
+          {/* Owner Login Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowOwnerLogin(true)}
+            className="h-8 w-8 opacity-30 hover:opacity-100 transition-opacity"
+          >
+            <MessageCircle className="w-4 h-4" />
+          </Button>
         </div>
-        <p className="text-sm text-muted-foreground">AI Assistant for Jewelry Services</p>
       </div>
 
-      {/* Chat Container - Centered like Gemini */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4">
-        {/* Messages Area */}
-        <div className="flex-1 py-8">
-          <ScrollArea className="h-[calc(100vh-200px)]" ref={scrollAreaRef}>
-            <div className="space-y-6">
+      {/* Chat Container - Proper proportions like Gemini */}
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
+        {/* Messages Area - Better height calculation */}
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full px-4 py-4" ref={scrollAreaRef}>
+            <div className="space-y-4 min-h-[60vh] flex flex-col justify-end">
               {messages.map((message) => (
                 <div key={message.id} className="flex flex-col space-y-2">
                   <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                    <div className={`max-w-[75%] rounded-2xl px-4 py-3 ${
                       message.isUser 
                         ? 'bg-primary text-primary-foreground ml-auto' 
                         : 'bg-muted text-foreground'
                     }`}>
-                      <div className="whitespace-pre-wrap break-words">
+                      <div className="whitespace-pre-wrap break-words text-sm leading-relaxed">
                         {message.isTyping ? (
                           <span className="animate-pulse">{message.text}</span>
                         ) : (
@@ -477,7 +491,7 @@ const Index = () => {
 
         {/* Quick Questions */}
         {showQuickQuestions && (
-          <div className="pb-4">
+          <div className="px-4 pb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
               {initialQuickQuestions.map((question, index) => (
                 <Button
@@ -506,7 +520,7 @@ const Index = () => {
 
         {/* Other Questions */}
         {showOtherQuestions && (
-          <div className="pb-4">
+          <div className="px-4 pb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {otherQuickQuestions.map((question, index) => (
                 <Button
@@ -524,8 +538,8 @@ const Index = () => {
         )}
 
         {/* Input Area - Fixed at bottom like Gemini */}
-        <div className="flex-shrink-0 pb-6">
-          <div className="relative flex items-center space-x-2 bg-muted/50 rounded-full p-2 border border-border/20">
+        <div className="flex-shrink-0 p-4 border-t border-border/10">
+          <div className="relative flex items-center space-x-2 bg-muted/30 rounded-3xl p-3 border border-border/20">
             <Input
               type="text"
               placeholder={isMessageLoading ? t('chat.thinking') : t('chat.placeholder')}
@@ -533,21 +547,21 @@ const Index = () => {
               onChange={(e) => setInputText(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage(inputText)}
               disabled={isMessageLoading}
-              className="flex-1 border-0 bg-transparent focus:ring-0 focus:ring-offset-0 placeholder:text-muted-foreground/60"
+              className="flex-1 border-0 bg-transparent focus:ring-0 focus:ring-offset-0 placeholder:text-muted-foreground/60 text-base"
             />
             <SpeechToText onTranscription={setInputText} />
             <Button
               onClick={() => handleSendMessage(inputText)}
               disabled={!inputText.trim() || isMessageLoading}
               size="icon"
-              className="rounded-full h-8 w-8 bg-primary hover:bg-primary/90"
+              className="rounded-full h-9 w-9 bg-primary hover:bg-primary/90"
             >
               <Send className="w-4 h-4" />
             </Button>
           </div>
           
           {/* Action buttons */}
-          <div className="flex justify-center space-x-4 mt-4">
+          <div className="flex justify-center space-x-6 mt-4">
             <Button
               variant="ghost"
               size="sm"
