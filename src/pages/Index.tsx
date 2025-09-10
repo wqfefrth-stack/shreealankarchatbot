@@ -78,6 +78,7 @@ const Index = () => {
   
   // ALL REF HOOKS
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const playedWelcomeRef = useRef(false);
 
   // ALL CALLBACK HOOKS
   const handleNameSubmit = useCallback((name: string, whatsapp: string) => {
@@ -126,6 +127,19 @@ const Index = () => {
   useEffect(() => {
     initializeMessages();
   }, [initializeMessages]);
+
+  // Play welcome sound when chat becomes active
+  useEffect(() => {
+    if (!showNameSelector && !showLoading && !showLanguageSelector && !playedWelcomeRef.current) {
+      const welcomeAudio = new Audio('/sounds/welcome.mp3');
+      welcomeAudio.volume = 0.7;
+      welcomeAudio.play().catch(() => {
+        // Ignore autoplay restrictions or missing file
+        console.log('Welcome sound could not be played');
+      });
+      playedWelcomeRef.current = true;
+    }
+  }, [showNameSelector, showLoading, showLanguageSelector]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
