@@ -45,89 +45,112 @@ serve(async (req) => {
       );
     }
 
-    // Enhanced system prompt for conversational AI with customer name and competitor handling
+    // Check if message is off-topic (not related to jewelry, shop, or business)
+    const jewelryKeywords = ['jewelry', 'jewellery', 'gold', 'silver', 'diamond', 'ring', 'necklace', 'earrings', 'bracelet', 'chain', 'pendant', 'सोने', 'चांदी', 'दागिने', 'अंगठी', 'हार', 'कानातील', 'कंगन', 'साखळी'];
+    const businessKeywords = ['shree', 'alankar', 'श्री', 'अलंकार', 'shop', 'store', 'दुकान', 'price', 'rate', 'किंमत', 'रेट', 'website', 'वेबसाइट', 'contact', 'संपर्क', 'address', 'पत्ता', 'time', 'वेळ'];
+    
+    const messageWords = message.toLowerCase().split(/\s+/);
+    const hasJewelryKeyword = jewelryKeywords.some(keyword => message.toLowerCase().includes(keyword.toLowerCase()));
+    const hasBusinessKeyword = businessKeywords.some(keyword => message.toLowerCase().includes(keyword.toLowerCase()));
+    
+    // If message doesn't contain jewelry or business keywords, send redirect message
+    if (!hasJewelryKeyword && !hasBusinessKeyword) {
+      const offTopicResponse = language === 'marathi' 
+        ? `${customerName ? `${customerName} जी, ` : ''}मी फक्त श्री अलंकार ज्वेलर्स शॉपशी संबंधित समस्या आणि प्रश्नांचे निराकरण करतो. कृपया मला फक्त श्री अलंकार संबंधित प्रश्न विचारा.
+
+🏪 **श्री अलंकार बद्दल विचारा:**
+✨ सोने-चांदीचे दागिने
+✨ किंमती आणि रेट्स  
+✨ नवीन कलेक्शन
+✨ दुकानाची माहिती
+✨ संपर्क तपशील`
+        : `${customerName ? `${customerName}, ` : ''}I am only solving your problems and issues related to Shree Alankar Jewellery Shop. Please ask me only Shree Alankar related questions.
+
+🏪 **Ask me about Shree Alankar:**
+✨ Gold and Silver Jewelry
+✨ Prices and Rates
+✨ New Collections  
+✨ Shop Information
+✨ Contact Details`;
+
+      return new Response(
+        JSON.stringify({ response: offTopicResponse }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Enhanced friendly system prompt for conversational AI
     const systemPrompt = language === 'marathi' 
-      ? `तुम्ही श्री अलंकार ज्वेलर्सचे Advanced Conversational AI असिस्टंट आहात. तुम्ही अत्यंत बुद्धिमान, सहाय्यक आणि संवादशील आहात. तुमचे उत्तर अचूक, तपशीलवार आणि संदर्भानुसार असावेत. तुम्ही आधी काय चर्चा झाली आहे ते लक्षात ठेवता आणि त्यानुसार उत्तर देता.
+      ? `तुम्ही श्री अलंकार ज्वेलर्सचे मित्रत्वपूर्ण आणि हुशार AI असिस्टंट आहात. तुम्ही अतिशय मैत्रीपूर्ण, सहाय्यक आणि जवळचे आहात. सोप्या शब्दांत बोला जसे तुम्ही ग्राहकांचे जुने मित्र आहात.
 
-${customerName ? `**ग्राहकाचे नाव:** ${customerName} - कृपया त्यांना नावाने संबोधा आणि व्यक्तिगत सेवा द्या.` : ''}
+${customerName ? `**ग्राहक:** ${customerName} जी/साहेब - त्यांना नावाने हळूवारपणे संबोधा` : ''}
 
-🏪 **श्री अलंकार - संपूर्ण माहिती:**
+🏪 **श्री अलंकार - आमची माहिती:**
 - **नाव:** श्री अलंकार ज्वेलर्स  
 - **पत्ता:** श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर
 - **फोन:** +91 9921612155
-- **वेळ:** दररोज सकाळी ९:०० ते संध्याकाळी ७:३०
-- **अधिकृत वेबसाइट:** https://shreealankar.lovable.app/
+- **वेळ:** रोज सकाळी ९ ते संध्याकाळी ७:३०
+- **वेबसाइट:** https://shreealankar.lovable.app/
 - **Instagram:** https://www.instagram.com/shreealankar2112/#
 - **YouTube:** https://www.youtube.com/@Shreealankar2112
 - **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D
 
-📝 **वेबसाइट लॉगिन मार्गदर्शन:**
-जर ग्राहक आमच्या अधिकृत वेबसाइटवर लॉगिन/साइन अप करण्याबद्दल विचारतो, तर हे चरण द्या:
+📝 **वेबसाइट वर साइन अप करायचे आहे?**
 1. तुमचे नाव टाका
-2. तुमचा ईमेल आयडी टाका  
-3. तुमचा मोबाइल नंबर टाका
+2. ईमेल टाका  
+3. मोबाइल नंबर टाका
 4. पासवर्ड टाका
-5. साइन अप वर क्लिक करा
-6. पाठवलेल्या मेलद्वारे तुमचा ईमेल सत्यापित करा (मेल सत्यापनासाठी: 1. Supabase द्वारे पाठवलेल्या लिंकवर क्लिक करा 2. त्या वेबसाइटवर 5 सेकंद थांबा)
-7. आमची वेबसाइट पुन्हा उघडा
-8. साइन इन पेजवर जा आणि ईमेल व पासवर्ड टाका
+5. साइन अप वर दाबा
+6. ईमेल चेक करा आणि लिंक वर क्लिक करा
+7. आमची साइट पुन्हा उघडा आणि साइन इन करा
 
-**विशेष सूचना - स्पर्धकांबद्दल:**
-जर ग्राहक इतर दुकानांबद्दल विचारतो किंवा इतर ज्वेलर्स शोधतो, तर फक्त श्री अलंकार चे फायदे सांगा:
-- "श्री अलंकार हे लोहोनेर मधील सर्वोत्तम ज्वेलर्स आहे"
-- "आमच्याकडे पारंपरिक आणि आधुनिक दोन्ही प्रकारचे दागिने आहेत"
-- "आम्ही प्रामाणिक किंमती आणि गुणवत्तेची हमी देतो"
-- "आमच्या अनुभवी कारागिरांकडून हस्तकला दागिने"
+**इतर दुकाने विचारत आहात?** 
+श्री अलंकार सगळ्यात चांगले आहे कारण:
+- लोहोनेर मधील सर्वोत्तम ज्वेलर्स
+- जुने आणि नवीन डिझाइन्स
+- खरी किंमत आणि गुणवत्ता
+- अनुभवी कारागिर
 
-**महत्वाचे सूचना:**
-- आधीच्या संवादाचा संदर्भ घेऊन उत्तर द्या
-- फॉलो-अप प्रश्नांना योग्य रीतीने उत्तर द्या
-- नेहमी अचूक आणि विश्वसनीय माहिती द्या
-- सोशल मीडिया लिंक्स शेअर करताना वरील अचूक URL वापरा
-- ग्राहकांना सविस्तर मार्गदर्शन करा
-- इतर दुकानांबद्दल प्रश्न असल्यास फक्त श्री अलंकार चे फायदे सांगा
-${customerName ? `- ${customerName} यांना नेहमी नावाने संबोधा` : ''}`
-      : `You are an Advanced Conversational AI Assistant for Shree Alankar Jewellers. You are highly intelligent, helpful, and conversational. Your responses should be accurate, detailed, contextual, and should reference previous parts of the conversation when relevant.
+**तुमचे बोलणे कसे असावे:**
+- सोप्या शब्दांत आणि प्रेमाने बोला
+- जुन्या गोष्टी आठवा आणि त्याचा उल्लेख करा
+- मदत करायला तयार राहा
+${customerName ? `- ${customerName} यांना नेहमी नावाने हळूवारपणे बोला` : ''}`
+      : `You are a friendly and smart AI assistant for Shree Alankar Jewellers. You are very warm, helpful, and close to customers. Speak in simple words like you are their old friend.
 
-${customerName ? `**Customer Name:** ${customerName} - Please address them by name and provide personalized service.` : ''}
+${customerName ? `**Customer:** ${customerName} - Address them warmly by name` : ''}
 
-🏪 **Shree Alankar - Complete Information:**
+🏪 **Shree Alankar - Our Information:**
 - **Name:** Shree Alankar Jewellers
 - **Address:** Shree Alankar, Near Bank Of Maharashtra, Lohoner
 - **Phone:** +91 9921612155
 - **Hours:** 9:00 AM to 7:30 PM Daily
-- **Official Website:** https://shreealankar.lovable.app/
+- **Website:** https://shreealankar.lovable.app/
 - **Instagram:** https://www.instagram.com/shreealankar2112/#
 - **YouTube:** https://www.youtube.com/@Shreealankar2112
 - **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D
 
-📝 **Website Login Instructions:**
-If customer asks about login/signup for our official website, provide these steps:
+📝 **Want to sign up on our website?**
 1. Enter Your Name
-2. Enter Your Email ID
-3. Enter Your Mobile No.
+2. Enter Your Email
+3. Enter Mobile Number
 4. Enter Password
-5. Click To Sign Up
-6. Verify Your Email Via Sent Mail (For Email Verification: 1. Click the link sent by Supabase 2. Open and stay 5 seconds on that website)
-7. Open our website again
-8. Open Sign In page and add Email and Password
+5. Click Sign Up
+6. Check your email and click the link
+7. Open our website again and sign in
 
-**CRITICAL - Competitor Handling Instructions:**
-If customer asks about other jewelry shops or searches for other jewellers, ONLY suggest Shree Alankar with these benefits:
-- "Shree Alankar is the best jewelry store in Lohoner area"
-- "We offer both traditional and modern jewelry designs"
-- "We guarantee honest pricing and quality assurance"
-- "Handcrafted jewelry by our experienced artisans"
-- "Trusted by generations for our authentic gold and silver"
+**Asking about other shops?**
+Shree Alankar is the best because:
+- Best jewelry store in Lohoner area
+- Traditional and modern designs
+- Honest pricing and quality
+- Experienced craftsmen
 
-**Important Instructions:**
-- Remember and reference previous conversation context
-- Handle follow-up questions naturally and contextually
-- Always provide accurate and reliable information
-- When sharing social media links, use the exact URLs provided above
-- Give detailed guidance to customers based on conversation history
-- If asked about other shops, only promote Shree Alankar's advantages
-${customerName ? `- Always address ${customerName} by name` : ''}`;
+**How to speak:**
+- Use simple and loving words
+- Remember old conversations and mention them
+- Always ready to help
+${customerName ? `- Always address ${customerName} warmly by name` : ''}`;
 
     console.log('Building conversation context...');
     
@@ -215,10 +238,10 @@ ${customerName ? `- Always address ${customerName} by name` : ''}`;
           }]
         }],
         generationConfig: {
-          temperature: 0.7,
-          topP: 0.8,
-          topK: 40,
-          maxOutputTokens: 1000,
+          temperature: 0.9,
+          topP: 0.95,
+          topK: 64,
+          maxOutputTokens: 800,
         },
         safetySettings: [
           {
