@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, MessageCircle, RotateCcw, Phone, ExternalLink } from 'lucide-react';
+import { Send, MessageCircle, RotateCcw, Phone, ExternalLink, Volume2, VolumeX } from 'lucide-react';
 import '@fontsource/poppins/400.css';
 import '@fontsource/poppins/500.css';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import OwnerDashboard from '@/components/OwnerDashboard';
 import SpeechToText from '@/components/SpeechToText';
 import { useRates } from '@/hooks/useRates';
 import { useAIChat } from '@/hooks/useAIChat';
+import { useSound } from '@/hooks/useSound';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
@@ -45,8 +46,11 @@ const Index = () => {
             key={index}
             variant="outline"
             size="sm"
-            onClick={() => window.open(cleanUrl, '_blank', 'noopener,noreferrer')}
-            className="mx-1 my-1 h-auto py-2 px-3 text-xs inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+            onClick={() => {
+              play('click');
+              window.open(cleanUrl, '_blank', 'noopener,noreferrer');
+            }}
+            className="mx-1 my-1 h-auto py-2 px-3 text-xs inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 hover-scale transition-transform duration-200"
           >
             <ExternalLink className="w-3 h-3" />
             {displayText}
@@ -62,6 +66,7 @@ const Index = () => {
   const { customerName, whatsappNo, setCustomerName, setWhatsappNo } = useCustomer();
   const { rates, isLoading: ratesLoading, refetchRates } = useRates();
   const { sendAIMessage, isLoading: aiLoading, conversationHistory, clearConversationHistory } = useAIChat();
+  const { enabled: soundEnabled, setEnabled: setSoundEnabled, play } = useSound();
   
   // ALL STATE HOOKS
   const [showNameSelector, setShowNameSelector] = useState(true);
@@ -337,6 +342,7 @@ const Index = () => {
   };
 
   const handleWhatsAppClick = () => {
+    play('click');
     const phoneNumber = '+919921612155';
     const message = `Hello! I'm ${customerName}. I need assistance with jewelry inquiries from Shree Alankar website.`;
     const whatsappUrl = `https://wa.me/${phoneNumber.replace('+', '')}?text=${encodeURIComponent(message)}`;
@@ -383,6 +389,9 @@ const Index = () => {
         ? { ...msg, text: text, isTyping: false }
         : msg
     ));
+
+    // Play receive sound when bot finishes typing
+    play('receive');
   };
 
   const handleSendMessage = async (text: string) => {
@@ -402,6 +411,9 @@ const Index = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
     setIsMessageLoading(true);
+
+    // Play send sound when user sends message
+    play('send');
 
     const loadingMessage: Message = {
       id: messages.length + 2,
@@ -454,6 +466,9 @@ const Index = () => {
   const handleQuestionClick = async (question: string) => {
     if (isMessageLoading) return;
     
+    // Play click sound for quick questions
+    play('click');
+    
     const userMessage: Message = {
       id: messages.length + 1,
       text: question,
@@ -500,6 +515,9 @@ const Index = () => {
 
   const handleOtherClick = async () => {
     if (isMessageLoading) return;
+    
+    // Play click sound for other questions button
+    play('click');
     
     const userMessage: Message = {
       id: messages.length + 1,
@@ -560,28 +578,45 @@ const Index = () => {
             </div>
           </div>
           
-          {/* Owner Login Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowOwnerLogin(true)}
-            className="h-8 w-8 opacity-30 hover:opacity-100 transition-opacity"
-          >
-            <MessageCircle className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center space-x-2">
+            {/* Sound Toggle Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className="h-8 w-8 opacity-60 hover:opacity-100 transition-opacity"
+              title={soundEnabled ? "Turn sound off" : "Turn sound on"}
+            >
+              {soundEnabled ? (
+                <Volume2 className="w-4 h-4" />
+              ) : (
+                <VolumeX className="w-4 h-4" />
+              )}
+            </Button>
+            
+            {/* Owner Login Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowOwnerLogin(true)}
+              className="h-8 w-8 opacity-30 hover:opacity-100 transition-opacity"
+            >
+              <MessageCircle className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Chat Container with padding for fixed header and footer */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full pt-20 pb-32">
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full pt-20 pb-32 animate-fade-in">
         {/* Messages Area */}
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-full px-4 py-4" ref={scrollAreaRef}>
             <div className="space-y-4 min-h-[60vh] flex flex-col justify-end">
               {messages.map((message) => (
-                <div key={message.id} className="flex flex-col space-y-2">
+                <div key={message.id} className="flex flex-col space-y-2 animate-fade-in">
                   <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[75%] rounded-2xl px-4 py-3 ${
+                    <div className={`max-w-[75%] rounded-2xl px-4 py-3 transform transition-all duration-300 ${
                       message.isUser 
                         ? 'bg-primary text-primary-foreground ml-auto' 
                         : 'bg-muted text-foreground'
@@ -611,7 +646,7 @@ const Index = () => {
                   variant="outline"
                   onClick={() => handleQuestionClick(question)}
                   disabled={isMessageLoading}
-                  className="text-left justify-start h-auto py-3 px-4 whitespace-normal bg-card hover:bg-accent"
+                  className="text-left justify-start h-auto py-3 px-4 whitespace-normal bg-card hover:bg-accent hover-scale transition-transform duration-200"
                 >
                   {question}
                 </Button>
@@ -640,7 +675,7 @@ const Index = () => {
                   variant="outline"
                   onClick={() => handleQuestionClick(question)}
                   disabled={isMessageLoading}
-                  className="text-left justify-start h-auto py-3 px-4 whitespace-normal bg-card hover:bg-accent"
+                  className="text-left justify-start h-auto py-3 px-4 whitespace-normal bg-card hover:bg-accent hover-scale transition-transform duration-200"
                 >
                   {question}
                 </Button>
@@ -679,7 +714,7 @@ const Index = () => {
                 variant="ghost"
                 size="sm"
                 onClick={handleWhatsAppClick}
-                className="text-green-600 hover:text-green-700"
+                className="text-green-600 hover:text-green-700 hover-scale transition-transform duration-200"
               >
                 <Phone className="w-4 h-4 mr-2" />
                 WhatsApp

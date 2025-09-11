@@ -170,6 +170,15 @@ All colors MUST be HSL.
     right: -5px;
     animation: sparkle 2s infinite;
   }
+
+  /* Hover scale animation utility */
+  .hover-scale {
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
 }
 
 /* Custom scrollbar for chat */
