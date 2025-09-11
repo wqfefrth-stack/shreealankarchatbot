@@ -90,10 +90,16 @@ ${customerName ? `**ग्राहक:** ${customerName} जी/साहेब
 - **पत्ता:** श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर
 - **फोन:** +91 9921612155
 - **वेळ:** रोज सकाळी ९ ते संध्याकाळी ७:३०
-- **वेबसाइट:** https://shreealankar.lovable.app/
-- **Instagram:** https://www.instagram.com/shreealankar2112/#
+- **वेबसाइट:** https://shreealankar.lovable.app
+- **Instagram:** https://www.instagram.com/shreealankar2112
 - **YouTube:** https://www.youtube.com/@Shreealankar2112
-- **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D
+- **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s
+
+**महत्वाचे सूचना:**
+- जेव्हा ग्राहक लिंक मागतात तेव्हा फक्त साफ URL द्या, कोणतेही इमोजी किंवा अतिरिक्त अक्षरे नको
+- वेबसाइट लिंक: https://shreealankar.lovable.app
+- Instagram लिंक: https://www.instagram.com/shreealankar2112
+- YouTube लिंक: https://www.youtube.com/@Shreealankar2112
 
 📝 **वेबसाइट वर साइन अप करायचे आहे?**
 1. तुमचे नाव टाका
@@ -125,10 +131,16 @@ ${customerName ? `**Customer:** ${customerName} - Address them warmly by name` :
 - **Address:** Shree Alankar, Near Bank Of Maharashtra, Lohoner
 - **Phone:** +91 9921612155
 - **Hours:** 9:00 AM to 7:30 PM Daily
-- **Website:** https://shreealankar.lovable.app/
-- **Instagram:** https://www.instagram.com/shreealankar2112/#
+- **Website:** https://shreealankar.lovable.app
+- **Instagram:** https://www.instagram.com/shreealankar2112
 - **YouTube:** https://www.youtube.com/@Shreealankar2112
-- **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D
+- **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s
+
+**Important Instructions:**
+- When customers ask for links, provide only clean URLs without emojis or extra characters
+- Website link: https://shreealankar.lovable.app
+- Instagram link: https://www.instagram.com/shreealankar2112
+- YouTube link: https://www.youtube.com/@Shreealankar2112
 
 📝 **Want to sign up on our website?**
 1. Enter Your Name
@@ -277,17 +289,17 @@ ${customerName ? `- Always address ${customerName} warmly by name` : ''}`;
 📞 **फोन:** +91 9921612155
 📍 **पत्ता:** श्री अलंकार, बँक ऑफ महाराष्ट्र जवळ, लोहोनेर
 🕒 **वेळ:** दररोज सकाळी ९:०० ते संध्याकाळी ७:३०
-📱 **Instagram:** https://www.instagram.com/shreealankar2112/#
+📱 **Instagram:** https://www.instagram.com/shreealankar2112
 📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
-🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`
+🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s`
         : `${customerName ? `${customerName}, ` : ''}Sorry, AI service is currently unavailable. Please contact us directly:
 
 📞 **Phone:** +91 9921612155
 📍 **Address:** Shree Alankar, Near Bank Of Maharashtra, Lohoner
 🕒 **Hours:** 9:00 AM to 7:30 PM Daily
-📱 **Instagram:** https://www.instagram.com/shreealankar2112/#
+📱 **Instagram:** https://www.instagram.com/shreealankar2112
 📺 **YouTube:** https://www.youtube.com/@Shreealankar2112
-🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s?authuser=0&entry=ttu&g_ep=EgoyMDI1MDcwOC4wIKXMDSoASAFQAw%3D%3D`;
+🗺️ **Google Maps:** https://www.google.com/maps/place/Shree+Alankar/@20.5144759,74.2000775,18z/data=!4m6!3m5!1s0x3bde7d9ab173487f:0xf0a759b0a4f281e2!8m2!3d20.5137601!4d74.1991422!16s%2Fg%2F11qzzxsp6s`;
 
       return new Response(JSON.stringify({ response: fallbackResponse }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
