@@ -127,163 +127,35 @@ All colors MUST be HSL.
     100% { background-position: 200% 0; }
   }
   
-  /* Enhanced Chat Animations */
+  /* Chat bubble animations */
   .chat-bubble-enter {
-    animation: slide-up-fade-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-  
-  .chat-bubble-user {
-    animation: slide-in-right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-  
-  .chat-bubble-bot {
-    animation: slide-in-left 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: fade-in 0.3s ease-out;
   }
   
   .chat-typing {
-    animation: pulse 1.5s infinite, bounce-subtle 2s infinite;
+    animation: pulse 1.5s infinite;
   }
   
-  /* Enhanced Thinking Animation */
+  /* Thinking animation */
   .thinking-dots {
-    animation: thinking-enhanced 1.4s infinite ease-in-out;
-    position: relative;
-  }
-  
-  .thinking-dots::before {
-    content: '💭';
-    position: absolute;
-    left: -30px;
-    animation: float 2s ease-in-out infinite;
+    animation: thinking 1.4s infinite ease-in-out;
   }
   
   .thinking-dots::after {
-    content: '...';
+    content: '';
     display: inline-block;
-    animation: thinking-dots-enhanced 1.4s infinite ease-in-out;
-    color: #d97706;
-    font-weight: bold;
+    width: 4px;
+    animation: thinking-dots 1.4s infinite ease-in-out;
   }
   
-  /* Button Animations */
-  .quick-question-btn {
-    animation: stagger-fade-in 0.6s ease-out backwards;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  @keyframes thinking {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
   }
   
-  .quick-question-btn:hover {
-    animation: bounce-gentle 0.6s ease-in-out;
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(217, 119, 6, 0.3);
-  }
-  
-  /* Message Reaction Animations */
-  .message-highlight {
-    animation: glow-pulse 1.5s ease-in-out;
-  }
-  
-  .message-emphasis {
-    animation: shake-subtle 0.8s ease-in-out;
-  }
-  
-  /* Enhanced Keyframes */
-  @keyframes slide-up-fade-in {
-    0% {
-      opacity: 0;
-      transform: translateY(30px) scale(0.95);
-    }
-    50% {
-      opacity: 0.7;
-      transform: translateY(-5px) scale(1.02);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-  
-  @keyframes slide-in-right {
-    0% {
-      opacity: 0;
-      transform: translateX(50px) rotateY(15deg);
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(0) rotateY(0deg);
-    }
-  }
-  
-  @keyframes slide-in-left {
-    0% {
-      opacity: 0;
-      transform: translateX(-50px) rotateY(-15deg);
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(0) rotateY(0deg);
-    }
-  }
-  
-  @keyframes bounce-subtle {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
-  }
-  
-  @keyframes bounce-gentle {
-    0%, 100% { transform: translateY(0) scale(1); }
-    25% { transform: translateY(-5px) scale(1.05); }
-    50% { transform: translateY(-8px) scale(1.08); }
-    75% { transform: translateY(-3px) scale(1.03); }
-  }
-  
-  @keyframes thinking-enhanced {
-    0%, 80%, 100% { 
-      opacity: 0.4; 
-      transform: scale(0.9);
-    }
-    40% { 
-      opacity: 1; 
-      transform: scale(1.1);
-    }
-  }
-  
-  @keyframes thinking-dots-enhanced {
-    0% { opacity: 0.2; }
-    25% { opacity: 0.8; }
-    50% { opacity: 1; }
-    75% { opacity: 0.8; }
-    100% { opacity: 0.2; }
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-  
-  @keyframes stagger-fade-in {
-    0% {
-      opacity: 0;
-      transform: translateY(20px) scale(0.8);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-  
-  @keyframes glow-pulse {
-    0%, 100% {
-      box-shadow: 0 0 5px rgba(217, 119, 6, 0.3);
-    }
-    50% {
-      box-shadow: 0 0 20px rgba(217, 119, 6, 0.6), 0 0 30px rgba(217, 119, 6, 0.4);
-    }
-  }
-  
-  @keyframes shake-subtle {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-    20%, 40%, 60%, 80% { transform: translateX(2px); }
+  @keyframes thinking-dots {
+    0%, 60%, 100% { transform: scale(0.8); opacity: 0.3; }
+    30% { transform: scale(1.1); opacity: 1; }
   }
   
   /* Sparkle effect for jewelry theme */
@@ -299,76 +171,13 @@ All colors MUST be HSL.
     animation: sparkle 2s infinite;
   }
 
-  /* Enhanced Interactive Elements */
+  /* Hover scale animation utility */
   .hover-scale {
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform 0.2s ease-in-out;
   }
   
   .hover-scale:hover {
-    transform: scale(1.05) translateY(-2px);
-    filter: brightness(1.1);
-  }
-  
-  .hover-bounce {
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  }
-  
-  .hover-bounce:hover {
-    animation: bounce-gentle 0.6s ease-in-out;
-  }
-  
-  .pulse-glow {
-    animation: pulse-glow-continuous 2s ease-in-out infinite;
-  }
-  
-  .rotate-on-hover {
-    transition: transform 0.3s ease-in-out;
-  }
-  
-  .rotate-on-hover:hover {
-    transform: rotate(5deg) scale(1.05);
-  }
-  
-  /* Loading and Typing Enhancements */
-  .typing-indicator {
-    animation: typing-pulse 1.2s ease-in-out infinite;
-  }
-  
-  .message-appear {
-    animation: message-slide-in 0.5s ease-out;
-  }
-  
-  @keyframes pulse-glow-continuous {
-    0%, 100% {
-      box-shadow: 0 0 5px rgba(217, 119, 6, 0.5);
-      opacity: 0.9;
-    }
-    50% {
-      box-shadow: 0 0 15px rgba(217, 119, 6, 0.8);
-      opacity: 1;
-    }
-  }
-  
-  @keyframes typing-pulse {
-    0%, 100% {
-      opacity: 0.6;
-      transform: scale(0.95);
-    }
-    50% {
-      opacity: 1;
-      transform: scale(1.05);
-    }
-  }
-  
-  @keyframes message-slide-in {
-    0% {
-      opacity: 0;
-      transform: translateY(15px) scale(0.95);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+    transform: scale(1.02);
   }
 }
 
