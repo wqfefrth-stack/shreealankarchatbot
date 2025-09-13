@@ -47,7 +47,15 @@ serve(async (req) => {
 
     // Check if message is off-topic (not related to jewelry, shop, or business)
     const jewelryKeywords = ['jewelry', 'jewellery', 'gold', 'silver', 'diamond', 'ring', 'necklace', 'earrings', 'bracelet', 'chain', 'pendant', 'सोने', 'चांदी', 'दागिने', 'अंगठी', 'हार', 'कानातील', 'कंगन', 'साखळी'];
-    const businessKeywords = ['shree', 'alankar', 'श्री', 'अलंकार', 'shop', 'store', 'दुकान', 'price', 'rate', 'किंमत', 'रेट', 'website', 'वेबसाइट', 'contact', 'संपर्क', 'address', 'पत्ता', 'time', 'वेळ'];
+    const businessKeywords = [
+      'shree', 'alankar', 'श्री', 'अलंकार', 'shreealankar', 'alnkar', 'alankar', 'alankaar', 'alonkar',
+      'shop', 'store', 'दुकान', 'jeweller', 'jewelers', 'jwellers', 'jwellery',
+      'price', 'rate', 'किंमत', 'रेट', 'cost', 'rates', 'pricing',
+      'website', 'वेबसाइट', 'site', 'online', 'web',
+      'contact', 'संपर्क', 'phone', 'call', 'number', 'mobile',
+      'address', 'पत्ता', 'location', 'where', 'lohoner', 'लोहोनेर',
+      'time', 'वेळ', 'timing', 'hours', 'open', 'close', 'available', 'service', 'avalable', 'timing', 'when'
+    ];
     
     const messageWords = message.toLowerCase().split(/\s+/);
     const hasJewelryKeyword = jewelryKeywords.some(keyword => message.toLowerCase().includes(keyword.toLowerCase()));
