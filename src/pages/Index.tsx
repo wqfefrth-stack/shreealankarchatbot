@@ -567,14 +567,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Fixed Header - Always Visible */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm p-3 border-b border-border/10">
+      {/* Fixed Header - Always Visible with Enhanced Animations */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm p-3 border-b border-border/10 message-appear">
         <div className="flex items-center justify-between max-w-4xl mx-auto">
           <div className="flex items-center space-x-3">
-            <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar" className="w-7 h-7 object-contain" />
-            <div>
-              <h1 className="text-lg font-medium text-foreground">Shree Alankar</h1>
-              <p className="text-xs text-muted-foreground">AI Assistant for Jewelry Services</p>
+            <div className="pulse-glow hover-bounce">
+              <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar" className="w-7 h-7 object-contain sparkle-animation" />
+            </div>
+            <div className="hover-scale">
+              <h1 className="text-lg font-medium text-foreground">✨ Shree Alankar</h1>
+              <p className="text-xs text-muted-foreground">AI Assistant for Jewelry Services 💎</p>
             </div>
           </div>
           
@@ -584,7 +586,7 @@ const Index = () => {
               variant="ghost"
               size="icon"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="h-8 w-8 opacity-60 hover:opacity-100 transition-opacity"
+              className="h-8 w-8 opacity-60 hover:opacity-100 transition-opacity hover-bounce rotate-on-hover"
               title={soundEnabled ? "Turn sound off" : "Turn sound on"}
             >
               {soundEnabled ? (
@@ -599,7 +601,7 @@ const Index = () => {
               variant="ghost"
               size="icon"
               onClick={() => setShowOwnerLogin(true)}
-              className="h-8 w-8 opacity-30 hover:opacity-100 transition-opacity"
+              className="h-8 w-8 opacity-30 hover:opacity-100 transition-opacity hover-bounce"
             >
               <MessageCircle className="w-4 h-4" />
             </Button>
@@ -613,17 +615,18 @@ const Index = () => {
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-full px-4 py-4" ref={scrollAreaRef}>
             <div className="space-y-4 min-h-[60vh] flex flex-col justify-end">
-              {messages.map((message) => (
-                <div key={message.id} className="flex flex-col space-y-2 animate-fade-in">
+              {messages.map((message, index) => (
+                <div key={message.id} className={`flex flex-col space-y-2 ${message.isUser ? 'chat-bubble-user' : 'chat-bubble-bot'}`}
+                     style={{ animationDelay: `${index * 100}ms` }}>
                   <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[75%] rounded-2xl px-4 py-3 transform transition-all duration-300 ${
+                    <div className={`max-w-[75%] rounded-2xl px-4 py-3 transform transition-all duration-300 hover:shadow-lg hover:scale-105 ${
                       message.isUser 
-                        ? 'bg-primary text-primary-foreground ml-auto' 
-                        : 'bg-muted text-foreground'
+                        ? 'bg-primary text-primary-foreground ml-auto message-highlight' 
+                        : 'bg-muted text-foreground message-emphasis'
                     }`}>
                       <div className="chat-font whitespace-pre-wrap break-words text-sm leading-relaxed">
                         {message.isTyping ? (
-                          <span className="thinking-dots">{message.text}</span>
+                          <span className="thinking-dots typing-indicator">{message.text}</span>
                         ) : (
                           renderTextWithLinks(message.text)
                         )}
@@ -636,9 +639,9 @@ const Index = () => {
           </ScrollArea>
         </div>
 
-        {/* Quick Questions */}
+        {/* Enhanced Quick Questions with Stagger Animation */}
         {showQuickQuestions && (
-          <div className="px-4 pb-4">
+          <div className="px-4 pb-4 message-appear">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
               {initialQuickQuestions.map((question, index) => (
                 <Button
@@ -646,8 +649,10 @@ const Index = () => {
                   variant="outline"
                   onClick={() => handleQuestionClick(question)}
                   disabled={isMessageLoading}
-                  className="text-left justify-start h-auto py-3 px-4 whitespace-normal bg-card hover:bg-accent hover-scale transition-transform duration-200"
+                  className="text-left justify-start h-auto py-3 px-4 whitespace-normal bg-card hover:bg-accent quick-question-btn hover-bounce"
+                  style={{ animationDelay: `${index * 150}ms` }}
                 >
+                  <span className="mr-2">💎</span>
                   {question}
                 </Button>
               ))}
@@ -657,17 +662,17 @@ const Index = () => {
                 variant="ghost"
                 onClick={handleOtherClick}
                 disabled={isMessageLoading}
-                className="text-primary hover:text-primary/80"
+                className="text-primary hover:text-primary/80 pulse-glow hover-bounce"
               >
-                {t('language') === 'marathi' ? 'इतर प्रश्न' : 'More Questions'}
+                ✨ {t('language') === 'marathi' ? 'इतर प्रश्न' : 'More Questions'} →
               </Button>
             </div>
           </div>
         )}
 
-        {/* Other Questions */}
+        {/* Enhanced Other Questions with Stagger Animation */}
         {showOtherQuestions && (
-          <div className="px-4 pb-4">
+          <div className="px-4 pb-4 message-appear">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {otherQuickQuestions.map((question, index) => (
                 <Button
@@ -675,8 +680,10 @@ const Index = () => {
                   variant="outline"
                   onClick={() => handleQuestionClick(question)}
                   disabled={isMessageLoading}
-                  className="text-left justify-start h-auto py-3 px-4 whitespace-normal bg-card hover:bg-accent hover-scale transition-transform duration-200"
+                  className="text-left justify-start h-auto py-3 px-4 whitespace-normal bg-card hover:bg-accent quick-question-btn hover-bounce"
+                  style={{ animationDelay: `${index * 150}ms` }}
                 >
+                  <span className="mr-2">💫</span>
                   {question}
                 </Button>
               ))}
@@ -684,10 +691,10 @@ const Index = () => {
           </div>
         )}
 
-        {/* Fixed Input Area - Always Visible */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border/10">
+        {/* Enhanced Fixed Input Area - Always Visible */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border/10 message-appear">
           <div className="max-w-4xl mx-auto p-4">
-            <div className="relative flex items-center space-x-2 bg-muted/30 rounded-3xl p-3 border border-border/20">
+            <div className="relative flex items-center space-x-2 bg-muted/30 rounded-3xl p-3 border border-border/20 hover:shadow-lg transition-all duration-300">
               <Input
                 type="text"
                 placeholder={isMessageLoading ? t('chat.thinking') : t('chat.placeholder')}
@@ -695,29 +702,31 @@ const Index = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage(inputText)}
                 disabled={isMessageLoading}
-                className="flex-1 border-0 bg-transparent focus:ring-0 focus:ring-offset-0 placeholder:text-muted-foreground/60 text-base"
+                className="flex-1 border-0 bg-transparent focus:ring-0 focus:ring-offset-0 placeholder:text-muted-foreground/60 text-base focus:scale-105 transition-transform duration-300"
               />
-              <SpeechToText onTranscription={setInputText} />
+              <div className="hover-bounce">
+                <SpeechToText onTranscription={setInputText} />
+              </div>
               <Button
                 onClick={() => handleSendMessage(inputText)}
                 disabled={!inputText.trim() || isMessageLoading}
                 size="icon"
-                className="rounded-full h-9 w-9 bg-primary hover:bg-primary/90"
+                className="rounded-full h-9 w-9 bg-primary hover:bg-primary/90 pulse-glow hover-bounce"
               >
                 <Send className="w-4 h-4" />
               </Button>
             </div>
             
-            {/* Action buttons - Only WhatsApp */}
+            {/* Enhanced Action buttons - Only WhatsApp */}
             <div className="flex justify-center mt-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleWhatsAppClick}
-                className="text-green-600 hover:text-green-700 hover-scale transition-transform duration-200"
+                className="text-green-600 hover:text-green-700 hover-bounce pulse-glow transition-all duration-300"
               >
                 <Phone className="w-4 h-4 mr-2" />
-                WhatsApp
+                💬 WhatsApp
               </Button>
             </div>
           </div>
