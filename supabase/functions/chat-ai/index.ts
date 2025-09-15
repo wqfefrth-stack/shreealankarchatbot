@@ -19,7 +19,54 @@ serve(async (req) => {
     const requestBody = await req.json();
     console.log('Request body:', requestBody);
     
-    const { message, language = 'english', conversationHistory = [], customerName = '' } = requestBody;
+    const { message, language = 'english', conversationHistory = [], customerName = '', whatsappNo = '', callRequest = null } = requestBody;
+
+    // Handle call request flow
+    if (callRequest) {
+      console.log('Processing call request:', callRequest);
+      
+      try {
+        // Import Resend
+        const { Resend } = await import('npm:resend@2.0.0');
+        const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+
+        // Send email notification
+        const emailResponse = await resend.emails.send({
+          from: 'Shree Alankar <onboarding@resend.dev>',
+          to: ['info@shreealankar.com'], // Replace with actual admin email
+          subject: 'Call Request from Customer',
+          html: `
+            <h2>New Call Request</h2>
+            <p><strong>Customer Name:</strong> ${callRequest.customerName}</p>
+            <p><strong>Phone Number:</strong> ${callRequest.phoneNumber}</p>
+            <p><strong>Issue/Query:</strong> ${callRequest.issue}</p>
+            <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
+          `,
+        });
+
+        console.log('Email sent successfully:', emailResponse);
+
+        const confirmationMessage = language === 'marathi' 
+          ? `${customerName ? `${customerName} जी, ` : ''}तुमची कॉल रिक्वेस्ट प्राप्त झाली आहे! आम्ही २४ तासांच्या आत तुमच्याशी संपर्क साधू.\n\n📞 **फोन:** ${callRequest.phoneNumber}\n📝 **समस्या:** ${callRequest.issue}\n\nधन्यवाद!`
+          : `${customerName ? `${customerName}, ` : ''}Your call request has been received! We will touch base with you within 24 hours.\n\n📞 **Phone:** ${callRequest.phoneNumber}\n📝 **Issue:** ${callRequest.issue}\n\nThank you!`;
+
+        return new Response(
+          JSON.stringify({ response: confirmationMessage }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+        
+      } catch (error) {
+        console.error('Error processing call request:', error);
+        const errorMessage = language === 'marathi' 
+          ? 'कॉल रिक्वेस्ट प्रक्रिया करताना त्रुटी झाली. कृपया थेट संपर्क साधा: +91 9921612155'
+          : 'Error processing call request. Please contact us directly: +91 9921612155';
+        
+        return new Response(
+          JSON.stringify({ response: errorMessage }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
 
     if (!message || message.trim() === '') {
       console.error('Message is required');
@@ -42,6 +89,36 @@ serve(async (req) => {
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
+      );
+    }
+
+    // Check for call request keywords
+    const callKeywords = ['call me', 'call to me', 'फोन करा', 'कॉल करा', 'contact me', 'reach me', 'get in touch', 'connect with me', 'speak with me', 'talk to me', 'संपर्क करा', 'बोला', 'phone me'];
+    
+    const isCallRequest = callKeywords.some(keyword => message.toLowerCase().includes(keyword.toLowerCase()));
+    
+    if (isCallRequest) {
+      console.log('Call request detected');
+      
+      const callRequestResponse = language === 'marathi' 
+        ? `${customerName ? `${customerName} जी, ` : ''}मी तुमची कॉल रिक्वेस्ट समजली आहे! 
+
+📞 **तुमचा सध्याचा नंबर:** ${whatsappNo || 'उपलब्ध नाही'}
+
+कृपया खालील पर्यायांपैकी एक निवडा:`
+        : `${customerName ? `${customerName}, ` : ''}I understand you want a call back! 
+
+📞 **Your current number:** ${whatsappNo || 'Not available'}
+
+Please choose one of the options below:`;
+      
+      return new Response(
+        JSON.stringify({ 
+          response: callRequestResponse,
+          showCallOptions: true,
+          currentNumber: whatsappNo
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 

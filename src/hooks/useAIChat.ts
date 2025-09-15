@@ -21,12 +21,13 @@ export const useAIChat = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
 
-  const sendAIMessage = async (message: string, customerName?: string): Promise<string> => {
+  const sendAIMessage = async (message: string, customerName?: string, whatsappNo?: string): Promise<any> => {
     setIsLoading(true);
     
     try {
       console.log('Sending message to AI:', message);
       console.log('Customer name:', customerName);
+      console.log('WhatsApp number:', whatsappNo);
       console.log('Current conversation history:', conversationHistory);
       
       const { data, error } = await supabase.functions.invoke('chat-ai', {
@@ -34,7 +35,8 @@ export const useAIChat = () => {
           message: message.trim(),
           language: language === 'marathi' ? 'marathi' : 'english',
           conversationHistory: conversationHistory,
-          customerName: customerName || ''
+          customerName: customerName || '',
+          whatsappNo: whatsappNo || ''
         }
       });
 
@@ -45,7 +47,7 @@ export const useAIChat = () => {
         throw new Error('Failed to get AI response');
       }
 
-      const aiData = data as AIResponse;
+      const aiData = data as any;
       
       if (aiData.error) {
         console.error('AI service error:', aiData.error);
@@ -79,7 +81,8 @@ export const useAIChat = () => {
         await supabase.from('chat_logs').insert({
           customer_name: customerName || 'Anonymous',
           message: message,
-          response: aiData.response
+          response: aiData.response,
+          whatsapp_no: whatsappNo || null
         });
         console.log('Chat saved to database');
       } catch (dbError) {
@@ -94,7 +97,8 @@ export const useAIChat = () => {
           : 'AI has responded to your question.',
       });
       
-      return aiData.response;
+      // Return full data if it has showCallOptions, otherwise just the response
+      return aiData.showCallOptions ? aiData : aiData.response;
       
     } catch (error) {
       console.error('Error in sendAIMessage:', error);
