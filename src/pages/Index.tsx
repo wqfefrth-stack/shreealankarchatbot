@@ -61,6 +61,7 @@ const Index = () => {
       return <span key={index}>{part}</span>;
     });
   };
+
   // ALL HOOKS MUST BE DECLARED AT THE TOP - NO CONDITIONAL CALLS
   const { t } = useLanguage();
   const { customerName, whatsappNo, setCustomerName, setWhatsappNo } = useCustomer();
@@ -80,10 +81,6 @@ const Index = () => {
   const [isMessageLoading, setIsMessageLoading] = useState(false);
   const [showOwnerLogin, setShowOwnerLogin] = useState(false);
   const [showOwnerDashboard, setShowOwnerDashboard] = useState(false);
-  const [showCallOptions, setShowCallOptions] = useState(false);
-  const [showPhoneForm, setShowPhoneForm] = useState(false);
-  const [newPhoneNumber, setNewPhoneNumber] = useState('');
-  const [callIssue, setCallIssue] = useState('');
   const [showCallOptions, setShowCallOptions] = useState(false);
   const [showPhoneForm, setShowPhoneForm] = useState(false);
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
@@ -328,90 +325,7 @@ const Index = () => {
     }
   };
 
-  const handleCallRequest = async (phoneNumber: string, issue: string) => {
-    try {
-      const response = await supabase.functions.invoke('chat-ai', {
-        body: {
-          message: '',
-          language: t('language'),
-          customerName,
-          whatsappNo,
-          callRequest: {
-            customerName,
-            phoneNumber,
-            issue
-          }
-        }
-      });
-
-      if (response.data?.response) {
-        const botMessage: Message = {
-          id: messages.length + 1,
-          text: response.data.response,
-          isUser: false,
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, botMessage]);
-        play('receive');
-      }
-    } catch (error) {
-      console.error('Call request error:', error);
-    }
-  };
-
   const getResponse = async (question: string): Promise<string> => {
-    // Check if it's a rate-related query
-    if (isRateQuery(question)) {
-      const rateInfo = getCurrentRates();
-      return rateInfo.message;
-    }
-
-    // Check if it's a social media query
-    if (isSocialMediaQuery(question)) {
-      const socialInfo = getSocialMediaResponse();
-      return socialInfo.message;
-    }
-
-    // Check if it's a predefined question
-    const responses: { [key: string]: string } = {
-      [t('question.hours')]: t('response.hours'),
-      [t('question.custom')]: t('response.custom'),
-      [t('question.rates')]: t('response.rates'),
-      [t('question.valuation')]: t('response.valuation'),
-      [t('question.types')]: t('response.types'),
-      [t('question.coins')]: t('response.coins'),
-      [t('question.return')]: t('response.return'),
-      [t('question.repair')]: t('response.repair'),
-      [t('question.checkRates')]: t('response.checkRates'),
-      [t('question.wedding')]: t('response.wedding'),
-      [t('question.certificates')]: t('response.certificates'),
-      [t('question.online')]: t('response.online')
-    };
-
-    // If it's a predefined question, return the predefined response
-    if (responses[question]) {
-      return responses[question];
-    }
-
-    // For all other questions, use AI with conversation context and customer name
-    console.log('Using Advanced Conversational Gemini AI for question:', question);
-    try {
-      const aiResponse = await sendAIMessage(question, customerName, whatsappNo);
-      
-      // Check if AI response includes call options
-      if (typeof aiResponse === 'object' && aiResponse.showCallOptions) {
-        setShowCallOptions(true);
-        return aiResponse.response;
-      }
-      
-      return aiResponse;
-    } catch (error) {
-      console.error('Advanced Conversational AI error handling:', error);
-      return t('language') === 'marathi' 
-        ? 'तांत्रिक अडचण झाली आहे. कृपया पुन्हा प्रयत्न करा.'
-        : 'Technical difficulty occurred. Please try again.';
-    }
-  };
     // Check if it's a rate-related query
     if (isRateQuery(question)) {
       const rateInfo = getCurrentRates();
