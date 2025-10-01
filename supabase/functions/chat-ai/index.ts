@@ -122,47 +122,7 @@ Please choose one of the options below:`;
       );
     }
 
-    // Check if message is off-topic (not related to jewelry, shop, or business)
-    const jewelryKeywords = ['jewelry', 'jewellery', 'gold', 'silver', 'diamond', 'ring', 'necklace', 'earrings', 'bracelet', 'chain', 'pendant', 'सोने', 'चांदी', 'दागिने', 'अंगठी', 'हार', 'कानातील', 'कंगन', 'साखळी'];
-    const businessKeywords = [
-      'shree', 'alankar', 'श्री', 'अलंकार', 'shreealankar', 'alnkar', 'alankar', 'alankaar', 'alonkar',
-      'shop', 'store', 'दुकान', 'jeweller', 'jewelers', 'jwellers', 'jwellery',
-      'price', 'rate', 'किंमत', 'रेट', 'cost', 'rates', 'pricing',
-      'website', 'वेबसाइट', 'site', 'online', 'web',
-      'contact', 'संपर्क', 'phone', 'call', 'number', 'mobile',
-      'address', 'पत्ता', 'location', 'where', 'lohoner', 'लोहोनेर',
-      'time', 'वेळ', 'timing', 'hours', 'open', 'close', 'available', 'service', 'avalable', 'timing', 'when'
-    ];
-    
-    const messageWords = message.toLowerCase().split(/\s+/);
-    const hasJewelryKeyword = jewelryKeywords.some(keyword => message.toLowerCase().includes(keyword.toLowerCase()));
-    const hasBusinessKeyword = businessKeywords.some(keyword => message.toLowerCase().includes(keyword.toLowerCase()));
-    
-    // If message doesn't contain jewelry or business keywords, send redirect message
-    if (!hasJewelryKeyword && !hasBusinessKeyword) {
-      const offTopicResponse = language === 'marathi' 
-        ? `${customerName ? `${customerName} जी, ` : ''}मी फक्त श्री अलंकार ज्वेलर्स शॉपशी संबंधित समस्या आणि प्रश्नांचे निराकरण करतो. कृपया मला फक्त श्री अलंकार संबंधित प्रश्न विचारा.
-
-🏪 **श्री अलंकार बद्दल विचारा:**
-✨ सोने-चांदीचे दागिने
-✨ किंमती आणि रेट्स  
-✨ नवीन कलेक्शन
-✨ दुकानाची माहिती
-✨ संपर्क तपशील`
-        : `${customerName ? `${customerName}, ` : ''}I am only solving your problems and issues related to Shree Alankar Jewellery Shop. Please ask me only Shree Alankar related questions.
-
-🏪 **Ask me about Shree Alankar:**
-✨ Gold and Silver Jewelry
-✨ Prices and Rates
-✨ New Collections  
-✨ Shop Information
-✨ Contact Details`;
-
-      return new Response(
-        JSON.stringify({ response: offTopicResponse }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    // Off-topic filter removed - AI will naturally stay on topic through system prompt
 
     // Enhanced friendly system prompt for conversational AI
     const systemPrompt = language === 'marathi' 
