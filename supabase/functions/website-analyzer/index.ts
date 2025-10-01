@@ -26,7 +26,7 @@ serve(async (req) => {
       );
     }
 
-    const geminiApiKey = 'AIzaSyAR7PeMiRvpDyvdYgRw8J7e2A4O56vESlE';
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
     
     console.log(`Fetching content from: ${url}`);
     
@@ -60,7 +60,7 @@ Provide the information in a clear, organized format.`;
     console.log('Making Gemini API call for website analysis...');
 
     // Make API call to Gemini for analysis
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

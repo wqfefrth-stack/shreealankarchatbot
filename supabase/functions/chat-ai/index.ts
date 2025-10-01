@@ -79,12 +79,12 @@ serve(async (req) => {
       );
     }
 
-    const geminiApiKey = 'AIzaSyAR7PeMiRvpDyvdYgRw8J7e2A4O56vESlE';
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
     
     if (!geminiApiKey) {
-      console.error('Gemini API key not found');
+      console.error('GEMINI_API_KEY is not defined');
       return new Response(
-        JSON.stringify({ error: 'API key not configured' }),
+        JSON.stringify({ error: 'GEMINI_API_KEY is not defined' }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -323,7 +323,7 @@ ${customerName ? `- Always address ${customerName} warmly by name` : ''}`;
     console.log('Making Gemini API call...');
 
     // Make API call to Gemini
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
