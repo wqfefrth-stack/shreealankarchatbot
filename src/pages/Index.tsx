@@ -109,12 +109,13 @@ const Index = () => {
 
   const initializeMessages = useCallback(() => {
     if (customerName && !showNameSelector && !showLanguageSelector && !showLoading) {
-      const personalizedGreeting = t('chat.greeting').replace('{{name}}', customerName) || 
-        `Hello ${customerName}! Welcome to Shree Alankar. How can I assist you today?`;
+      const diwaliGreeting = t('language') === 'marathi' 
+        ? `🪔✨ **दिवाळीच्या हार्दिक शुभेच्छा!** ✨🪔\n\nश्री अलंकार टीमच्या वतीने ${customerName} जी/साहेब, तुम्हाला आणि तुमच्या कुटुंबाला दिवाळीच्या हार्दिक शुभेच्छा! 🎇\n\nआपल्या सेवेत सदैव तत्पर आहोत. आम्ही आपली कशी मदत करू शकतो?`
+        : `🪔✨ **Happy Diwali!** ✨🪔\n\nWarm Diwali wishes from Shree Alankar Team! ${customerName}, may this festival of lights bring prosperity and joy to you and your family! 🎇\n\nHow can we assist you today?`;
       
       setMessages([{
         id: 1,
-        text: personalizedGreeting,
+        text: diwaliGreeting,
         isUser: false,
         timestamp: new Date()
       }]);
@@ -393,12 +394,13 @@ const Index = () => {
   };
 
   const handleClearChat = () => {
-    const personalizedGreeting = t('chat.greeting').replace('{{name}}', customerName) || 
-      `Hello ${customerName}! Welcome to Shree Alankar. How can I assist you today?`;
+    const diwaliGreeting = t('language') === 'marathi' 
+      ? `🪔✨ **दिवाळीच्या हार्दिक शुभेच्छा!** ✨🪔\n\nश्री अलंकार टीमच्या वतीने ${customerName} जी/साहेब, तुम्हाला आणि तुमच्या कुटुंबाला दिवाळीच्या हार्दिक शुभेच्छा! 🎇\n\nआपल्या सेवेत सदैव तत्पर आहोत. आम्ही आपली कशी मदत करू शकतो?`
+      : `🪔✨ **Happy Diwali!** ✨🪔\n\nWarm Diwali wishes from Shree Alankar Team! ${customerName}, may this festival of lights bring prosperity and joy to you and your family! 🎇\n\nHow can we assist you today?`;
     
     setMessages([{
       id: 1,
-      text: personalizedGreeting,
+      text: diwaliGreeting,
       isUser: false,
       timestamp: new Date()
     }]);
