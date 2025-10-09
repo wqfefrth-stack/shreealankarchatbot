@@ -139,72 +139,94 @@ const Index = () => {
     initializeMessages();
   }, [initializeMessages]);
 
-  // Play welcome sound when chat becomes active
+  // Play welcome sound and fireworks when chat becomes active
   useEffect(() => {
     if (!showNameSelector && !showLoading && !showLanguageSelector && !playedWelcomeRef.current) {
-      // Speak welcome message using Web Speech API with female voice
+      // Fireworks animation
+      const createFireworks = () => {
+        const container = document.createElement('div');
+        container.className = 'fireworks';
+        document.body.appendChild(container);
+
+        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#ff9ff3'];
+        const positions = [
+          { x: 20, y: 30 },
+          { x: 50, y: 20 },
+          { x: 80, y: 35 }
+        ];
+
+        positions.forEach((pos, index) => {
+          setTimeout(() => {
+            for (let i = 0; i < 30; i++) {
+              const particle = document.createElement('div');
+              particle.className = 'firework';
+              particle.style.left = `${pos.x}%`;
+              particle.style.top = `${pos.y}%`;
+              particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+              
+              const angle = (Math.PI * 2 * i) / 30;
+              const velocity = 50 + Math.random() * 50;
+              particle.style.setProperty('--tx', `${Math.cos(angle) * velocity}px`);
+              particle.style.setProperty('--ty', `${Math.sin(angle) * velocity}px`);
+              
+              container.appendChild(particle);
+            }
+          }, index * 200);
+        });
+
+        setTimeout(() => {
+          container.remove();
+        }, 2000);
+      };
+
+      createFireworks();
+
+      // Speak welcome message
       const speakWelcome = () => {
         try {
           if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance('Welcome to Shree Alankar');
+            const isMarathi = t('language') === 'marathi';
+            const welcomeText = isMarathi ? 'श्री अलंकार मध्ये आपले स्वागत आहे' : 'Welcome to Shree Alankar';
+            
+            const utterance = new SpeechSynthesisUtterance(welcomeText);
             utterance.rate = 0.8;
             utterance.pitch = 1.2;
             utterance.volume = 0.9;
+            utterance.lang = isMarathi ? 'mr-IN' : 'en-US';
             
-            // Function to find best female voice
-            const findFemaleVoice = () => {
+            const findBestVoice = () => {
               const voices = speechSynthesis.getVoices();
               
-              // Priority list for female voices
+              if (isMarathi) {
+                const marathiVoice = voices.find(v => v.lang.startsWith('mr'));
+                if (marathiVoice) return marathiVoice;
+              }
+              
               const femaleVoiceNames = [
-                'microsoft zira - english (united states)',
-                'google us english female',
-                'female',
-                'woman',
-                'alice',
-                'samantha',
-                'victoria',
-                'karen',
-                'moira',
-                'fiona',
-                'susan',
-                'allison',
-                'ava',
-                'serena'
+                'microsoft zira', 'google us english female', 'female', 'woman',
+                'alice', 'samantha', 'victoria', 'karen', 'moira', 'fiona'
               ];
               
-              // First try to find by name
-              for (const femaleName of femaleVoiceNames) {
-                const voice = voices.find(v => 
-                  v.name.toLowerCase().includes(femaleName.toLowerCase())
-                );
+              for (const name of femaleVoiceNames) {
+                const voice = voices.find(v => v.name.toLowerCase().includes(name));
                 if (voice) return voice;
               }
               
-              // Then try to find by language and assume female if available
-              const englishVoices = voices.filter(v => 
-                v.lang.startsWith('en') && !v.name.toLowerCase().includes('male')
-              );
-              
-              // Return the second english voice (often female) or first available
-              return englishVoices[1] || englishVoices[0] || voices[0];
+              return voices[0];
             };
             
-            // Set the best female voice
-            const femaleVoice = findFemaleVoice();
-            if (femaleVoice) {
-              utterance.voice = femaleVoice;
-              console.log('Using voice:', femaleVoice.name);
+            const voice = findBestVoice();
+            if (voice) {
+              utterance.voice = voice;
             }
             
             speechSynthesis.speak(utterance);
           }
         } catch (error) {
-          console.log('Welcome speech could not be played:', error);
+          console.log('Welcome speech error:', error);
         }
       };
       
-      // Wait for voices to be loaded
       if (speechSynthesis.getVoices().length > 0) {
         setTimeout(speakWelcome, 500);
       } else {
@@ -215,7 +237,7 @@ const Index = () => {
       
       playedWelcomeRef.current = true;
     }
-  }, [showNameSelector, showLoading, showLanguageSelector]);
+  }, [showNameSelector, showLoading, showLanguageSelector, t]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -619,7 +641,10 @@ const Index = () => {
             <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar" className="w-7 h-7 object-contain" />
             <div>
               <h1 className="text-lg font-medium text-foreground">Shree Alankar</h1>
-              <p className="text-xs text-muted-foreground">AI Assistant for Jewelry Services</p>
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                AI Assistant for Jewelry Services
+                <span className="akashkandil">🪔</span>
+              </p>
             </div>
           </div>
           
