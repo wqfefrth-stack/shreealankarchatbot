@@ -177,7 +177,7 @@ const Index = () => {
 
         setTimeout(() => {
           container.remove();
-        }, 5000);
+        }, 7000);
       };
 
       createFireworks();
