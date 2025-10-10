@@ -28,6 +28,7 @@ const translations = {
     'chat.quickQuestions': '💡 Quick Questions - Click to ask:',
     'chat.greeting': '🙏 Namaste! Welcome to Shree Alankar - Your trusted jewelry partner since 1998. How may I assist you today?',
     'chat.hello': '🙏 Hello! Welcome to Shree Alankar! I\'m here to help you with all your jewelry needs. Please feel free to ask any questions or select from the quick questions below.',
+    'chat.diwali': '🪔✨ **Happy Diwali!** ✨🪔\n\nWarm Diwali wishes from Shree Alankar Team! {name}, may this festival of lights bring prosperity and joy to you and your family! 🎇\n\nHow can we assist you today?',
     
     // Questions
     'question.hours': 'What are your business hours?',
@@ -94,6 +95,7 @@ const translations = {
     'chat.quickQuestions': '💡 त्वरित प्रश्न - विचारण्यासाठी क्लिक करा:',
     'chat.greeting': '🙏 नमस्कार! श्री अलंकारमध्ये आपले स्वागत - १९९८ पासून आपला विश्वसनीय दागिने भागीदार. आज मी आपली कशी मदत करू शकतो?',
     'chat.hello': '🙏 नमस्कार! श्री अलंकारमध्ये आपले स्वागत! मी आपल्या सर्व दागिन्यांच्या गरजांमध्ये मदत करण्यासाठी येथे आहे. कृपया कोणतेही प्रश्न विचारण्यास मोकळ्या मनाने किंवा खालील त्वरित प्रश्न निवडा.',
+    'chat.diwali': '🪔✨ **दिवाळीच्या हार्दिक शुभेच्छा!** ✨🪔\n\nश्री अलंकार टीमच्या वतीने {name} जी/साहेब, तुम्हाला आणि तुमच्या कुटुंबाला दिवाळीच्या हार्दिक शुभेच्छा! 🎇\n\nआपल्या सेवेत सदैव तत्पर आहोत. आम्ही आपली कशी मदत करू शकतो?',
     
     // Questions
     'question.hours': 'आपले व्यवसायिक वेळा काय आहेत?',

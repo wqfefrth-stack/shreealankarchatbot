@@ -109,9 +109,7 @@ const Index = () => {
 
   const initializeMessages = useCallback(() => {
     if (customerName && !showNameSelector && !showLanguageSelector && !showLoading) {
-      const diwaliGreeting = t('language') === 'marathi' 
-        ? `🪔✨ **दिवाळीच्या हार्दिक शुभेच्छा!** ✨🪔\n\nश्री अलंकार टीमच्या वतीने ${customerName} जी/साहेब, तुम्हाला आणि तुमच्या कुटुंबाला दिवाळीच्या हार्दिक शुभेच्छा! 🎇\n\nआपल्या सेवेत सदैव तत्पर आहोत. आम्ही आपली कशी मदत करू शकतो?`
-        : `🪔✨ **Happy Diwali!** ✨🪔\n\nWarm Diwali wishes from Shree Alankar Team! ${customerName}, may this festival of lights bring prosperity and joy to you and your family! 🎇\n\nHow can we assist you today?`;
+      const diwaliGreeting = t('chat.diwali').replace('{name}', customerName);
       
       setMessages([{
         id: 1,
@@ -142,6 +140,9 @@ const Index = () => {
   // Play welcome sound and fireworks when chat becomes active
   useEffect(() => {
     if (!showNameSelector && !showLoading && !showLanguageSelector && !playedWelcomeRef.current) {
+      // Play firework sound
+      play('click');
+      
       // Fireworks animation
       const createFireworks = () => {
         const container = document.createElement('div');
@@ -176,7 +177,7 @@ const Index = () => {
 
         setTimeout(() => {
           container.remove();
-        }, 2000);
+        }, 5000);
       };
 
       createFireworks();
@@ -416,9 +417,7 @@ const Index = () => {
   };
 
   const handleClearChat = () => {
-    const diwaliGreeting = t('language') === 'marathi' 
-      ? `🪔✨ **दिवाळीच्या हार्दिक शुभेच्छा!** ✨🪔\n\nश्री अलंकार टीमच्या वतीने ${customerName} जी/साहेब, तुम्हाला आणि तुमच्या कुटुंबाला दिवाळीच्या हार्दिक शुभेच्छा! 🎇\n\nआपल्या सेवेत सदैव तत्पर आहोत. आम्ही आपली कशी मदत करू शकतो?`
-      : `🪔✨ **Happy Diwali!** ✨🪔\n\nWarm Diwali wishes from Shree Alankar Team! ${customerName}, may this festival of lights bring prosperity and joy to you and your family! 🎇\n\nHow can we assist you today?`;
+    const diwaliGreeting = t('chat.diwali').replace('{name}', customerName);
     
     setMessages([{
       id: 1,
