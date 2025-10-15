@@ -308,7 +308,7 @@ ${customerName ? `- Always address ${customerName} warmly by name as an old frie
           temperature: 0.4,
           topP: 0.9,
           topK: 64,
-          maxOutputTokens: 800,
+          maxOutputTokens: 2048,
         },
         safetySettings: [
           {
@@ -376,6 +376,11 @@ ${customerName ? `- Always address ${customerName} warmly by name as an old frie
         aiResponse = language === 'marathi'
           ? `${customerName ? `${customerName} जी, ` : ''}मला तुमच्या प्रश्नाचे उत्तर द्यायचे आहे! कृपया आपला प्रश्न वेगळ्या पद्धतीने विचारा किंवा आमच्याशी थेट संपर्क साधा: +91 9921612155`
           : `${customerName ? `${customerName}, ` : ''}I want to help you! Please rephrase your question or contact us directly: +91 9921612155`;
+      } else if (candidate.finishReason === 'MAX_TOKENS') {
+        console.log('Response cut off due to MAX_TOKENS');
+        aiResponse = language === 'marathi'
+          ? `${customerName ? `${customerName} जी, ` : ''}माफ करा, माझ्या उत्तराची लांबी मर्यादा ओलांडली. कृपया थोडा सोपा प्रश्न विचारा किंवा थेट संपर्क साधा: +91 9921612155`
+          : `${customerName ? `${customerName}, ` : ''}Sorry, my response was too long. Please ask a simpler question or contact us directly: +91 9921612155`;
       } else if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
         aiResponse = candidate.content.parts[0].text;
       }
