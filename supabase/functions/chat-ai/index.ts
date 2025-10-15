@@ -313,19 +313,19 @@ ${customerName ? `- Always address ${customerName} warmly by name as an old frie
         safetySettings: [
           {
             category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            threshold: "BLOCK_ONLY_HIGH"
           },
           {
             category: "HARM_CATEGORY_HATE_SPEECH",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            threshold: "BLOCK_ONLY_HIGH"
           },
           {
             category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            threshold: "BLOCK_ONLY_HIGH"
           },
           {
             category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            threshold: "BLOCK_ONLY_HIGH"
           }
         ]
       }),
@@ -362,14 +362,21 @@ ${customerName ? `- Always address ${customerName} warmly by name as an old frie
     }
 
     const data = await response.json();
-    console.log('Gemini API response received successfully');
+    console.log('Gemini API full response:', JSON.stringify(data));
     
     // Extract response
     let aiResponse = '';
     
     if (data.candidates && data.candidates.length > 0) {
       const candidate = data.candidates[0];
-      if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+      
+      // Check for safety blocks
+      if (candidate.finishReason === 'SAFETY') {
+        console.log('Response blocked by safety filters');
+        aiResponse = language === 'marathi'
+          ? `${customerName ? `${customerName} जी, ` : ''}मला तुमच्या प्रश्नाचे उत्तर द्यायचे आहे! कृपया आपला प्रश्न वेगळ्या पद्धतीने विचारा किंवा आमच्याशी थेट संपर्क साधा: +91 9921612155`
+          : `${customerName ? `${customerName}, ` : ''}I want to help you! Please rephrase your question or contact us directly: +91 9921612155`;
+      } else if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
         aiResponse = candidate.content.parts[0].text;
       }
     }
@@ -377,6 +384,7 @@ ${customerName ? `- Always address ${customerName} warmly by name as an old frie
     // Fallback if no response
     if (!aiResponse) {
       console.log('No valid response from Gemini, using fallback');
+      console.log('Response data structure:', JSON.stringify(data, null, 2));
       aiResponse = language === 'marathi' 
         ? `${customerName ? `${customerName} जी, ` : ''}माफ करा, मी तुमच्या प्रश्नाचे योग्य उत्तर देऊ शकत नाही. कृपया आमच्याशी थेट संपर्क साधा:
 
