@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, MessageCircle, RotateCcw, Phone, ExternalLink, Volume2, VolumeX } from 'lucide-react';
+import { Send, MessageCircle, RotateCcw, Phone, ExternalLink, Volume2, VolumeX, Speaker } from 'lucide-react';
 import '@fontsource/poppins/400.css';
 import '@fontsource/poppins/500.css';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import SpeechToText from '@/components/SpeechToText';
 import { useRates } from '@/hooks/useRates';
 import { useAIChat } from '@/hooks/useAIChat';
 import { useSound } from '@/hooks/useSound';
+import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
@@ -68,6 +69,7 @@ const Index = () => {
   const { rates, isLoading: ratesLoading, refetchRates } = useRates();
   const { sendAIMessage, isLoading: aiLoading, conversationHistory, clearConversationHistory } = useAIChat();
   const { enabled: soundEnabled, setEnabled: setSoundEnabled, play } = useSound();
+  const { speak, stop, isSpeaking, currentMessageId, isSupported: ttsSupported } = useTextToSpeech();
   
   // ALL STATE HOOKS
   const [showNameSelector, setShowNameSelector] = useState(true);
@@ -85,6 +87,8 @@ const Index = () => {
   const [showPhoneForm, setShowPhoneForm] = useState(false);
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
   const [callIssue, setCallIssue] = useState('');
+  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [speakingMessageId, setSpeakingMessageId] = useState<number | null>(null);
   
   // ALL REF HOOKS
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -261,6 +265,13 @@ const Index = () => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
+
+  // Sync speaking state with TTS
+  useEffect(() => {
+    if (!isSpeaking) {
+      setSpeakingMessageId(null);
+    }
+  }, [isSpeaking]);
 
   // NOW WE CAN DO CONDITIONAL RENDERING AFTER ALL HOOKS ARE DECLARED
   if (showOwnerDashboard) {
@@ -458,6 +469,13 @@ const Index = () => {
 
     // Play receive sound when bot finishes typing
     play('receive');
+    
+    // Auto-speak bot response if enabled
+    if (autoSpeak && ttsSupported) {
+      setSpeakingMessageId(messageId);
+      const lang = t('language') === 'marathi' ? 'mr-IN' : 'en-US';
+      speak(text, { lang });
+    }
   };
 
   const handleSendMessage = async (text: string) => {
@@ -648,6 +666,23 @@ const Index = () => {
           </div>
           
           <div className="flex items-center space-x-2">
+            {/* Auto-Speak Toggle Button */}
+            {ttsSupported && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setAutoSpeak(!autoSpeak)}
+                className="h-8 w-8 opacity-60 hover:opacity-100 transition-opacity"
+                title={autoSpeak ? "Turn auto-speak off" : "Turn auto-speak on"}
+              >
+                {autoSpeak ? (
+                  <Speaker className="w-4 h-4" />
+                ) : (
+                  <VolumeX className="w-4 h-4" />
+                )}
+              </Button>
+            )}
+            
             {/* Sound Toggle Button */}
             <Button
               variant="ghost"
@@ -682,9 +717,9 @@ const Index = () => {
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-full px-4 py-4" ref={scrollAreaRef}>
             <div className="space-y-4 min-h-[60vh] flex flex-col justify-end">
-              {messages.map((message) => (
+            {messages.map((message) => (
                 <div key={message.id} className="flex flex-col space-y-2 animate-fade-in">
-                  <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} items-end gap-2`}>
                     <div className={`max-w-[75%] rounded-2xl px-4 py-3 transform transition-all duration-300 ${
                       message.isUser 
                         ? 'bg-primary text-primary-foreground ml-auto' 
@@ -698,6 +733,30 @@ const Index = () => {
                         )}
                       </div>
                     </div>
+                    {/* TTS Speaker Button for bot messages */}
+                    {!message.isUser && !message.isTyping && ttsSupported && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={`h-8 w-8 opacity-50 hover:opacity-100 transition-opacity ${
+                          speakingMessageId === message.id ? 'text-primary animate-pulse' : ''
+                        }`}
+                        onClick={() => {
+                          if (speakingMessageId === message.id) {
+                            stop();
+                            setSpeakingMessageId(null);
+                          } else {
+                            stop();
+                            setSpeakingMessageId(message.id);
+                            const lang = t('language') === 'marathi' ? 'mr-IN' : 'en-US';
+                            speak(message.text, { lang });
+                          }
+                        }}
+                        title={speakingMessageId === message.id ? "Stop speaking" : "Read message aloud"}
+                      >
+                        <Speaker className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
