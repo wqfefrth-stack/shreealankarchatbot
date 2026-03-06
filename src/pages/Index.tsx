@@ -113,11 +113,11 @@ const Index = () => {
 
   const initializeMessages = useCallback(() => {
     if (customerName && !showNameSelector && !showLanguageSelector && !showLoading) {
-      const diwaliGreeting = t('chat.diwali').replace('{name}', customerName);
+      const greeting = t('chat.hello');
       
       setMessages([{
         id: 1,
-        text: diwaliGreeting,
+        text: greeting,
         isUser: false,
         timestamp: new Date()
       }]);
