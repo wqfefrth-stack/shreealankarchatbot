@@ -113,11 +113,11 @@ const Index = () => {
 
   const initializeMessages = useCallback(() => {
     if (customerName && !showNameSelector && !showLanguageSelector && !showLoading) {
-      const diwaliGreeting = t('chat.diwali').replace('{name}', customerName);
+      const greeting = t('chat.hello');
       
       setMessages([{
         id: 1,
-        text: diwaliGreeting,
+        text: greeting,
         isUser: false,
         timestamp: new Date()
       }]);
@@ -141,50 +141,10 @@ const Index = () => {
     initializeMessages();
   }, [initializeMessages]);
 
-  // Play welcome sound and fireworks when chat becomes active
+  // Play welcome sound when chat becomes active
   useEffect(() => {
     if (!showNameSelector && !showLoading && !showLanguageSelector && !playedWelcomeRef.current) {
-      // Play firework sound
       play('click');
-      
-      // Fireworks animation
-      const createFireworks = () => {
-        const container = document.createElement('div');
-        container.className = 'fireworks';
-        document.body.appendChild(container);
-
-        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#ff9ff3'];
-        const positions = [
-          { x: 20, y: 30 },
-          { x: 50, y: 20 },
-          { x: 80, y: 35 }
-        ];
-
-        positions.forEach((pos, index) => {
-          setTimeout(() => {
-            for (let i = 0; i < 30; i++) {
-              const particle = document.createElement('div');
-              particle.className = 'firework';
-              particle.style.left = `${pos.x}%`;
-              particle.style.top = `${pos.y}%`;
-              particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-              
-              const angle = (Math.PI * 2 * i) / 30;
-              const velocity = 50 + Math.random() * 50;
-              particle.style.setProperty('--tx', `${Math.cos(angle) * velocity}px`);
-              particle.style.setProperty('--ty', `${Math.sin(angle) * velocity}px`);
-              
-              container.appendChild(particle);
-            }
-          }, index * 200);
-        });
-
-        setTimeout(() => {
-          container.remove();
-        }, 7000);
-      };
-
-      createFireworks();
 
       // Speak welcome message
       const speakWelcome = () => {
@@ -428,11 +388,11 @@ const Index = () => {
   };
 
   const handleClearChat = () => {
-    const diwaliGreeting = t('chat.diwali').replace('{name}', customerName);
+    const greeting = t('chat.hello');
     
     setMessages([{
       id: 1,
-      text: diwaliGreeting,
+      text: greeting,
       isUser: false,
       timestamp: new Date()
     }]);
@@ -658,9 +618,8 @@ const Index = () => {
             <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar" className="w-7 h-7 object-contain" />
             <div>
               <h1 className="text-lg font-medium text-foreground">Shree Alankar</h1>
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <p className="text-xs text-muted-foreground">
                 AI Assistant for Jewelry Services
-                <span className="akashkandil">🪔</span>
               </p>
             </div>
           </div>
