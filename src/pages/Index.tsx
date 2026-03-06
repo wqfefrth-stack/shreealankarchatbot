@@ -618,9 +618,8 @@ const Index = () => {
             <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar" className="w-7 h-7 object-contain" />
             <div>
               <h1 className="text-lg font-medium text-foreground">Shree Alankar</h1>
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <p className="text-xs text-muted-foreground">
                 AI Assistant for Jewelry Services
-                <span className="akashkandil">🪔</span>
               </p>
             </div>
           </div>
