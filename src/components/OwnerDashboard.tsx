@@ -107,8 +107,7 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
 
   const deleteChat = async (chatId: string) => {
     try {
-      const { error } = await supabase
-        .from('chat_logs')
+      const { error } = await (supabase.from as any)('chat_logs')
         .delete()
         .eq('id', chatId);
 
