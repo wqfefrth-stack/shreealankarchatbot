@@ -531,7 +531,7 @@ const Index = () => {
 
     // Save chat to database
     try {
-      await supabase.from('chat_logs').insert({
+      await (supabase.from as any)('chat_logs').insert({
         customer_name: customerName || 'Anonymous',
         whatsapp_no: whatsappNo || '',
         message: text,
