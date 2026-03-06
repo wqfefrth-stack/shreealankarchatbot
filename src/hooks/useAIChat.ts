@@ -78,7 +78,7 @@ export const useAIChat = () => {
       
       // Save chat to database
       try {
-        await supabase.from('chat_logs').insert({
+      await (supabase.from as any)('chat_logs').insert({
           customer_name: customerName || 'Anonymous',
           message: message,
           response: aiData.response,

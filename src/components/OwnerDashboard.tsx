@@ -139,8 +139,7 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
 
   const toggleSeenStatus = async (chatId: string, currentSeen: boolean) => {
     try {
-      const { error } = await supabase
-        .from('chat_logs')
+      const { error } = await (supabase.from as any)('chat_logs')
         .update({ seen: !currentSeen })
         .eq('id', chatId);
 
