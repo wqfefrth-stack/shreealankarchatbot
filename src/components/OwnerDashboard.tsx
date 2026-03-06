@@ -45,8 +45,7 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onLogout }) => {
       const fortyEightHoursAgo = new Date();
       fortyEightHoursAgo.setHours(fortyEightHoursAgo.getHours() - 48);
 
-      const { data, error } = await supabase
-        .from('chat_logs')
+      const { data, error } = await (supabase.from as any)('chat_logs')
         .select('*')
         .gte('created_at', fortyEightHoursAgo.toISOString())
         .order('created_at', { ascending: false });
