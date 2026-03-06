@@ -388,11 +388,11 @@ const Index = () => {
   };
 
   const handleClearChat = () => {
-    const diwaliGreeting = t('chat.diwali').replace('{name}', customerName);
+    const greeting = t('chat.hello');
     
     setMessages([{
       id: 1,
-      text: diwaliGreeting,
+      text: greeting,
       isUser: false,
       timestamp: new Date()
     }]);
