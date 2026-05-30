@@ -87,7 +87,7 @@ const Index = () => {
   const [showPhoneForm, setShowPhoneForm] = useState(false);
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
   const [callIssue, setCallIssue] = useState('');
-  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [autoSpeak] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState<number | null>(null);
   
   // ALL REF HOOKS
