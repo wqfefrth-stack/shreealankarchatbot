@@ -1,102 +1,83 @@
-
 import React, { useEffect, useState } from 'react';
-import { Sparkles } from 'lucide-react';
 
 interface LoadingAnimationProps {
   onComplete: () => void;
 }
 
+const loadingTexts = [
+  'Preparing your experience',
+  'श्री अलंकार',
+  'Fine Jewelry · Since 1998',
+  'Welcome · स्वागत',
+];
+
 const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
-  const [currentText, setCurrentText] = useState('Loading...');
-
-  const loadingTexts = [
-    'Loading...',
-    'श्री अलंकार',
-    'Fine Jewelry Since 1998',
-    '१९९८ पासून उत्कृष्ट दागिने',
-    'Welcome / स्वागत'
-  ];
+  const [textIdx, setTextIdx] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(onComplete, 500);
+    const i = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 100) {
+          clearInterval(i);
+          setTimeout(onComplete, 450);
           return 100;
         }
-        return prev + 2;
+        return p + 2;
       });
-    }, 50);
-
-    return () => clearInterval(interval);
+    }, 45);
+    return () => clearInterval(i);
   }, [onComplete]);
 
   useEffect(() => {
-    const textInterval = setInterval(() => {
-      setCurrentText(prev => {
-        const currentIndex = loadingTexts.indexOf(prev);
-        const nextIndex = (currentIndex + 1) % loadingTexts.length;
-        return loadingTexts[nextIndex];
-      });
-    }, 800);
-
-    return () => clearInterval(textInterval);
+    const t = setInterval(() => setTextIdx((i) => (i + 1) % loadingTexts.length), 1100);
+    return () => clearInterval(t);
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 z-50 flex items-center justify-center">
-      <div className="text-center text-white">
-        {/* Logo */}
-        <div className="mb-8 animate-pulse">
-          <img 
-            src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" 
-            alt="Shree Alankar Logo" 
-            className="w-32 h-32 mx-auto object-contain"
-          />
-        </div>
-        
-        {/* Company Name */}
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-6xl font-bold mb-2 animate-fade-in">
-            श्री अलंकार
-          </h1>
-          <h2 className="text-2xl md:text-3xl font-semibold opacity-90">
-            Shree Alankar
-          </h2>
-          <p className="text-lg md:text-xl opacity-75 mt-2">
-            Fine Jewelry Since 1998
-          </p>
-        </div>
+    <div className="fixed inset-0 z-50 gradient-backdrop flex items-center justify-center overflow-hidden">
+      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-primary/20 blur-3xl animate-float" />
+      <div
+        className="absolute -bottom-40 -right-32 w-[28rem] h-[28rem] rounded-full bg-primary-glow/20 blur-3xl animate-float"
+        style={{ animationDelay: '1.5s' }}
+      />
 
-        {/* Sparkles Animation */}
-        <div className="mb-8 relative">
-          <Sparkles className="w-12 h-12 mx-auto animate-spin text-amber-300" />
-          <div className="absolute -top-2 -right-2">
-            <Sparkles className="w-6 h-6 animate-pulse text-yellow-300" />
-          </div>
-          <div className="absolute -bottom-2 -left-2">
-            <Sparkles className="w-4 h-4 animate-bounce text-amber-200" />
+      <div className="relative text-center px-6 max-w-md w-full">
+        <div className="relative mx-auto mb-10 w-28 h-28">
+          <div className="absolute inset-0 rounded-full luxury-gradient opacity-30 blur-2xl animate-glow" />
+          <div className="relative w-28 h-28 rounded-full glass-panel flex items-center justify-center shadow-elegant animate-float">
+            <img
+              src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png"
+              alt="Shree Alankar"
+              className="w-16 h-16 object-contain"
+            />
           </div>
         </div>
 
-        {/* Loading Text */}
-        <div className="mb-8">
-          <p className="text-xl md:text-2xl font-medium animate-pulse">
-            {currentText}
-          </p>
-        </div>
+        <h1 className="font-display text-5xl md:text-6xl font-semibold mb-2 text-luxury animate-fade-up">
+          श्री अलंकार
+        </h1>
+        <p
+          className="text-xs uppercase tracking-[0.35em] text-muted-foreground mb-12 animate-fade-up"
+          style={{ animationDelay: '0.1s' }}
+        >
+          Shree Alankar · Est. 1998
+        </p>
 
-        {/* Progress Bar */}
-        <div className="w-80 max-w-full mx-auto">
-          <div className="bg-amber-700 h-2 rounded-full overflow-hidden">
-            <div 
-              className="bg-gradient-to-r from-yellow-300 to-amber-300 h-full transition-all duration-300 ease-out"
+        <p key={textIdx} className="text-base text-foreground/80 mb-8 animate-fade-up min-h-[1.5rem]">
+          {loadingTexts[textIdx]}
+        </p>
+
+        <div className="w-full max-w-xs mx-auto">
+          <div className="h-[3px] rounded-full bg-border/60 overflow-hidden">
+            <div
+              className="h-full luxury-gradient transition-all duration-300 ease-out rounded-full"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-sm opacity-75 mt-2">{progress}%</p>
+          <p className="mt-3 text-xs tracking-widest text-muted-foreground tabular-nums">
+            {String(progress).padStart(3, '0')}%
+          </p>
         </div>
       </div>
     </div>
