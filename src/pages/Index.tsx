@@ -658,65 +658,74 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Chat Container */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full pt-20 pb-32 animate-fade-up">
+      {/* Chat Container — header & input are fixed; only this middle area scrolls */}
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full pt-[72px] pb-[120px] animate-fade-up">
         <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full px-4 py-4 chat-scroll" ref={scrollAreaRef}>
-            <div className="space-y-4 min-h-[60vh] flex flex-col justify-end">
-            {messages.map((message) => (
-                <div key={message.id} className="flex flex-col space-y-1 animate-message-in">
-                  <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} items-end gap-2`}>
-                    {!message.isUser && (
-                      <div className="w-8 h-8 rounded-full luxury-gradient flex items-center justify-center shadow-soft shrink-0 mb-1">
+          <ScrollArea className="h-full px-3 sm:px-4 py-4 chat-scroll" ref={scrollAreaRef}>
+            <div className="space-y-2.5 min-h-[60vh] flex flex-col justify-end">
+            {messages.map((message, idx) => {
+              const prev = messages[idx - 1];
+              const isFirstOfGroup = !prev || prev.isUser !== message.isUser;
+              return (
+                <div
+                  key={message.id}
+                  className={`flex ${message.isUser ? 'justify-end pl-10' : 'justify-start pr-10'} items-end gap-2 animate-message-in ${isFirstOfGroup ? 'mt-3' : 'mt-0.5'}`}
+                >
+                  {!message.isUser && (
+                    isFirstOfGroup ? (
+                      <div className="w-8 h-8 rounded-full luxury-gradient flex items-center justify-center shadow-soft shrink-0">
                         <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="" className="w-5 h-5 object-contain" />
                       </div>
-                    )}
-                    <div className={`max-w-[78%] px-4 py-3 transition-all duration-300 shadow-soft ${
-                      message.isUser
-                        ? 'luxury-gradient text-primary-foreground rounded-2xl rounded-br-md'
-                        : 'bg-card text-card-foreground border border-border/50 rounded-2xl rounded-bl-md'
-                    }`}>
-                      <div className="chat-font whitespace-pre-wrap break-words text-[15px] leading-relaxed">
-                        {message.isTyping ? (
-                          <span className="inline-flex items-center gap-2">
-                            <span className="shimmer-text font-medium">{message.text}</span>
-                            <span className="inline-flex items-end pb-0.5">
-                              <span className="typing-dot" />
-                              <span className="typing-dot" />
-                              <span className="typing-dot" />
-                            </span>
+                    ) : (
+                      <div className="w-8 shrink-0" aria-hidden />
+                    )
+                  )}
+                  <div className={`max-w-[80%] sm:max-w-[72%] px-4 py-2.5 shadow-soft ${
+                    message.isUser
+                      ? `luxury-gradient text-primary-foreground rounded-2xl ${isFirstOfGroup ? 'rounded-br-sm' : 'rounded-br-sm rounded-tr-2xl'}`
+                      : `bg-card text-card-foreground border border-border/50 rounded-2xl ${isFirstOfGroup ? 'rounded-bl-sm' : 'rounded-bl-sm rounded-tl-2xl'}`
+                  }`}>
+                    <div className="chat-font whitespace-pre-wrap break-words text-[15px] leading-[1.55]">
+                      {message.isTyping ? (
+                        <span className="inline-flex items-center gap-2">
+                          <span className="shimmer-text font-medium">{message.text}</span>
+                          <span className="inline-flex items-end pb-0.5">
+                            <span className="typing-dot" />
+                            <span className="typing-dot" />
+                            <span className="typing-dot" />
                           </span>
-                        ) : (
-                          renderTextWithLinks(message.text)
-                        )}
-                      </div>
+                        </span>
+                      ) : (
+                        renderTextWithLinks(message.text)
+                      )}
                     </div>
-                    {!message.isUser && !message.isTyping && ttsSupported && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={`h-8 w-8 rounded-full opacity-40 hover:opacity-100 hover:bg-accent transition-all ${
-                          speakingMessageId === message.id ? 'text-primary opacity-100 animate-pulse' : ''
-                        }`}
-                        onClick={() => {
-                          if (speakingMessageId === message.id) {
-                            stop();
-                            setSpeakingMessageId(null);
-                          } else {
-                            stop();
-                            setSpeakingMessageId(message.id);
-                            const lang = t('language') === 'marathi' ? 'mr-IN' : 'en-US';
-                            speak(message.text, { lang });
-                          }
-                        }}
-                        title={speakingMessageId === message.id ? "Stop speaking" : "Read message aloud"}
-                      >
-                        <Speaker className="w-4 h-4" />
-                      </Button>
-                    )}
                   </div>
+                  {!message.isUser && !message.isTyping && ttsSupported && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={`h-8 w-8 rounded-full shrink-0 opacity-40 hover:opacity-100 hover:bg-accent transition-all ${
+                        speakingMessageId === message.id ? 'text-primary opacity-100 animate-pulse' : ''
+                      }`}
+                      onClick={() => {
+                        if (speakingMessageId === message.id) {
+                          stop();
+                          setSpeakingMessageId(null);
+                        } else {
+                          stop();
+                          setSpeakingMessageId(message.id);
+                          const lang = t('language') === 'marathi' ? 'mr-IN' : 'en-US';
+                          speak(message.text, { lang });
+                        }
+                      }}
+                      title={speakingMessageId === message.id ? "Stop speaking" : "Tap to listen"}
+                    >
+                      <Speaker className="w-4 h-4" />
+                    </Button>
+                  )}
                 </div>
-              ))}
+              );
+            })}
             </div>
           </ScrollArea>
         </div>
