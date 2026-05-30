@@ -868,10 +868,10 @@ const Index = () => {
           </div>
         )}
 
-        {/* Fixed Input Area - Always Visible */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border/10">
+        {/* Fixed Input Area */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-border/40">
           <div className="max-w-4xl mx-auto p-4">
-            <div className="relative flex items-center space-x-2 bg-muted/30 rounded-3xl p-3 border border-border/20">
+            <div className="relative flex items-center gap-2 bg-card/80 rounded-2xl px-3 py-2 border border-border/60 shadow-soft focus-within:border-primary/60 focus-within:shadow-elegant transition-all duration-300">
               <Input
                 type="text"
                 placeholder={isMessageLoading ? t('chat.thinking') : t('chat.placeholder')}
@@ -879,29 +879,28 @@ const Index = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage(inputText)}
                 disabled={isMessageLoading}
-                className="flex-1 border-0 bg-transparent focus:ring-0 focus:ring-offset-0 placeholder:text-muted-foreground/60 text-base"
+                className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60 text-base h-11"
               />
               <SpeechToText onTranscription={setInputText} />
               <Button
                 onClick={() => handleSendMessage(inputText)}
                 disabled={!inputText.trim() || isMessageLoading}
                 size="icon"
-                className="rounded-full h-9 w-9 bg-primary hover:bg-primary/90"
+                className="rounded-full h-10 w-10 luxury-gradient text-primary-foreground shadow-soft hover:shadow-elegant hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 transition-all"
               >
                 <Send className="w-4 h-4" />
               </Button>
             </div>
-            
-            {/* Action buttons - Only WhatsApp */}
-            <div className="flex justify-center mt-4">
+
+            <div className="flex justify-center mt-3">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleWhatsAppClick}
-                className="text-green-600 hover:text-green-700 hover-scale transition-transform duration-200"
+                className="text-xs text-muted-foreground hover:text-primary hover:bg-accent rounded-full transition-all"
               >
-                <Phone className="w-4 h-4 mr-2" />
-                WhatsApp
+                <Phone className="w-3.5 h-3.5 mr-2" />
+                Chat on WhatsApp
               </Button>
             </div>
           </div>
