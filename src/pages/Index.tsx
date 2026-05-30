@@ -610,59 +610,58 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Fixed Header - Always Visible */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm p-3 border-b border-border/10">
-        <div className="flex items-center justify-between max-w-4xl mx-auto">
+    <div className="min-h-screen gradient-backdrop flex flex-col">
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-border/40">
+        <div className="flex items-center justify-between max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center space-x-3">
-            <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar" className="w-7 h-7 object-contain" />
+            <div className="relative w-10 h-10">
+              <div className="absolute inset-0 rounded-full luxury-gradient opacity-30 blur-md" />
+              <div className="relative w-10 h-10 rounded-full glass-panel flex items-center justify-center">
+                <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="Shree Alankar" className="w-7 h-7 object-contain" />
+              </div>
+            </div>
             <div>
-              <h1 className="text-lg font-medium text-foreground">Shree Alankar</h1>
-              <p className="text-xs text-muted-foreground">
-                AI Assistant for Jewelry Services
-              </p>
+              <h1 className="font-display text-xl font-semibold text-luxury leading-tight">Shree Alankar</h1>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">AI Jewelry Concierge</p>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-2">
-            {/* Auto-Speak Toggle Button */}
+
+          <div className="flex items-center space-x-1">
             {ttsSupported && (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setAutoSpeak(!autoSpeak)}
-                className="h-8 w-8 opacity-60 hover:opacity-100 transition-opacity"
+                className="h-9 w-9 rounded-full opacity-70 hover:opacity-100 hover:bg-accent transition-all"
                 title={autoSpeak ? "Turn auto-speak off" : "Turn auto-speak on"}
               >
-                {autoSpeak ? (
-                  <Speaker className="w-4 h-4" />
-                ) : (
-                  <VolumeX className="w-4 h-4" />
-                )}
+                {autoSpeak ? <Speaker className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
               </Button>
             )}
-            
-            {/* Sound Toggle Button */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="h-8 w-8 opacity-60 hover:opacity-100 transition-opacity"
+              className="h-9 w-9 rounded-full opacity-70 hover:opacity-100 hover:bg-accent transition-all"
               title={soundEnabled ? "Turn sound off" : "Turn sound on"}
             >
-              {soundEnabled ? (
-                <Volume2 className="w-4 h-4" />
-              ) : (
-                <VolumeX className="w-4 h-4" />
-              )}
+              {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </Button>
-            
-            {/* Owner Login Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleClearChat}
+              className="h-9 w-9 rounded-full opacity-70 hover:opacity-100 hover:bg-accent transition-all"
+              title="Clear chat"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setShowOwnerLogin(true)}
-              className="h-8 w-8 opacity-30 hover:opacity-100 transition-opacity"
+              className="h-9 w-9 rounded-full opacity-20 hover:opacity-100 transition-opacity"
             >
               <MessageCircle className="w-4 h-4" />
             </Button>
@@ -670,35 +669,45 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Chat Container with padding for fixed header and footer */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full pt-20 pb-32 animate-fade-in">
-        {/* Messages Area */}
+      {/* Chat Container */}
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full pt-20 pb-32 animate-fade-up">
         <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full px-4 py-4" ref={scrollAreaRef}>
+          <ScrollArea className="h-full px-4 py-4 chat-scroll" ref={scrollAreaRef}>
             <div className="space-y-4 min-h-[60vh] flex flex-col justify-end">
             {messages.map((message) => (
-                <div key={message.id} className="flex flex-col space-y-2 animate-fade-in">
+                <div key={message.id} className="flex flex-col space-y-1 animate-message-in">
                   <div className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} items-end gap-2`}>
-                    <div className={`max-w-[75%] rounded-2xl px-4 py-3 transform transition-all duration-300 ${
-                      message.isUser 
-                        ? 'bg-primary text-primary-foreground ml-auto' 
-                        : 'bg-muted text-foreground'
+                    {!message.isUser && (
+                      <div className="w-8 h-8 rounded-full luxury-gradient flex items-center justify-center shadow-soft shrink-0 mb-1">
+                        <img src="/lovable-uploads/df89ad8d-4e94-4d53-813b-4e057004190e.png" alt="" className="w-5 h-5 object-contain" />
+                      </div>
+                    )}
+                    <div className={`max-w-[78%] px-4 py-3 transition-all duration-300 shadow-soft ${
+                      message.isUser
+                        ? 'luxury-gradient text-primary-foreground rounded-2xl rounded-br-md'
+                        : 'bg-card text-card-foreground border border-border/50 rounded-2xl rounded-bl-md'
                     }`}>
-                      <div className="chat-font whitespace-pre-wrap break-words text-sm leading-relaxed">
+                      <div className="chat-font whitespace-pre-wrap break-words text-[15px] leading-relaxed">
                         {message.isTyping ? (
-                          <span className="thinking-dots">{message.text}</span>
+                          <span className="inline-flex items-center gap-2">
+                            <span className="shimmer-text font-medium">{message.text}</span>
+                            <span className="inline-flex items-end pb-0.5">
+                              <span className="typing-dot" />
+                              <span className="typing-dot" />
+                              <span className="typing-dot" />
+                            </span>
+                          </span>
                         ) : (
                           renderTextWithLinks(message.text)
                         )}
                       </div>
                     </div>
-                    {/* TTS Speaker Button for bot messages */}
                     {!message.isUser && !message.isTyping && ttsSupported && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className={`h-8 w-8 opacity-50 hover:opacity-100 transition-opacity ${
-                          speakingMessageId === message.id ? 'text-primary animate-pulse' : ''
+                        className={`h-8 w-8 rounded-full opacity-40 hover:opacity-100 hover:bg-accent transition-all ${
+                          speakingMessageId === message.id ? 'text-primary opacity-100 animate-pulse' : ''
                         }`}
                         onClick={() => {
                           if (speakingMessageId === message.id) {
