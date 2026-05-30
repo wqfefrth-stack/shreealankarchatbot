@@ -628,17 +628,6 @@ const Index = () => {
           </div>
 
           <div className="flex items-center space-x-1">
-            {ttsSupported && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setAutoSpeak(!autoSpeak)}
-                className="h-9 w-9 rounded-full opacity-70 hover:opacity-100 hover:bg-accent transition-all"
-                title={autoSpeak ? "Turn auto-speak off" : "Turn auto-speak on"}
-              >
-                {autoSpeak ? <Speaker className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-              </Button>
-            )}
             <Button
               variant="ghost"
               size="icon"
