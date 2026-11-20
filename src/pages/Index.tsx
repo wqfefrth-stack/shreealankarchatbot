@@ -610,7 +610,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen gradient-backdrop flex flex-col">
+    <div className="h-[100dvh] min-h-0 overflow-hidden overscroll-none gradient-backdrop flex flex-col">
       {/* Fixed Header */}
       <div className="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-border/40">
         <div className="flex items-center justify-between max-w-4xl mx-auto px-4 py-3">
@@ -659,8 +659,8 @@ const Index = () => {
       </div>
 
       {/* Chat Container — header & input are fixed; only this middle area scrolls */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full pt-[72px] pb-[120px] animate-fade-up">
-        <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col max-w-4xl mx-auto w-full pt-[72px] pb-[calc(144px+env(safe-area-inset-bottom))] animate-fade-up overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-hidden">
           <ScrollArea className="h-full px-3 sm:px-4 py-4 chat-scroll" ref={scrollAreaRef}>
             <div className="space-y-2.5 min-h-[60vh] flex flex-col justify-end">
             {messages.map((message, idx) => {
@@ -868,7 +868,7 @@ const Index = () => {
 
         {/* Fixed Input Area */}
         <div className="fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-border/40">
-          <div className="max-w-4xl mx-auto p-4">
+          <div className="max-w-4xl mx-auto p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
             <div className="relative flex items-center gap-2 bg-card/80 rounded-2xl px-3 py-2 border border-border/60 shadow-soft focus-within:border-primary/60 focus-within:shadow-elegant transition-all duration-300">
               <Input
                 type="text"
